@@ -2185,7 +2185,6 @@ function downloadScorePDF(){
     .foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}
     @media print{body{margin:20px}}
   </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head><body>
   <div class="hdr"><h1>Machine-Visibility Report</h1><p>${r.domain} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Issued by Technical Graffiti</p></div>
   <div class="score">${r.overall}</div>
@@ -2193,7 +2192,7 @@ function downloadScorePDF(){
   <h3>Issues found</h3>
   ${r.issues.map(i=>`<div class="issue"><span class="bdg ${i.p==='critical'?'crit':'high'}">${i.p.toUpperCase()}</span>${i.t}</div>`).join('')}
   <h3>Recommended actions</h3>
-  <p style="font-size:16px;color:#3D3D3D;line-height:1.7">1. Install Schema 3.0 JSON-LD markup — use the Schema Generator 2. Create and upload llms.txt — use the llms.txt Generator<br>3. Standardise business listings across directories — use Citation Checker</p>
+  <p style="font-size:16px;color:#3D3D3D;line-height:1.7">1. Log in to your Aenima dashboard to generate and download your AI visibility files.<br>2. Install your visibility files on your website or activate the WordPress plugin.<br>3. Check and fix your directory listings using the Citation Checker.</p>
   <div class="foot"><span>Technical Graffiti Ltd · Company No. 07180346</span><span>technicalgraffiti.co.uk</span></div>
   
 </body></html>`);
@@ -3033,7 +3032,7 @@ async function genReport(){
 function printRpt(){
   const el=document.getElementById('rptContent');if(!el)return;
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Machine-Visibility Certificate</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}.hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}.hdr h1{font-size:26px;margin:0 0 6px}.hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}h4{display:none}.rs h5{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:24px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}.rs p,.rs li{font-size:16px;color:#3D3D3D;line-height:1.7}.rs ul{padding-left:20px}.hl{color:#E8500A;font-weight:600}.rw{color:#CC6600}.rok{color:#0A6E2E}.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}button{display:none!important}@media print{body{margin:20px}}</style>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Machine-Visibility Certificate</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}.hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}.hdr h1{font-size:26px;margin:0 0 6px}.hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}h4{display:none}.rs h5{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:24px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}.rs p,.rs li{font-size:16px;color:#3D3D3D;line-height:1.7}.rs ul{padding-left:20px}.hl{color:#E8500A;font-weight:600}.rw{color:#CC6600}.rok{color:#0A6E2E}.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}button{display:none!important}@media print{body{margin:20px}}</style>  <script
 </head><body>
   <div class="hdr"><h1>Machine-Visibility Certificate</h1><p>${v('rn')||'Business'} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Technical Graffiti</p></div>
   ${el.innerHTML}
@@ -3393,10 +3392,23 @@ function toast(msg){
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
-loadS();
-if(S.user)showPage('dashboard');
-else showPage('marketing');
-setTimeout(initConsent,300);
+initSupabase();
+(async()=>{
+  await loadS();
+  const _up=new URLSearchParams(window.location.search);
+  if(_up.get('upgraded')==='1'&&_up.get('plan')&&S.user){
+    S.plan=_up.get('plan');
+    S.user.plan=S.plan;
+    saveS();
+    showPage('dashboard');
+    setTimeout(()=>showDp('billing',null),500);
+  } else if(S.user){
+    showPage('dashboard');
+  } else {
+    showPage('marketing');
+  }
+  setTimeout(initConsent,300);
+})();
 
 function renderIssues(issues){
   const el=document.getElementById('issuesList');
