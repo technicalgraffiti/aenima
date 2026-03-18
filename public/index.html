@@ -1335,34 +1335,28 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 .policy-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
 .policy-content{display:none}
 .policy-content.active{display:block}
-.bill-btn{
-  font-size:12px;font-weight:700;font-family:inherit;
-  padding:6px 10px;border-radius:6px;cursor:pointer;
-  background:rgba(255,255,255,0.08);
-  border:1.5px solid rgba(255,255,255,0.15);
-  color:rgba(255,255,255,0.6);transition:all 0.15s;
-}
-.bill-btn:hover{background:rgba(255,255,255,0.15);color:#FFFFFF}
-.bill-btn.bill-active{
-  background:var(--orange);border-color:var(--orange);color:#FFFFFF;
-}
+/* old bill-btn removed */
 .pc-billing-hidden{display:none}
 
 /* ── BILLING TOGGLE ── */
-.billing-toggle{
-  display:flex;gap:0;background:var(--bg-warm);border:1.5px solid var(--border-lt);
-  border-radius:8px;padding:4px;margin:24px auto 40px;
-  width:fit-content;
+..billing-toggle{
+  display:inline-flex;gap:4px;background:rgba(0,0,0,0.15);border-radius:10px;
+  padding:4px;margin:24px auto 40px;width:fit-content;
 }
 .bill-btn{
-  padding:8px 20px;border-radius:6px;border:none;background:none;
-  font-family:'Work Sans',sans-serif;font-size:14px;font-weight:600;
-  cursor:pointer;color:var(--t-support);transition:all 0.15s;white-space:nowrap;
+  padding:10px 24px;border-radius:8px;border:2px solid transparent;
+  font-family:'Work Sans',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;color:var(--t-support);transition:all 0.2s;white-space:nowrap;
+  background:transparent;
 }
-.bill-btn.active{background:#FFFFFF;color:var(--t-heading);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.bill-btn:hover{color:var(--t-heading);background:rgba(0,0,0,0.05)}
+.bill-btn.active{
+  background:var(--orange);color:#FFFFFF;border-color:var(--orange);
+  box-shadow:0 2px 12px rgba(240,90,34,0.3);
+}
 .bill-save{
-  font-size:11px;font-weight:700;background:var(--green);color:#FFFFFF;
-  border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:middle;
+  font-size:11px;font-weight:600;color:var(--green);
+  margin-left:4px;vertical-align:middle;
 }
   html,body{overflow-x:hidden;max-width:100vw}
 </style>
