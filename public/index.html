@@ -2816,9 +2816,9 @@ function syncDash(){
   if(!S.user)return;
   const sn=document.getElementById('sbName');const sp=document.getElementById('sbPlan');
   const dw=document.getElementById('dhWelcome');const mp=document.getElementById('mPlan');
-  if(sn)sn.textContent=S.user.name||S.user.email;
+  if(sn)sn.textContent=S.user.business||S.user.name||S.user.email;
   if(sp)sp.innerHTML=`<span class="pb pb-${S.plan}">${S.plan}</span>`;
-  if(dw)dw.textContent=`Welcome back, ${S.user.name||'there'}.`;
+  if(dw)dw.textContent='Welcome back, '+(S.user.business||S.user.name||'')+'.';
   if(mp)mp.textContent=S.plan.charAt(0).toUpperCase()+S.plan.slice(1);
   updBilling();
   // Pre-fill fields
