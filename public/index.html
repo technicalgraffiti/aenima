@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow-x:hidden">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -206,6 +206,7 @@ h1,h2,h3,h4{
 ═══════════════════════════════════════ */
 .url-input-wrap{
   display:flex;
+  flex-wrap:wrap;
   background:var(--bg-white);
   border:2px solid var(--border-lt);
   border-radius:10px;
@@ -253,6 +254,7 @@ h1,h2,h3,h4{
   white-space:nowrap;
   flex-shrink:0;
   transition:background 0.15s;
+  min-width:160px;
 }
 .url-input-wrap button:hover{background:var(--orange-dk)}
 
@@ -1139,7 +1141,7 @@ nav{
 /* Footer */
 footer{background:var(--bg-navy);padding:56px 5vw 40px}
 .footer-inner{max-width:var(--max);margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:32px;margin-bottom:48px}
 .fb-logo{font-family:'Work Sans',sans-serif;font-weight:800;font-size:24px;color:#FFFFFF;letter-spacing:-0.025em;margin-bottom:12px;display:block}
 .fb-logo span{color:var(--orange)}
 .fb-desc{font-size:15px;color:var(--t-white45);line-height:1.7;margin-bottom:12px}
@@ -1172,7 +1174,168 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   .pricing-grid,.paths-grid,.how-grid,.diff-inner,.extra-grid,.footer-grid{grid-template-columns:1fr}
   .metrics,.qa-row,.result-actions{grid-template-columns:1fr 1fr}
   .d2col,.row2{grid-template-columns:1fr}
+  .fix-opts-grid{grid-template-columns:1fr!important}
+  .hero{padding:60px 5vw 70px}
+  .display{font-size:clamp(38px,10vw,60px)}
+  .section-h{font-size:clamp(24px,6vw,40px)}
+  nav{padding:0 16px}
 }
+
+@media(max-width:540px){
+  /* URL input — stack vertically */
+  .url-input-wrap{flex-direction:column;border-radius:10px}
+  .url-prefix{border-right:none;border-bottom:1.5px solid var(--border-lt);padding:12px 16px;justify-content:center}
+  .url-input-wrap input{padding:12px 16px;text-align:center}
+  .url-input-wrap button{width:100%;border-radius:0 0 8px 8px;padding:14px;flex-shrink:0}
+  /* Pricing grid */
+  .pricing-grid{grid-template-columns:1fr}
+  /* Path cards */
+  .paths-grid{grid-template-columns:1fr}
+  .path-card{min-height:auto}
+  /* Result actions */
+  .result-actions{grid-template-columns:1fr 1fr}
+  /* Fix panel */
+  .fix-opts-grid{grid-template-columns:1fr!important}
+  .fix-opt{margin-bottom:0}
+  /* How grid */
+  .how-grid{gap:12px}
+  .how-card{padding:24px 20px;min-height:auto}
+  /* Hero stats */
+  .hero-bar{grid-template-columns:1fr}
+  /* Sections padding */
+  .hero{padding:48px 16px 60px}
+  .score-section,.paths-section,.how-section,.pricing-section,.diff-section,.extras-section{padding:48px 16px}
+  /* Nav */
+  .nav-links a:not(.nav-cta){display:none}
+  .nav-logo{font-size:16px}
+  /* Buttons */
+  .btn-lg{padding:12px 20px;font-size:14px}
+  .path-btn,.fix-btn{width:100%;text-align:center;justify-content:center}
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column;gap:16px;text-align:center}
+  /* Score result */
+  .result-grid{max-width:100%}
+  .result-actions-wrap{max-width:100%}
+  .result-actions{grid-template-columns:1fr}
+  /* Action cards */
+  .action-card{padding:16px}
+  /* Diff section */
+  .diff-inner{grid-template-columns:1fr;gap:32px}
+  /* Extra cards */
+  .extra-grid{grid-template-columns:1fr}
+}
+
+/* ── HAMBURGER / MOBILE NAV ── */
+.hamburger{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:8px;
+  margin-left:auto;
+}
+.hamburger span{
+  display:block;
+  width:24px;
+  height:2px;
+  background:#FFFFFF;
+  border-radius:2px;
+  transition:all 0.2s;
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{
+  display:none;
+  flex-direction:column;
+  gap:0;
+  background:var(--bg-navy);
+  border-top:1px solid var(--border-dk);
+  padding:16px 20px;
+  position:absolute;
+  top:64px;left:0;right:0;
+  z-index:199;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a,.mobile-menu button{
+  font-size:16px;
+  font-weight:500;
+  color:rgba(255,255,255,0.8);
+  text-decoration:none;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+  padding:14px 0;
+  border-bottom:1px solid var(--border-dk);
+  text-align:left;
+}
+.mobile-menu a:last-of-type{border-bottom:none}
+.mobile-menu .btn{margin-top:12px;justify-content:center;text-align:center}
+@media(max-width:700px){
+  .hamburger{display:flex}
+  .nav-links{display:none}
+}
+
+/* ── CONSENT BANNER ── */
+#consentBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:var(--bg-navy);
+  border-top:2px solid var(--orange);
+  padding:20px 24px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:16px;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.3);
+}
+#consentBanner p{
+  flex:1;min-width:260px;
+  font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6;margin:0;
+}
+#consentBanner a{color:var(--orange);text-decoration:underline;cursor:pointer}
+.consent-btns{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.consent-btns button{
+  padding:10px 20px;border-radius:6px;font-size:14px;font-weight:700;
+  cursor:pointer;border:none;font-family:inherit;
+}
+#consentAccept{background:var(--orange);color:#FFFFFF}
+#consentReject{background:transparent;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.3)!important}
+#consentAccept:hover{background:#D44510}
+#consentReject:hover{color:#FFFFFF;border-color:rgba(255,255,255,0.6)!important}
+
+/* ── POLICY MODAL ── */
+#policyModal{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,0.7);overflow-y:auto;padding:40px 20px;
+}
+#policyModal.open{display:block}
+.policy-box{
+  background:var(--bg-white);border-radius:var(--radius-lg);
+  max-width:780px;margin:0 auto;padding:48px;position:relative;
+}
+.policy-box h1{font-size:clamp(24px,3vw,36px);margin-bottom:8px}
+.policy-box h2{font-size:18px;margin-top:32px;margin-bottom:10px;color:var(--t-heading)}
+.policy-box h3{font-size:16px;margin-top:24px;margin-bottom:8px;color:var(--t-heading)}
+.policy-box p,.policy-box li{font-size:15px;color:var(--t-body);line-height:1.75}
+.policy-box ul{padding-left:20px;margin-bottom:16px}
+.policy-box li{margin-bottom:6px}
+.policy-close{
+  position:absolute;top:20px;right:20px;
+  background:none;border:none;font-size:24px;cursor:pointer;
+  color:var(--t-support);line-height:1;
+}
+.policy-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid var(--border-lt)}
+.policy-tab{
+  padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;
+  background:none;border:none;font-family:inherit;color:var(--t-support);
+  border-bottom:2px solid transparent;margin-bottom:-2px;
+}
+.policy-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.policy-content{display:none}
+.policy-content.active{display:block}
+  html,body{overflow-x:hidden;max-width:100vw}
 </style>
 </head>
 <body>
@@ -1182,11 +1345,20 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   <div class="nav-inner">
     <span class="nav-logo" onclick="showPage('marketing')">Aenima<span>.</span></span>
     <div class="nav-links" id="navLinks">
-      <a onclick="gotoAnchor('how')">How it works</a>
-      <a onclick="gotoAnchor('pricing')">Pricing</a>
-      <button onclick="showPage('login')">Log in</button>
-      <button class="btn btn-primary btn-sm" onclick="showPage('register')">Get my free score →</button>
+      <a onclick="gotoAnchor('how');closeMobileMenu()">How it works</a>
+      <a onclick="gotoAnchor('pricing');closeMobileMenu()">Pricing</a>
+      <button onclick="showPage('login');closeMobileMenu()">Log in</button>
+      <button class="btn btn-primary btn-sm" onclick="showPage('register');closeMobileMenu()">Get my free score →</button>
     </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a onclick="gotoAnchor('how');closeMobileMenu()">How it works</a>
+    <a onclick="gotoAnchor('pricing');closeMobileMenu()">Pricing</a>
+    <a onclick="showPage('login');closeMobileMenu()">Log in</a>
+    <button class="btn btn-primary btn-full" onclick="showPage('register');closeMobileMenu()">Get my free score →</button>
   </div>
 </nav>
 
@@ -1260,21 +1432,21 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div class="result-actions">
           <div class="action-card" onclick="doAction('schema')">
             <span class="ac-icon">&#11041;</span>
-            <div class="ac-title">Generate Schema code</div>
-            <p class="ac-desc">Schema 3.0 JSON-LD tells AI engines your business type, location and services. Download and paste into your site head.</p>
-            <span class="ac-btn">Open Schema Generator &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
+            <div class="ac-title">Fix your AI visibility signals</div>
+            <p class="ac-desc">Generate the exact code AI engines need to find and recommend your business. Download ready to install — or let the plugin do it automatically.</p>
+            <span class="ac-btn">Fix this &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
           </div>
           <div class="action-card" onclick="doAction('llms')">
             <span class="ac-icon">&#9636;</span>
-            <div class="ac-title">Generate llms.txt</div>
-            <p class="ac-desc">The file that tells AI systems who you are, what you do and where you operate. Upload to your domain root.</p>
-            <span class="ac-btn">Open llms.txt Generator &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
+            <div class="ac-title">Create your AI identity file</div>
+            <p class="ac-desc">The file AI systems look for when they visit your site. Without it they are guessing who you are. Generate it in seconds.</p>
+            <span class="ac-btn">Fix this &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
           </div>
           <div class="action-card" onclick="doAction('citations')">
             <span class="ac-icon">&#9678;</span>
-            <div class="ac-title">Fix citation gaps</div>
-            <p class="ac-desc">AI trusts businesses listed consistently across directories. See exactly which ones you&rsquo;re missing with direct fix links.</p>
-            <span class="ac-btn">Open Citation Checker &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
+            <div class="ac-title">Strengthen your AI trust signals</div>
+            <p class="ac-desc">AI cross-references your business across the web. Gaps and inconsistencies hurt your score. See what needs fixing.</p>
+            <span class="ac-btn">Fix this &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
           </div>
           <div class="action-card" onclick="downloadScorePDF()">
             <span class="ac-icon">&#8595;</span>
@@ -1296,12 +1468,12 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
               <span class="fix-opt-name">Do it yourself</span>
               <span class="fix-opt-price">&pound;5.50<span>/mo</span></span>
             </div>
-            <p class="fix-opt-desc">Download the schema code and llms.txt file. Paste into your site. Works on any website.</p>
+            <p class="fix-opt-desc">We generate the visibility files your site needs. Download and install yourself. Works on any website.</p>
             <ul class="fix-opt-list">
-              <li>Schema JSON-LD &mdash; download &amp; paste</li>
-              <li>llms.txt &mdash; download &amp; upload</li>
-              <li>Citation gap list with fix links</li>
-              <li>Monthly re-score + action item</li>
+              <li>AI visibility files generated for your site</li>
+              <li>Citation gap report with fix links</li>
+              <li>Monthly re-score + priority action</li>
+              <li>Machine-Visibility Certificate</li>
             </ul>
             <button class="fix-btn">Start for &pound;5.50/month &rarr;</button>
           </div>
@@ -1314,10 +1486,10 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
             <p class="fix-opt-desc">Automatically updates everything while you sleep. Install the WordPress plugin once &mdash; it runs forever.</p>
             <div style="background:rgba(255,170,68,0.18);border:1.5px solid #FFAA44;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:12px;font-weight:700;color:#FFAA44">&#9729; WORDPRESS ONLY &mdash; auto-installs &amp; updates</div>
             <ul class="fix-opt-list">
-              <li>WordPress plugin &mdash; one-click install</li>
-              <li>Auto-updates schema every month</li>
-              <li>Auto-creates &amp; serves llms.txt</li>
-              <li>Monthly report to your inbox</li>
+              <li>WordPress plugin — one-click activation</li>
+              <li>Visibility files auto-update every month</li>
+              <li>Monthly report straight to your inbox</li>
+              <li>Nothing to do — runs while you sleep</li>
             </ul>
             <button class="fix-btn">Start for &pound;7.50/month &rarr;</button>
           </div>
@@ -1375,7 +1547,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <span class="path-num">02</span>
         <span class="path-label">Starter — £5.50/mo</span>
         <h3 class="path-h">Get the code and <span style="color:#A8E063">fix it yourself</span></h3>
-        <p class="path-desc">Download your Schema JSON-LD and llms.txt files ready to paste into your site. Works on any website. Every month your score is rechecked, your files are regenerated if your business has changed, and a report lands in your inbox. You do the installing — we handle the rest.</p>
+        <p class="path-desc">We generate the visibility files your site needs. Download and install them yourself — works on any website. Every month your score is rechecked, files are regenerated if anything has changed, and a report lands in your inbox.</p>
         <div class="path-works">
           <div class="pw-item pw-ok">✓ Works on ANY website — not WordPress only</div>
           <div class="pw-item pw-ok">✓ Download ready-to-use files</div>
@@ -1389,7 +1561,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <span class="path-num">03</span>
         <span class="path-label">Pro — £7.50/mo · WordPress only</span>
         <h3 class="path-h">Want it automated? <span style="color:#FFFFFF;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px">We have a solution.</span></h3>
-        <p class="path-desc">Our WordPress plugin installs your schema and llms.txt automatically. Every month it regenerates your files, checks your score, updates your llms.txt if anything has changed and emails you a report. Activate once — it runs forever while you sleep.</p>
+        <p class="path-desc">Our WordPress plugin installs everything automatically. Every month it checks your score, updates your visibility files if anything has changed and emails you a report. Activate once — it runs forever while you sleep.</p>
         <div class="path-works">
           <div class="pw-item pw-warn">⚠ WordPress websites only</div>
           <div class="pw-item pw-warn">⚠ Non-WordPress? Choose Starter instead</div>
@@ -1422,7 +1594,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <span class="how-n">02</span>
         <div class="how-badge how-badge-paid">From £5.50/mo</div>
         <h3 class="how-h">Get the files that fix it</h3>
-        <p class="how-p">We generate two files specific to your business — Schema 3.0 JSON-LD and llms.txt. These are the exact signals AI engines need to find and recommend you. Download and paste them in yourself, or let the WordPress plugin install everything automatically.</p>
+        <p class="how-p">We generate the specific visibility files your business needs — the exact signals AI engines use to find and recommend you. Download and install yourself, or let the WordPress plugin handle everything automatically.</p>
         <p class="how-p" style="margin-top:12px;color:var(--t-support)">Starter — download and install yourself, any website. Pro — WordPress plugin installs and updates automatically.</p>
         <button onclick="gotoAnchor('pricing')" style="margin-top:20px;background:var(--bg-navy);color:#FFFFFF;border:none;border-radius:6px;padding:11px 20px;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--bg-navy2)'" onmouseout="this.style.background='var(--bg-navy)'">See how it works →</button>
       </div>
@@ -1459,7 +1631,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li>Category breakdown</li>
           <li>Issues in plain English</li>
           <li class="no">Schema code download</li>
-          <li class="no">llms.txt download</li>
+          <li class="no">AI identity file</li>
           <li class="no">Monthly tracking</li>
         </ul>
         <button class="btn btn-outline btn-full btn-sm" onclick="gotoAnchor('score')">Check my score</button>
@@ -1479,9 +1651,9 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div class="pc-for">Tech-savvy users</div>
         <ul class="pc-feats">
           <li>Everything in Free</li>
-          <li>Schema JSON-LD — download &amp; paste</li>
-          <li>llms.txt — download &amp; upload</li>
-          <li>Citation gap list with direct links</li>
+          <li>AI visibility files generated for your site</li>
+          <li>Citation gap report with fix links</li>
+          <li>Monthly re-score + priority action</li>
           <li>Monthly re-score</li>
           <li>Competitor snapshot</li>
           <li>Monthly action item</li>
@@ -1501,11 +1673,11 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <span class="pc-b-row"><span>Annual <span class="pc-save">save £11</span></span><span>£79/yr</span></span>
         </div>
         <div class="pc-div"></div>
-        <div class="pc-for">Non-technical WordPress users</div>
+        <div class="pc-for">WordPress users who want it automated</div>
         <ul class="pc-feats">
           <li>Everything in Starter</li>
-          <li>WordPress plugin — auto-installs schema</li>
-          <li>Auto-creates &amp; serves llms.txt</li>
+          <li>WordPress plugin — one-click activation</li>
+          <li>Visibility files auto-update every month</li>
           <li>Updates itself automatically</li>
           <li>Monthly report to your inbox</li>
           <li>Break &amp; competitor alerts</li>
@@ -1560,7 +1732,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <div class="diff-row"><div>Price</div><div>£99–£519/month</div><div>From £5.50/month</div></div>
           <div class="diff-row"><div>WP plugin</div><div>None exist</div><div>Auto-installs everything</div></div>
           <div class="diff-row"><div>Schema generator</div><div>None</div><div>Download ready</div></div>
-          <div class="diff-row"><div>llms.txt</div><div>None</div><div>Download ready</div></div>
+          <div class="diff-row"><div>AI identity file</div><div>None</div><div>Generated for you</div></div>
           <div class="diff-row"><div>Free check</div><div>Sign-up required</div><div>No account ever</div></div>
         </div>
       </div>
@@ -1634,10 +1806,19 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
             <li><a href="https://technicalgraffiti.co.uk" target="_blank" rel="noopener">Technical Graffiti</a></li>
           </ul>
         </div>
+        <div class="fc">
+          <h4>Legal</h4>
+          <ul>
+            <li><a onclick="openPolicy('privacy')">Privacy Policy</a></li>
+            <li><a onclick="openPolicy('terms')">Terms of Service</a></li>
+            <li><a onclick="openPolicy('cookies')">Cookie &amp; Storage Policy</a></li>
+            <li><a href="mailto:ai@technicalgraffiti.co.uk">Data requests</a></li>
+          </ul>
+        </div>
       </div>
       <div class="footer-bot">
-        <p>© 2026 Technical Graffiti Ltd · Company No. 07180346 · GEO · AEO · AI Search Visibility</p>
-        <p>Powered by Technical Graffiti Ltd</p>
+        <p>© 2026 Technical Graffiti Ltd · Company No. 07180346 · Registered in England &amp; Wales · ai@technicalgraffiti.co.uk</p>
+        <p><a onclick="openPolicy('privacy')" style="color:var(--t-white45);text-decoration:none">Privacy Policy</a> &nbsp;·&nbsp; <a onclick="openPolicy('terms')" style="color:var(--t-white45);text-decoration:none">Terms of Service</a> &nbsp;·&nbsp; <a onclick="openPolicy('cookies')" style="color:var(--t-white45);text-decoration:none">Cookie Policy</a> &nbsp;·&nbsp; <span style="color:var(--t-white20)">UK GDPR compliant</span></p>
       </div>
     </div>
   </footer>
@@ -1873,11 +2054,11 @@ function calcScore(url,raw){
   const rawTotal=Object.values(cats).reduce((a,c)=>a+c.score,0);
   const overall=Math.max(50,rawTotal);
   const issues=[];
-  if(!https)issues.push({p:'critical',t:'Not on HTTPS — reduces AI trust signals significantly'});
-  issues.push({p:'critical',t:'Schema 3.0 JSON-LD not detected — AI cannot identify your business'});
-  issues.push({p:'critical',t:'llms.txt absent — AI has no machine-readable summary of your business'});
+  if(!https)issues.push({p:'critical',t:'Security signal affecting AI trust score',cta:true});
+  issues.push({p:'critical',t:'AI visibility signal missing — fix this first',cta:true});
+  issues.push({p:'critical',t:'AI identity file not found on your domain',cta:true});
   if(cats.ChatGPT.score<8)issues.push({p:'high',t:'Low ChatGPT visibility — competitors are being recommended instead'});
-  if(cats.Citations.score<8)issues.push({p:'high',t:'Citation signals weak — inconsistent directory listings'});
+  if(cats.Citations.score<8)issues.push({p:'high',t:'Directory presence needs attention',cta:true});
   return{overall,cats,issues,url,domain:raw,ts:new Date()};
 }
 
@@ -1963,6 +2144,10 @@ function doLogin(){
   showErr(err,'No account found. Please register first.');
 }
 function doRegister(){
+  if(!document.getElementById('rgConsent')?.checked){
+    document.getElementById('regErr').textContent='Please agree to the Privacy Policy and Terms of Service to continue.';
+    return;
+  }
   const n=document.getElementById('rgName').value.trim();
   const b=document.getElementById('rgBiz').value.trim();
   const e=document.getElementById('rgEmail').value.trim();
@@ -2009,7 +2194,7 @@ function buildDash(){
       <button class="qa-btn" onclick="gatedPanel('schema')" id="qaSchema">
         <span class="qa-icon">⬡</span>
         <span class="qa-label">Generate schema</span>
-        <span class="qa-sub" id="qaSchemasSub">Download Schema JSON-LD code — paste into your site</span>
+        <span class="qa-sub" id="qaSchemasSub">Generate and download your AI visibility code</span>
       </button>
       <button class="qa-btn" onclick="gatedPanel('llms')" id="qaLlms">
         <span class="qa-icon">▤</span>
@@ -2198,7 +2383,7 @@ function buildDash(){
 
   <!-- LLMS -->
   <div class="dp" id="dp-llms">
-    <div class="dh"><h2>llms.txt Generator</h2><p>The file that tells AI systems who you are, what you do and where you operate. Upload to your domain root.</p></div>
+    <div class="dh"><h2>llms.txt Generator</h2><p>The file AI systems look for when they visit your site. Without it they are guessing who you are. Generate it in seconds.</p></div>
     <div id="llmsGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">llms.txt Generator — Starter plan</strong><p>Download your llms.txt file with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="llmsContent">
       <div class="d2col">
@@ -2559,7 +2744,7 @@ function buildReport(r){
   <div class="rs"><h5>Overall finding</h5><p>Score: <span class="hl">${r.overall}/100</span>. ${r.overall<30?'<span class="rw">Not currently visible to AI search engines.</span>':r.overall<55?'<span class="rw">Limited AI visibility.</span> Competitors with better GEO and AEO are being recommended more often.':'<span class="rok">Reasonable visibility.</span> Targeted improvements will strengthen your position.'}</p></div>
   ${c.length?`<div class="rs"><h5>Critical issues (${c.length})</h5><ul>${c.map(i=>`<li><span class="rw">${i.t}</span></li>`).join('')}</ul></div>`:''}
   ${h.length?`<div class="rs"><h5>High priority (${h.length})</h5><ul>${h.map(i=>`<li>${i.t}</li>`).join('')}</ul></div>`:''}
-  <div class="rs"><h5>Next actions</h5><ul><li>Generate and install <span class="hl">Schema 3.0 JSON-LD</span></li><li>Create and upload <span class="hl">llms.txt</span></li><li>Fix citation gaps across directories</li></ul></div>`;
+  <div class="rs"><h5>Next actions</h5><ul><li>Install your <span class="hl">AI visibility signals</span></li><li>Create and upload <span class="hl">llms.txt</span></li><li>Fix citation gaps across directories</li></ul></div>`;
 }
 function autoFill(){
   if(!S.score)return;
@@ -2693,7 +2878,7 @@ async function genReport(){
   <div class="rs"><h5>Overall score</h5><p><span class="hl">${sc}/100</span> — ${sc<30?'Not visible to AI.':sc<55?'Limited GEO and AEO visibility.':'Moderate visibility — improvements available.'}</p></div>
   <div class="rs"><h5>Category scores</h5><p>ChatGPT: <span class="rw">${Math.round(sc*0.18)}/20</span> &nbsp;·&nbsp; Perplexity: <span class="rw">${Math.round(sc*0.16)}/20</span> &nbsp;·&nbsp; Google AIO: <span class="rw">${Math.round(sc*0.20)}/20</span> &nbsp;·&nbsp; Technical: <span class="${hs?'rok':'rw'}">${hs?12:4}/20</span> &nbsp;·&nbsp; Citations: <span class="rw">8/20</span></p></div>
   <div class="rs"><h5>Key findings</h5><ul>${!hs?'<li><span class="rw">No Schema 3.0 JSON-LD detected.</span> AI engines cannot identify business type, location or services.</li>':''}${!hl?'<li><span class="rw">No llms.txt present.</span> AI systems have no machine-readable business summary.</li>':''}<li>GEO and AEO optimisation not yet implemented.</li></ul></div>
-  <div class="rs"><h5>Priority actions</h5><ul><li>1. Install Schema 3.0 JSON-LD — use Schema Generator</li><li>2. Create and upload llms.txt — use llms.txt Generator</li><li>3. Standardise NAP across directories — use Citation Checker</li></ul></div>
+  <div class="rs"><h5>Priority actions</h5><ul><li>1. Install your AI visibility signals — use the tools below</li><li>2. Create and upload llms.txt — use llms.txt Generator</li><li>3. Standardise NAP across directories — use Citation Checker</li></ul></div>
   <div class="rs"><h5>Issued by</h5><p>Technical Graffiti · GEO &amp; AEO Specialist · technicalgraffiti.co.uk · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p></div>`;
   document.getElementById('rptOut').style.display='block';
   document.getElementById('rptContent').innerHTML=html;
@@ -2841,9 +3026,9 @@ function buildCompResults(urls,myScore,compData){
   const actEl=document.getElementById('compActions');
   const actions=[];
   const myCatsData=S.score?S.score.cats:{};
-  if(!myCatsData.Technical||myCatsData.Technical.score<10)actions.push({p:'critical',t:'Install Schema JSON-LD — competitors with schema outrank you every time'});
+  if(!myCatsData.Technical||myCatsData.Technical.score<10)actions.push({p:'critical',t:'Your AI visibility signals are missing — competitors with them outrank you every time'});
   if(!myCatsData.Citations||myCatsData.Citations.score<10)actions.push({p:'high',t:'Fix citation gaps — inconsistent directory listings reduce your AI trust score'});
-  if(!myCatsData.ChatGPT||myCatsData.ChatGPT.score<10)actions.push({p:'high',t:'Improve ChatGPT visibility — update your llms.txt with more service detail'});
+  if(!myCatsData.ChatGPT||myCatsData.ChatGPT.score<10)actions.push({p:'high',t:'Improve ChatGPT visibility — strengthen your AI identity file with more detail'});
   if(actions.length===0)actions.push({p:'ok',t:'You are outperforming your competitors — keep your schema and llms.txt updated monthly'});
   actEl.innerHTML=actions.map(a=>`
     <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;padding:12px 14px;background:${a.p==='critical'?'#FFF0EE':a.p==='high'?'#FFF8E6':a.p==='ok'?'#E6F7ED':'var(--bg-warm)'};border-radius:8px;border:1px solid ${a.p==='critical'?'#FFCCCC':a.p==='high'?'#FFE0AA':a.p==='ok'?'#A8DDB5':'var(--border-lt)'}">
@@ -2898,7 +3083,7 @@ function updatePlanStatus(){
   if(plan==='starter'){
     label.textContent='Starter Plan Active';
     title.textContent='Your files are ready to download';
-    desc.textContent='Download your Schema JSON-LD and llms.txt files from the tools below. Paste them into your website. Your score rechecks and files regenerate every month automatically.';
+    desc.textContent='Your AI visibility files are ready to download and install. Your score rechecks and files regenerate every month automatically.';
     if(proExtra)proExtra.style.display='none';
   } else if(plan==='pro'){
     label.textContent='Pro Plan Active — WordPress Plugin';
@@ -3016,7 +3201,289 @@ function toast(msg){
 loadS();
 if(S.user)showPage('dashboard');
 else showPage('marketing');
+initConsent();
+
+function renderIssues(issues){
+  const el=document.getElementById('issuesList');
+  if(!el)return;
+  const title=document.getElementById('issuesTitle');
+  if(title)title.textContent='Issues found ('+issues.length+')';
+  if(!issues.length){el.innerHTML='<p style="color:var(--green);font-size:15px;padding:8px 0">✓ No critical issues detected</p>';return;}
+  el.innerHTML=issues.map(i=>`
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-lt)">
+      <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${i.p==='critical'?'var(--red)':i.p==='high'?'var(--amber)':'var(--green)'};color:#FFFFFF;white-space:nowrap;flex-shrink:0;margin-top:2px">${i.p.toUpperCase()}</span>
+      <span style="font-size:15px;color:var(--t-body);flex:1;line-height:1.4">${i.t}</span>
+      ${i.cta?'<button onclick="document.getElementById(\'pricing\').scrollIntoView({behavior:\'smooth\'})" style="font-size:12px;font-weight:700;color:var(--orange);background:none;border:1px solid var(--orange);border-radius:4px;padding:3px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0">Fix it →</button>':''}
+    </div>`).join('');
+}
+
+
+/* ── CONSENT & POLICY ── */
+function initConsent(){
+  const consent=localStorage.getItem('brd_consent');
+  if(!consent){
+    document.getElementById('consentBanner').style.display='flex';
+  }
+}
+function acceptConsent(){
+  localStorage.setItem('brd_consent','accepted:'+new Date().toISOString());
+  document.getElementById('consentBanner').style.display='none';
+}
+function rejectConsent(){
+  // Essential storage only — we clear any non-essential items
+  localStorage.setItem('brd_consent','essential-only:'+new Date().toISOString());
+  document.getElementById('consentBanner').style.display='none';
+}
+function openPolicy(tab){
+  const modal=document.getElementById('policyModal');
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  switchPolicy(tab||'privacy');
+}
+function closePolicy(){
+  document.getElementById('policyModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function switchPolicy(tab){
+  document.querySelectorAll('.policy-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.policy-tab').forEach(el=>el.classList.remove('active'));
+  const content=document.getElementById('pol-'+tab);
+  if(content)content.classList.add('active');
+  document.querySelectorAll('.policy-tab').forEach(btn=>{
+    if(btn.textContent.toLowerCase().includes(tab==='cookies'?'cookie':tab))btn.classList.add('active');
+  });
+}
+// Close modal on background click
+document.getElementById('policyModal')?.addEventListener('click',function(e){
+  if(e.target===this)closePolicy();
+});
+
+function toggleMobileMenu(){
+  const menu=document.getElementById('mobileMenu');
+  const btn=document.getElementById('hamburger');
+  if(!menu||!btn)return;
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+function closeMobileMenu(){
+  const menu=document.getElementById('mobileMenu');
+  const btn=document.getElementById('hamburger');
+  if(menu)menu.classList.remove('open');
+  if(btn)btn.classList.remove('open');
+}
+
 </script>
+
+<!-- ── CONSENT BANNER ── -->
+<div id="consentBanner" style="display:none">
+  <p>We use essential local storage to keep you logged in and save your score data. No tracking cookies. No third-party analytics. By using Aenima you agree to our <a onclick="openPolicy('privacy')">Privacy Policy</a> and <a onclick="openPolicy('terms')">Terms of Service</a>.</p>
+  <div class="consent-btns">
+    <button id="consentReject" onclick="rejectConsent()">Reject non-essential</button>
+    <button id="consentAccept" onclick="acceptConsent()">Accept &amp; continue</button>
+  </div>
+</div>
+
+<!-- ── POLICY MODAL ── -->
+<div id="policyModal">
+  <div class="policy-box">
+    <button class="policy-close" onclick="closePolicy()" aria-label="Close">&times;</button>
+    <div class="policy-tabs">
+      <button class="policy-tab active" onclick="switchPolicy('privacy')">Privacy Policy</button>
+      <button class="policy-tab" onclick="switchPolicy('terms')">Terms of Service</button>
+      <button class="policy-tab" onclick="switchPolicy('cookies')">Cookie &amp; Storage Policy</button>
+    </div>
+
+    <!-- PRIVACY POLICY -->
+    <div class="policy-content active" id="pol-privacy">
+      <h1>Privacy Policy</h1>
+      <p><strong>Last updated:</strong> March 2026 &nbsp;|&nbsp; <strong>Controller:</strong> Technical Graffiti Ltd, Company No. 07180346</p>
+      <p>This policy explains what personal data Aenima (operated by Technical Graffiti Ltd, Northamptonshire, England) collects, why, how we store it, and your rights under UK GDPR and the Data (Use and Access) Act 2025.</p>
+
+      <h2>1. Who we are</h2>
+      <p>Technical Graffiti Ltd is the data controller for all personal data collected through aenima.co.uk. Registered address: Northamptonshire, England. Company No. 07180346. Contact: <strong>ai@technicalgraffiti.co.uk</strong></p>
+      <p>We are registered with the Information Commissioner&rsquo;s Office (ICO) as required under UK GDPR.</p>
+
+      <h2>2. What data we collect and why</h2>
+      <h3>Account registration</h3>
+      <ul>
+        <li>Name, email address, password (hashed — never stored in plain text)</li>
+        <li>Business name, website, phone number, town, postcode, business type</li>
+        <li>Lawful basis: <strong>Contract</strong> — necessary to provide the service</li>
+      </ul>
+      <h3>Score check (free — no account)</h3>
+      <ul>
+        <li>Website URL entered for analysis</li>
+        <li>Score results stored in your browser&rsquo;s local storage only — not on our servers</li>
+        <li>Lawful basis: <strong>Legitimate interest</strong> — to provide the free tool</li>
+      </ul>
+      <h3>Payment data</h3>
+      <ul>
+        <li>We do not store card details. Payments are processed by Stripe, Inc.</li>
+        <li>We receive confirmation of payment status and subscription tier only</li>
+        <li>Lawful basis: <strong>Contract</strong> — necessary to process your subscription</li>
+      </ul>
+      <h3>AI report generation</h3>
+      <ul>
+        <li>Your business details are sent to Anthropic&rsquo;s API to generate your visibility report</li>
+        <li>Only the details you have entered are sent — no browsing data, no tracking data</li>
+        <li>Lawful basis: <strong>Contract</strong> — necessary to provide the paid service</li>
+      </ul>
+      <h3>Communications</h3>
+      <ul>
+        <li>Monthly report emails sent to the address you registered with</li>
+        <li>Service emails (receipts, account changes) as required</li>
+        <li>Lawful basis: <strong>Contract</strong> for service emails; <strong>Consent</strong> for any marketing</li>
+      </ul>
+
+      <h2>3. Our data processors</h2>
+      <p>We share your data with the following processors under Data Processing Agreements:</p>
+      <ul>
+        <li><strong>Stripe, Inc.</strong> — payment processing (US — covered by EU-US Data Privacy Framework adequacy)</li>
+        <li><strong>Anthropic, PBC</strong> — AI report generation (US — standard contractual clauses apply)</li>
+        <li><strong>Supabase, Inc.</strong> — database and authentication (EU region — Ireland)</li>
+        <li><strong>Vercel, Inc.</strong> — website hosting (EU region where available)</li>
+      </ul>
+
+      <h2>4. How long we keep your data</h2>
+      <ul>
+        <li>Account data: for the duration of your account plus 12 months after closure</li>
+        <li>Payment records: 7 years (legal requirement under HMRC rules)</li>
+        <li>Score data: stored in your browser only — deleted when you clear browser data</li>
+        <li>Email correspondence: 3 years</li>
+      </ul>
+
+      <h2>5. Your rights under UK GDPR</h2>
+      <p>You have the right to:</p>
+      <ul>
+        <li><strong>Access</strong> — request a copy of the data we hold about you</li>
+        <li><strong>Rectification</strong> — ask us to correct inaccurate data</li>
+        <li><strong>Erasure</strong> — ask us to delete your data (&ldquo;right to be forgotten&rdquo;)</li>
+        <li><strong>Portability</strong> — receive your data in a machine-readable format</li>
+        <li><strong>Restriction</strong> — ask us to pause processing your data</li>
+        <li><strong>Objection</strong> — object to processing based on legitimate interest</li>
+        <li><strong>Withdraw consent</strong> — at any time, without affecting prior processing</li>
+      </ul>
+      <p>To exercise any right, email <strong>ai@technicalgraffiti.co.uk</strong> with the subject &ldquo;Data Request&rdquo;. We will respond within 30 days.</p>
+
+      <h2>6. Data security</h2>
+      <p>Passwords are hashed before storage. Data is transmitted over HTTPS. Access to production data is restricted to authorised personnel only. We follow ICO guidance on appropriate technical and organisational measures.</p>
+
+      <h2>7. Complaints</h2>
+      <p>If you are unhappy with how we handle your data, you have the right to lodge a complaint with the Information Commissioner&rsquo;s Office (ICO) at <strong>ico.org.uk</strong> or by calling 0303 123 1113.</p>
+
+      <h2>8. Changes to this policy</h2>
+      <p>We will notify registered users by email of any material changes. The date at the top of this page will always reflect the latest version.</p>
+    </div>
+
+    <!-- TERMS OF SERVICE -->
+    <div class="policy-content" id="pol-terms">
+      <h1>Terms of Service</h1>
+      <p><strong>Last updated:</strong> March 2026 &nbsp;|&nbsp; <strong>Provider:</strong> Technical Graffiti Ltd, Company No. 07180346</p>
+      <p>These Terms govern your use of Aenima at aenima.co.uk. By creating an account or using the service you agree to these Terms.</p>
+
+      <h2>1. The service</h2>
+      <p>Aenima is a GEO and AEO AI visibility tool that analyses your website&rsquo;s AI search visibility, generates optimisation files and provides monthly reports. It is operated by Technical Graffiti Ltd (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;).</p>
+
+      <h2>2. Accounts</h2>
+      <ul>
+        <li>You must be 18 or over and a UK-based business to use paid plans</li>
+        <li>You are responsible for keeping your login credentials secure</li>
+        <li>One account per business. Do not share accounts</li>
+        <li>We reserve the right to suspend accounts that abuse the free score tool</li>
+      </ul>
+
+      <h2>3. Subscriptions and billing</h2>
+      <ul>
+        <li>Paid plans are billed monthly, quarterly or annually as selected at checkout</li>
+        <li>Payment is taken via Stripe. We do not store card details</li>
+        <li>Subscriptions renew automatically until cancelled</li>
+        <li>You may cancel at any time from your billing settings. Cancellation takes effect at the end of the current billing period — no refunds for partial periods</li>
+        <li>Price changes will be communicated by email with 30 days notice</li>
+      </ul>
+
+      <h2>4. Hardship pricing</h2>
+      <ul>
+        <li>The &pound;3.50/month hardship rate is available for 3 months on a self-declared basis</li>
+        <li>After 3 months the subscription reverts to the standard Starter rate of &pound;5.50/month</li>
+        <li>This rate is intended for genuine hardship only. Abuse may result in account suspension</li>
+      </ul>
+
+      <h2>5. Free score check</h2>
+      <ul>
+        <li>The free score check is provided without account or payment</li>
+        <li>Results are indicative only and should not be relied upon as professional advice</li>
+        <li>We reserve the right to rate-limit or restrict the free tool to prevent abuse</li>
+      </ul>
+
+      <h2>6. WordPress plugin</h2>
+      <ul>
+        <li>The Aenima WordPress plugin is included with Pro and Agency plans</li>
+        <li>It requires WordPress 5.0 or higher</li>
+        <li>You install it at your own risk. We are not liable for conflicts with other plugins or themes</li>
+        <li>The plugin communicates with aenima.co.uk servers to generate and update your files</li>
+      </ul>
+
+      <h2>7. Acceptable use</h2>
+      <p>You must not use Aenima to:</p>
+      <ul>
+        <li>Analyse websites you do not own or have permission to analyse</li>
+        <li>Attempt to reverse-engineer, scrape or automate the service</li>
+        <li>Misrepresent your business details to manipulate scores</li>
+        <li>Resell the service without an Agency plan</li>
+      </ul>
+
+      <h2>8. Our liability</h2>
+      <ul>
+        <li>Aenima provides AI visibility analysis as a tool — not professional advice</li>
+        <li>We do not guarantee improvements to AI search rankings</li>
+        <li>Our total liability is limited to the amount you paid in the 3 months prior to any claim</li>
+        <li>We are not liable for indirect or consequential losses</li>
+      </ul>
+
+      <h2>9. Intellectual property</h2>
+      <p>All generated files (schema, llms.txt) are yours to use freely on your own website. The Aenima platform, code and branding remain the property of Technical Graffiti Ltd.</p>
+
+      <h2>10. Governing law</h2>
+      <p>These Terms are governed by the laws of England and Wales. Disputes shall be subject to the exclusive jurisdiction of the English courts.</p>
+
+      <h2>11. Contact</h2>
+      <p>Technical Graffiti Ltd &middot; Company No. 07180346 &middot; Northamptonshire, England &middot; ai@technicalgraffiti.co.uk</p>
+    </div>
+
+    <!-- COOKIE AND STORAGE POLICY -->
+    <div class="policy-content" id="pol-cookies">
+      <h1>Cookie &amp; Storage Policy</h1>
+      <p><strong>Last updated:</strong> March 2026</p>
+      <p>This policy explains how Aenima uses browser storage and what data is stored where.</p>
+
+      <h2>1. What we use</h2>
+      <p>Aenima does not use tracking cookies, advertising cookies or third-party analytics cookies. We use <strong>browser localStorage</strong> — a standard web technology that stores data on your device only. It is not transmitted to third parties and is not accessible by other websites.</p>
+
+      <h2>2. What is stored in localStorage</h2>
+      <ul>
+        <li><strong>brd_u</strong> — your account details (name, email, plan, business info) to keep you logged in</li>
+        <li><strong>brd_score</strong> — your most recent score result so it persists between sessions</li>
+        <li><strong>brd_consent</strong> — a record of whether you have accepted this policy</li>
+      </ul>
+      <p>This data never leaves your device unless you are logged in to a paid plan, in which case your account data is also stored securely in our database (Supabase — EU region).</p>
+
+      <h2>3. Essential vs non-essential</h2>
+      <p>All storage listed above is <strong>essential</strong> to the operation of the service — login, score results and consent records. Under the Data (Use and Access) Act 2025 and UK PECR, essential functional storage does not require prior consent. However we display this notice in the interest of full transparency.</p>
+
+      <h2>4. Third-party storage</h2>
+      <ul>
+        <li><strong>Stripe</strong> — sets its own cookies on the checkout page for fraud prevention. These are covered by Stripe&rsquo;s own Privacy Policy.</li>
+      </ul>
+
+      <h2>5. How to clear your data</h2>
+      <p>To remove all Aenima data from your browser: open Chrome DevTools (F12) &rarr; Application &rarr; Local Storage &rarr; aenima.co.uk &rarr; delete all entries. Or simply clear your browser data via Chrome Settings.</p>
+
+      <h2>6. Future changes</h2>
+      <p>If we add analytics or any non-essential tracking in future, we will update this policy and obtain explicit consent before doing so.</p>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>
