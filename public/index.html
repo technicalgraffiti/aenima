@@ -1363,6 +1363,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 }
   html,body{overflow-x:hidden;max-width:100vw}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1931,6 +1932,8 @@ const CFG={
   CHECKOUT:'/api/create-checkout',
   CLAUDE_KEY:'YOUR_CLAUDE_API_KEY',
   HARDSHIP_LINK:'https://buy.stripe.com/14A4gA7Gz9fl520bqK0Ny00',
+  SUPABASE_URL:'https://vnbjwffkvpvpmdpiumyy.supabase.co',
+  SUPABASE_KEY:'sb_publishable_Ky12QWTjBvBq2LOm4zYdhg_mn9dbiJR',
   PRICES:{
     starter_mo:'price_1TCGFwJB2Su5DD2s63b7Y3CB',
     starter_qtr:'price_1TCGGUJB2Su5DD2s4UEFEpsk',
@@ -1944,10 +1947,46 @@ const CFG={
 };
 
 /* ═══════════════════════════════════════
+   SUPABASE
+═══════════════════════════════════════ */
+let SB=null;
+function initSupabase(){
+  if(typeof supabase==='undefined'||!CFG.SUPABASE_URL||!CFG.SUPABASE_KEY)return;
+  try{SB=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);}
+  catch(e){console.warn('Supabase init failed:',e);}
+}
+
+/* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
 let S={user:null,plan:'free',score:null};
-function loadS(){try{const d=localStorage.getItem('brd_u');if(d){S.user=JSON.parse(d);S.plan=S.user.plan||'free';}}catch(e){}}
+async function loadS(){
+  try{const d=localStorage.getItem('brd_u');if(d){S.user=JSON.parse(d);S.plan=S.user.plan||'free';}}catch(e){}
+  // Restore Supabase session
+  if(SB){
+    try{
+      const {data}=await SB.auth.getSession();
+      if(data.session&&data.session.user){
+        const {data:profile}=await SB.from('users').select('*').eq('id',data.session.user.id).single();
+        if(profile){
+          S.user={
+            id:data.session.user.id,
+            email:data.session.user.email,
+            name:profile.name||'',
+            business:profile.business||'',
+            url:profile.website||'',
+            phone:profile.phone||'',
+            town:profile.town||'',
+            postcode:profile.postcode||'',
+            plan:profile.plan||'free',
+          };
+          S.plan=S.user.plan;
+          saveS();
+        }
+      }
+    }catch(ex){console.warn('Supabase session restore failed:',ex);}
+  }
+}
 function saveS(){if(S.user)localStorage.setItem('brd_u',JSON.stringify(S.user));}
 
 // ── PROFILE — single source of truth for all user details ──
@@ -2146,7 +2185,8 @@ function downloadScorePDF(){
     .foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}
     @media print{body{margin:20px}}
   </style>
-  </head><body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
   <div class="hdr"><h1>Machine-Visibility Report</h1><p>${r.domain} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Issued by Technical Graffiti</p></div>
   <div class="score">${r.overall}</div>
   <div class="grade">${r.overall<30?'Not visible to AI search engines.':r.overall<55?'Limited AI visibility.':'Reasonable visibility — improvements available.'}</div>
@@ -2169,16 +2209,53 @@ function doAction(panel){
 /* ═══════════════════════════════════════
    AUTH
 ═══════════════════════════════════════ */
-function doLogin(){
+async function doLogin(){
   const e=document.getElementById('liEmail').value.trim();
   const p=document.getElementById('liPass').value;
   const err=document.getElementById('loginErr');
+  const btn=document.getElementById('loginBtn');
   if(!e||!p){showErr(err,'Please enter your email and password.');return;}
+  if(btn){btn.disabled=true;btn.textContent='Logging in...';}
+
+  if(SB){
+    try{
+      const {data,error}=await SB.auth.signInWithPassword({email:e,password:p});
+      if(error){
+        if(btn){btn.disabled=false;btn.textContent='Log in →';}
+        showErr(err,'Incorrect email or password.');
+        return;
+      }
+      // Fetch user profile from users table
+      const {data:profile}=await SB.from('users').select('*').eq('id',data.user.id).single();
+      S.user={
+        id:data.user.id,
+        email:e,
+        name:profile?.name||data.user.user_metadata?.name||'',
+        business:profile?.business||data.user.user_metadata?.business||'',
+        url:profile?.website||'',
+        phone:profile?.phone||'',
+        town:profile?.town||'',
+        postcode:profile?.postcode||'',
+        plan:profile?.plan||'free',
+        joined:data.user.created_at
+      };
+      S.plan=S.user.plan;
+      saveS();
+      if(btn){btn.disabled=false;btn.textContent='Log in →';}
+      showPage('dashboard');
+      return;
+    }catch(ex){
+      console.warn('Supabase login failed, trying local:',ex);
+    }
+  }
+
+  // Fallback to localStorage
   const d=localStorage.getItem('brd_u');
-  if(d){const u=JSON.parse(d);if(u.email===e){S.user=u;S.plan=u.plan||'free';showPage('dashboard');return;}}
+  if(d){const u=JSON.parse(d);if(u.email===e){S.user=u;S.plan=u.plan||'free';if(btn){btn.disabled=false;btn.textContent='Log in →';}showPage('dashboard');return;}}
+  if(btn){btn.disabled=false;btn.textContent='Log in →';}
   showErr(err,'No account found. Please register first.');
 }
-function doRegister(){
+async function doRegister(){
   if(!document.getElementById('rgConsent')?.checked){
     document.getElementById('regErr').textContent='Please agree to the Privacy Policy and Terms of Service to continue.';
     return;
@@ -2189,19 +2266,52 @@ function doRegister(){
   const p=document.getElementById('rgPass').value;
   const rawU=document.getElementById('rgUrl').value.trim().replace(/^https?:\/\//i,'').replace(/^www\./i,'');
   const u=rawU?'https://'+rawU:'';
-  const err=document.getElementById('regErr');
-  if(!n||!e||!p){showErr(err,'Please fill in all required fields.');return;}
-  if(p.length<8){showErr(err,'Password must be at least 8 characters.');return;}
-  S.user={name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
-  S.plan='free';saveS();
-  // Save profile for autopopulation
   const ph=document.getElementById('rgPhone')?.value.trim()||'';
   const tw=document.getElementById('rgTown')?.value.trim()||'';
   const pc=document.getElementById('rgPost')?.value.trim()||'';
+  const err=document.getElementById('regErr');
+  const btn=document.getElementById('regBtn');
+  if(!n||!e||!p){showErr(err,'Please fill in all required fields.');return;}
+  if(p.length<8){showErr(err,'Password must be at least 8 characters.');return;}
+  if(btn){btn.disabled=true;btn.textContent='Creating account...';}
+
+  // Try Supabase first
+  if(SB){
+    try{
+      const {data,error}=await SB.auth.signUp({
+        email:e,
+        password:p,
+        options:{data:{name:n,business:b,website:u,phone:ph,town:tw,postcode:pc}}
+      });
+      if(error){
+        if(btn){btn.disabled=false;btn.textContent='Create free account →';}
+        showErr(err,error.message);
+        return;
+      }
+      // Also insert into users table
+      if(data.user){
+        await SB.from('users').upsert({
+          id:data.user.id,
+          email:e,name:n,business:b,website:u,
+          phone:ph,town:tw,postcode:pc,plan:'free'
+        });
+      }
+      S.user={id:data.user?.id,name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
+    }catch(ex){
+      console.warn('Supabase register failed, using local:',ex);
+      S.user={name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
+    }
+  } else {
+    S.user={name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
+  }
+
+  S.plan='free';saveS();
   saveProfile({name:n,business:b,email:e,url:rawU,phone:ph,town:tw,postcode:pc});
+  if(btn){btn.disabled=false;btn.textContent='Create free account →';}
   showPage('dashboard');
 }
-function doLogout(){S.user=null;S.plan='free';S.score=null;syncNav(false);showPage('marketing');}
+function doLogout(){
+  if(SB)SB.auth.signOut().catch(()=>{});S.user=null;S.plan='free';S.score=null;syncNav(false);showPage('marketing');}
 function showErr(el,msg){el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4000);}
 
 /* ═══════════════════════════════════════
@@ -2923,7 +3033,8 @@ async function genReport(){
 function printRpt(){
   const el=document.getElementById('rptContent');if(!el)return;
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Machine-Visibility Certificate</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}.hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}.hdr h1{font-size:26px;margin:0 0 6px}.hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}h4{display:none}.rs h5{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:24px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}.rs p,.rs li{font-size:16px;color:#3D3D3D;line-height:1.7}.rs ul{padding-left:20px}.hl{color:#E8500A;font-weight:600}.rw{color:#CC6600}.rok{color:#0A6E2E}.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}button{display:none!important}@media print{body{margin:20px}}</style></head><body>
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Machine-Visibility Certificate</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}.hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}.hdr h1{font-size:26px;margin:0 0 6px}.hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}h4{display:none}.rs h5{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:24px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}.rs p,.rs li{font-size:16px;color:#3D3D3D;line-height:1.7}.rs ul{padding-left:20px}.hl{color:#E8500A;font-weight:600}.rw{color:#CC6600}.rok{color:#0A6E2E}.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}button{display:none!important}@media print{body{margin:20px}}</style>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
   <div class="hdr"><h1>Machine-Visibility Certificate</h1><p>${v('rn')||'Business'} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Technical Graffiti</p></div>
   ${el.innerHTML}
   <div class="foot"><span>Technical Graffiti Ltd · Co. No. 07180346</span><span>technicalgraffiti.co.uk</span></div>
