@@ -3201,7 +3201,7 @@ function toast(msg){
 loadS();
 if(S.user)showPage('dashboard');
 else showPage('marketing');
-initConsent();
+setTimeout(initConsent,300);
 
 function renderIssues(issues){
   const el=document.getElementById('issuesList');
