@@ -2315,8 +2315,21 @@ async function doRegister(){
   if(btn){btn.disabled=false;btn.textContent='Create free account →';}
   showPage('dashboard');
 }
+function gatedAction(action){
+  if(S.plan==='free'){
+    gotoAnchor('pricing');
+    return;
+  }
+  if(action==='autofill')autoFill();
+}
 function doLogout(){
-  if(SB)SB.auth.signOut().catch(()=>{});S.user=null;S.plan='free';S.score=null;syncNav(false);showPage('marketing');}
+  if(SB)SB.auth.signOut().catch(()=>{});
+  S.user=null;S.plan='free';S.score=null;
+  localStorage.removeItem('brd_u');
+  localStorage.removeItem('brd_score');
+  syncNav(false);
+  showPage('marketing');
+}
 function showErr(el,msg){el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4000);}
 
 /* ═══════════════════════════════════════
@@ -2443,8 +2456,8 @@ function buildDash(){
       </div>
       <!-- 4 action buttons full width -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
-        <button class="btn btn-primary btn-full" onclick="autoFill()" style="font-size:14px;padding:12px 16px">
-          Auto-fill Schema + llms.txt
+        <button class="btn btn-primary btn-full" onclick="gatedAction('autofill')" style="font-size:14px;padding:12px 16px">
+          Fix my visibility
         </button>
         <button class="btn btn-secondary btn-full" onclick="showDp('cit',document.querySelectorAll('.sb-item')[4])" style="font-size:14px;padding:12px 16px">
           Check citations
