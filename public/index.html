@@ -2230,8 +2230,28 @@ async function doLogin(){
         showErr(err,'Incorrect email or password.');
         return;
       }
-      // Fetch user profile from users table
-      const {data:profile}=await SB.from('users').select('*').eq('id',data.user.id).single();
+      // Fetch user profile — gracefully handle missing profile
+      let profile=null;
+      try{
+        const {data:pd}=await SB.from('users').select('*').eq('id',data.user.id).single();
+        profile=pd;
+        // If profile missing, create it now
+        if(!profile){
+          const meta=data.user.user_metadata||{};
+          await SB.from('users').upsert({
+            id:data.user.id,
+            email:e,
+            name:meta.name||'',
+            business:meta.business||'',
+            website:meta.website||'',
+            phone:meta.phone||'',
+            town:meta.town||'',
+            postcode:meta.postcode||'',
+            plan:'free'
+          });
+          profile={name:meta.name||'',business:meta.business||'',website:meta.website||'',phone:meta.phone||'',town:meta.town||'',postcode:meta.postcode||'',plan:'free'};
+        }
+      }catch(pe){console.warn('Profile fetch error:',pe);}
       S.user={
         id:data.user.id,
         email:e,
