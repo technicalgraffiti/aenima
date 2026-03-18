@@ -1889,7 +1889,13 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div class="fg"><label>Postcode</label><input type="text" id="rgPost" placeholder="NN8 1AA" autocomplete="postal-code"></div>
       </div>
       <p style="font-size:13px;color:var(--t-support);margin:-8px 0 16px;line-height:1.5">These details pre-fill every tool in your dashboard — you only ever type them once.</p>
-      <button class="btn btn-primary btn-full" onclick="doRegister()">Create account →</button>
+      <div class="fg" style="margin-bottom:8px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;font-size:14px;color:var(--t-body)">
+          <input type="checkbox" id="rgConsent" style="margin-top:3px;flex-shrink:0;accent-color:var(--orange);width:16px;height:16px">
+          <span>I have read and agree to the <a onclick="openPolicy('privacy')" style="color:var(--orange);text-decoration:underline;cursor:pointer">Privacy Policy</a> and <a onclick="openPolicy('terms')" style="color:var(--orange);text-decoration:underline;cursor:pointer">Terms of Service</a>. I am 18 or over and registering on behalf of a business.</span>
+        </label>
+      </div>
+      <button class="btn btn-primary btn-full" id="regBtn" onclick="doRegister()">Create account →</button>
       <div class="auth-switch">Already have an account? <a onclick="showPage('login')">Log in</a></div>
     </div>
   </div>
