@@ -1645,9 +1645,9 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <h2 class="section-h">Simple. Fair. No surprises.</h2>
       <p class="section-intro" style="max-width:540px;margin:16px auto 0;font-size:18px;color:var(--t-support)">Start free. Pay only when you want the tools to fix it. Cancel anytime.</p>
       <div class="billing-toggle">
-        <button class="bill-btn active" id="billMo" onclick="setBilling('mo')">Monthly</button>
-        <button class="bill-btn" id="billQtr" onclick="setBilling('qtr')">Quarterly <span class="bill-save">Save £3</span></button>
-        <button class="bill-btn" id="billYr" onclick="setBilling('yr')">Annual <span class="bill-save">Save £11</span></button>
+        <button class="bill-btn active" id="billMo" onclick="setGlobalBilling('mo',this)">Monthly</button>
+        <button class="bill-btn" id="billQtr" onclick="setGlobalBilling('qtr',this)">Quarterly <span class="bill-save">Save £3</span></button>
+        <button class="bill-btn" id="billYr" onclick="setGlobalBilling('yr',this)">Annual <span class="bill-save">Save £11</span></button>
       </div>
     </div>
     <div class="pricing-grid">
@@ -3171,7 +3171,16 @@ function updBilling(){
 /* ═══════════════════════════════════════
    UPGRADE + CONTACT
 ═══════════════════════════════════════ */
-const PLAN_BILLING={starter:'mo',pro:'mo'};
+const PLAN_BILLING={starter:'mo',pro:'mo',agency:'mo'};
+function setGlobalBilling(period,btn){
+  S.billing=period;
+  PLAN_BILLING.starter=period;
+  PLAN_BILLING.pro=period;
+  document.querySelectorAll('.bill-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Update displayed prices
+  updPricing();
+}
 function setBilling(plan,period,btn){
   PLAN_BILLING[plan]=period;
   // Update active button
@@ -3180,7 +3189,7 @@ function setBilling(plan,period,btn){
 }
 function handleUpgrade(plan){
   if(CFG.STRIPE_KEY==='pk_live_YOUR_STRIPE_KEY'){showUpgradeModal(plan);return;}
-  const billing=PLAN_BILLING[plan]||S.billing||'mo';
+  const billing=S.billing||PLAN_BILLING[plan]||'mo';
   const btn=event?.target;
   if(btn){btn.disabled=true;btn.textContent='Redirecting...';}
   fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user?.email||''})})
