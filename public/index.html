@@ -1335,6 +1335,35 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 .policy-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
 .policy-content{display:none}
 .policy-content.active{display:block}
+.bill-btn{
+  font-size:12px;font-weight:700;font-family:inherit;
+  padding:6px 10px;border-radius:6px;cursor:pointer;
+  background:rgba(255,255,255,0.08);
+  border:1.5px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.6);transition:all 0.15s;
+}
+.bill-btn:hover{background:rgba(255,255,255,0.15);color:#FFFFFF}
+.bill-btn.bill-active{
+  background:var(--orange);border-color:var(--orange);color:#FFFFFF;
+}
+.pc-billing-hidden{display:none}
+
+/* ── BILLING TOGGLE ── */
+.billing-toggle{
+  display:flex;gap:0;background:var(--bg-warm);border:1.5px solid var(--border-lt);
+  border-radius:8px;padding:4px;margin:24px auto 40px;
+  width:fit-content;
+}
+.bill-btn{
+  padding:8px 20px;border-radius:6px;border:none;background:none;
+  font-family:'Work Sans',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;color:var(--t-support);transition:all 0.15s;white-space:nowrap;
+}
+.bill-btn.active{background:#FFFFFF;color:var(--t-heading);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.bill-save{
+  font-size:11px;font-weight:700;background:var(--green);color:#FFFFFF;
+  border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:middle;
+}
   html,body{overflow-x:hidden;max-width:100vw}
 </style>
 </head>
@@ -1615,6 +1644,11 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <span class="eyebrow">Pricing</span>
       <h2 class="section-h">Simple. Fair. No surprises.</h2>
       <p class="section-intro" style="max-width:540px;margin:16px auto 0;font-size:18px;color:var(--t-support)">Start free. Pay only when you want the tools to fix it. Cancel anytime.</p>
+      <div class="billing-toggle">
+        <button class="bill-btn active" id="billMo" onclick="setBilling('mo')">Monthly</button>
+        <button class="bill-btn" id="billQtr" onclick="setBilling('qtr')">Quarterly <span class="bill-save">Save £3</span></button>
+        <button class="bill-btn" id="billYr" onclick="setBilling('yr')">Annual <span class="bill-save">Save £11</span></button>
+      </div>
     </div>
     <div class="pricing-grid">
 
@@ -1643,9 +1677,11 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div class="pc-tagline">Get the code. Fix it yourself.</div>
         <div class="pc-price"><sup>£</sup>5.50</div>
         <div class="pc-billing">
-          <span class="pc-b-row"><span>Monthly</span><span>£5.50/mo</span></span>
-          <span class="pc-b-row"><span>Quarterly <span class="pc-save">save £1.50</span></span><span>£14.00</span></span>
-          <span class="pc-b-row"><span>Annual <span class="pc-save">save £17</span></span><span>£49/yr</span></span>
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <button onclick="setBilling('starter','mo',this)" class="bill-btn bill-active" id="starter-mo">Monthly £5.50</button>
+            <button onclick="setBilling('starter','qtr',this)" class="bill-btn" id="starter-qtr">Quarterly £14</button>
+            <button onclick="setBilling('starter','yr',this)" class="bill-btn" id="starter-yr">Annual £49</button>
+          </div>
         </div>
         <div class="pc-div"></div>
         <div class="pc-for">Tech-savvy users</div>
@@ -1668,6 +1704,13 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div class="pc-tagline">Automatically updates everything while you sleep.</div>
         <div class="pc-price"><sup>£</sup>7.50</div>
         <div class="pc-billing">
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <button onclick="setBilling('pro','mo',this)" class="bill-btn bill-active" id="pro-mo">Monthly £7.50</button>
+            <button onclick="setBilling('pro','qtr',this)" class="bill-btn" id="pro-qtr">Quarterly £19.50</button>
+            <button onclick="setBilling('pro','yr',this)" class="bill-btn" id="pro-yr">Annual £79</button>
+          </div>
+        </div>
+        <div class="pc-billing-hidden">
           <span class="pc-b-row"><span>Monthly</span><span>£7.50/mo</span></span>
           <span class="pc-b-row"><span>Quarterly <span class="pc-save">save £3</span></span><span>£19.50</span></span>
           <span class="pc-b-row"><span>Annual <span class="pc-save">save £11</span></span><span>£79/yr</span></span>
@@ -3128,9 +3171,16 @@ function updBilling(){
 /* ═══════════════════════════════════════
    UPGRADE + CONTACT
 ═══════════════════════════════════════ */
+const PLAN_BILLING={starter:'mo',pro:'mo'};
+function setBilling(plan,period,btn){
+  PLAN_BILLING[plan]=period;
+  // Update active button
+  document.querySelectorAll('#'+plan+'-mo,#'+plan+'-qtr,#'+plan+'-yr').forEach(b=>b.classList.remove('bill-active'));
+  if(btn)btn.classList.add('bill-active');
+}
 function handleUpgrade(plan){
   if(CFG.STRIPE_KEY==='pk_live_YOUR_STRIPE_KEY'){showUpgradeModal(plan);return;}
-  const billing=S.billing||'mo';
+  const billing=PLAN_BILLING[plan]||S.billing||'mo';
   const btn=event?.target;
   if(btn){btn.disabled=true;btn.textContent='Redirecting...';}
   fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user?.email||''})})
@@ -3279,6 +3329,36 @@ function switchPolicy(tab){
 document.getElementById('policyModal')?.addEventListener('click',function(e){
   if(e.target===this)closePolicy();
 });
+
+/* ── BILLING TOGGLE ── */
+const PRICES_DISPLAY={
+  starter:{mo:'£5.50/mo',qtr:'£14/qtr',yr:'£49/yr'},
+  pro:{mo:'£7.50/mo',qtr:'£19.50/qtr',yr:'£79/yr'},
+  agency:{mo:'£89/mo',qtr:'£89/mo',yr:'£89/mo'},
+};
+const PRICES_MAIN={
+  starter:{mo:'5.50',qtr:'14',yr:'49'},
+  pro:{mo:'7.50',qtr:'19.50',yr:'79'},
+  agency:{mo:'89',qtr:'89',yr:'89'},
+};
+
+function setBilling(period){
+  S.billing=period;
+  // Update toggle buttons
+  document.querySelectorAll('.bill-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('bill'+period.charAt(0).toUpperCase()+period.slice(1));
+  if(btn)btn.classList.add('active');
+  // Update starter price display
+  const sp=document.getElementById('starterPrice');
+  const sb=document.getElementById('starterBilling');
+  if(sp)sp.textContent=PRICES_MAIN.starter[period];
+  if(sb)sb.textContent=PRICES_DISPLAY.starter[period];
+  // Update pro price display
+  const pp=document.getElementById('proPrice');
+  const pb=document.getElementById('proBilling');
+  if(pp)pp.textContent=PRICES_MAIN.pro[period];
+  if(pb)pb.textContent=PRICES_DISPLAY.pro[period];
+}
 
 function toggleMobileMenu(){
   const menu=document.getElementById('mobileMenu');
