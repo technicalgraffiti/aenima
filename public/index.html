@@ -2337,7 +2337,7 @@ async function doRegister(){
 }
 function gatedAction(action){
   if(S.plan==='free'){
-    gotoAnchor('pricing');
+    showDp('billing',null);
     return;
   }
   if(action==='autofill')autoFill();
@@ -3459,7 +3459,7 @@ function renderIssues(issues){
     <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border-lt)">
       <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:${i.p==='critical'?'var(--red)':i.p==='high'?'var(--amber)':'var(--green)'};color:#FFFFFF;white-space:nowrap;flex-shrink:0;margin-top:2px">${i.p.toUpperCase()}</span>
       <span style="font-size:15px;color:var(--t-body);flex:1;line-height:1.4">${i.t}</span>
-      ${i.cta?'<button onclick="document.getElementById(\'pricing\').scrollIntoView({behavior:\'smooth\'})" style="font-size:12px;font-weight:700;color:var(--orange);background:none;border:1px solid var(--orange);border-radius:4px;padding:3px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0">Fix it →</button>':''}
+      ${i.cta?'<button onclick="S.user?showDp(\'billing\',null):gotoAnchor(\'pricing\')" style="font-size:12px;font-weight:700;color:var(--orange);background:none;border:1px solid var(--orange);border-radius:4px;padding:3px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0">Fix it →</button>':''}
     </div>`).join('');
 }
 
