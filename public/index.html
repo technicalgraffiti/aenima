@@ -3130,9 +3130,23 @@ function updBilling(){
 ═══════════════════════════════════════ */
 function handleUpgrade(plan){
   if(CFG.STRIPE_KEY==='pk_live_YOUR_STRIPE_KEY'){showUpgradeModal(plan);return;}
-  fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,email:S.user?.email})})
-    .then(r=>r.json()).then(d=>{if(d.url)window.location.href=d.url;})
-    .catch(()=>alert('Payment error. Please contact support.'));
+  const billing=S.billing||'mo';
+  const btn=event?.target;
+  if(btn){btn.disabled=true;btn.textContent='Redirecting...';}
+  fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user?.email||''})})
+    .then(r=>{
+      if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});
+      return r.json();
+    })
+    .then(d=>{
+      if(d.url){window.location.href=d.url;}
+      else{throw new Error('No checkout URL returned');}
+    })
+    .catch(err=>{
+      console.error('Checkout error:',err);
+      if(btn){btn.disabled=false;btn.textContent='Try again';}
+      alert('Payment error: '+err.message+'. Please email ai@technicalgraffiti.co.uk');
+    });
 }
 function showUpgradeModal(plan){
   const prices={starter:'£5.50/month · £14/quarter · £49/year — works on any website',pro:'£7.50/month · £19.50/quarter · £79/year — WordPress only',agency:'£89/month'};

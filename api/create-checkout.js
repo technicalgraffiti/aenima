@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
       mode:                 'subscription',
       customer_email:       email || undefined,
       line_items:           [{ price, quantity: 1 }],
-      success_url:          `${process.env.NEXT_PUBLIC_URL}/dashboard?upgraded=1&plan=${plan}`,
+      success_url:          `${process.env.NEXT_PUBLIC_URL}/?upgraded=1&plan=${plan}`,
       cancel_url:           `${process.env.NEXT_PUBLIC_URL}/#pricing`,
       subscription_data: {
         metadata: { plan, billing: billing || 'mo' },
