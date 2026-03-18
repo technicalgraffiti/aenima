@@ -1,0 +1,8 @@
+{
+  "name": "aenima",
+  "version": "1.0.0",
+  "description": "Aenima GEO & AEO AI Visibility Tool",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}
