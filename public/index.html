@@ -2370,18 +2370,13 @@ async function doRegister(){
   const consentBox=document.getElementById('rgConsent');
   const regErrEl=document.getElementById('regErr');
   if(!consentBox?.checked){
-    regErrEl.style.color='#CC2200';
-    regErrEl.style.fontWeight='600';
-    regErrEl.style.padding='10px 14px';
-    regErrEl.style.background='#FFF0EE';
-    regErrEl.style.borderRadius='6px';
-    regErrEl.style.border='1.5px solid #CC2200';
+    regErrEl.classList.add('show');
     regErrEl.textContent='⚠ You must tick the box to confirm you have read and agreed to our Privacy Policy and Terms of Service before continuing.';
     consentBox.focus();
     return;
   }
+  regErrEl.classList.remove('show');
   regErrEl.textContent='';
-  regErrEl.style='';
   const n=document.getElementById('rgName').value.trim();
   const b=document.getElementById('rgBiz').value.trim();
   const e=document.getElementById('rgEmail').value.trim();
