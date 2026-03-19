@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode:                 'subscription',
-      customer_email:       email || undefined,
+      customer_email:       email || undefined, // pre-fills checkout email
       line_items:           [{ price, quantity: 1 }],
       success_url:          `${process.env.NEXT_PUBLIC_URL}/?upgraded=1&plan=${plan}`,
       cancel_url:           `${process.env.NEXT_PUBLIC_URL}/#pricing`,
