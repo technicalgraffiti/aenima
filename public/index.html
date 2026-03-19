@@ -2347,7 +2347,9 @@ async function doLogin(){
 }
 async function doRegister(){
   if(!document.getElementById('rgConsent')?.checked){
-    document.getElementById('regErr').textContent='Please agree to the Privacy Policy and Terms of Service to continue.';
+    const re=document.getElementById('regErr');
+    re.style.color='var(--red)';
+    re.textContent='Please tick the box to agree to our Privacy Policy and Terms of Service.';
     return;
   }
   const n=document.getElementById('rgName').value.trim();
