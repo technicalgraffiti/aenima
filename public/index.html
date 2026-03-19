@@ -556,7 +556,7 @@ nav{
 /* Issues panel */
 .issues-panel{
   background:var(--bg-white);
-  border-radius:0;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
   border:1.5px solid var(--border-lt);
   border-top:none;
   padding:28px;
@@ -591,13 +591,13 @@ nav{
   grid-template-columns:repeat(4,1fr);
   gap:14px;
 }
-.action-card{
+.action-card{display:flex;flex-direction:column;justify-content:space-between;
   background:var(--bg-white);
   border:1.5px solid var(--border-lt);
-  border-radius:var(--radius);
-  padding:20px;
+  border-radius:var(--radius-lg);
+  padding:24px;
   cursor:pointer;
-  transition:border-color 0.2s,transform 0.15s;
+  transition:border-color 0.2s;
   text-align:left;
 }
 .action-card:hover{border-color:var(--orange);transform:translateY(-2px)}
@@ -612,13 +612,18 @@ nav{
 }
 .action-card .ac-desc{font-size:13px;color:var(--t-support);line-height:1.5}
 .action-card .ac-btn{
-  display:inline-block;
-  margin-top:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:nowrap;
+  margin-top:auto;
+  padding-top:16px;
   font-family:'Work Sans',sans-serif;
   font-size:13px;
   font-weight:700;
   color:var(--orange);
   letter-spacing:-0.01em;
+  white-space:nowrap;
 }
 .ac-cost{
   font-size:11px;
@@ -1162,8 +1167,10 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 }
 @media(max-width:960px){
   .result-grid{max-width:95%}
-  .result-actions-wrap{max-width:95%}
+  .result-actions-wrap{max-width:100%}
   .fix-opts-grid{grid-template-columns:1fr}
+  .fix-opts-3col{grid-template-columns:1fr!important}
+  .result-fix-row{grid-template-columns:1fr!important}
   .result-actions{grid-template-columns:1fr 1fr}
   .paths-grid,.how-grid,.pricing-grid,.diff-inner,.footer-grid{grid-template-columns:1fr 1fr}
   .fix-panel{position:static}
@@ -1185,6 +1192,8 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   /* Billing toggle */
   .billing-toggle{flex-direction:column;width:calc(100% - 32px);margin-left:16px;margin-right:16px;margin-top:16px}
   .bill-btn{width:100%;text-align:center;padding:12px 16px}
+  .fix-opts-3col{grid-template-columns:1fr!important}
+  .result-fix-row{grid-template-columns:1fr!important}
   /* URL input — stack vertically */
   .url-input-wrap{flex-direction:column;border-radius:10px}
   .url-prefix{border-right:none;border-bottom:1.5px solid var(--border-lt);padding:12px 16px;justify-content:center}
@@ -1222,8 +1231,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   .result-actions-wrap{max-width:100%}
   .result-actions{grid-template-columns:1fr}
   /* Action cards */
-  .action-card{padding:16px}
-  /* Diff section */
+    /* Diff section */
   .diff-inner{grid-template-columns:1fr;gap:32px}
   /* Extra cards */
   .extra-grid{grid-template-columns:1fr}
@@ -1361,7 +1369,15 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   font-size:11px;font-weight:600;color:var(--green);
   margin-left:4px;vertical-align:middle;
 }
+
+
+@media(max-width:540px){
+  .result-fix-row{grid-template-columns:1fr!important}
+  .fix-options-grid{grid-template-columns:1fr!important}
+}
   html,body{overflow-x:hidden;max-width:100vw}
+  .pdf-card{justify-content:flex-end!important}
+  .pdf-card-content{flex-shrink:0}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1420,7 +1436,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <p>Enter your website address. See your score and exactly what's wrong — in under 60 seconds.</p>
       <div class="url-input-wrap">
         <div class="url-prefix">yoursite</div>
-        <input type="text" id="pubUrl" placeholder=".co.uk" autocomplete="off">
+        <input type="text" id="pubUrl" placeholder=".co.uk" autocomplete="off" onkeydown="if(event.key==='Enter')runScore()">
         <button onclick="runScore()" id="scoreBtn">Check free →</button>
       </div>
       <p class="score-note">No sign-up. No email. No data stored.</p>
@@ -1454,33 +1470,52 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         </div>
       </div>
 
-      <!-- ROW 2: 4 action boxes — full width -->
+      <!-- ROW 2: Action row — fix button + PDF -->
       <div class="result-actions-wrap" style="margin-top:20px">
-        <div class="result-actions">
-          <div class="action-card" onclick="doAction('schema')">
-            <span class="ac-icon">&#11041;</span>
-            <div class="ac-title">Fix your AI visibility signals</div>
-            <p class="ac-desc">Generate the exact code AI engines need to find and recommend your business. Download ready to install — or let the plugin do it automatically.</p>
-            <span class="ac-btn">Fix this &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch" class="result-fix-row">
+
+          <!-- Fix panel — designed value card -->
+          <div class="action-card fix-value-card" onclick="S.user?showDp('billing',null):gotoAnchor('pricing')" style="cursor:pointer">
+            <div style="margin-bottom:20px">
+              <div class="ac-title" style="font-size:18px;margin-bottom:6px">Fix your AI visibility</div>
+              <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:0">Everything AI engines need to find, trust and recommend your business. Three fixes. One subscription.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0;margin-top:2px">&#11041;</span>
+                <div>
+                  <div style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:var(--t-heading);margin-bottom:3px">Fix your AI visibility signals</div>
+                  <p style="font-size:13px;color:var(--t-body);line-height:1.6;margin:0">Generate the exact code AI engines need to find and recommend your business. Download and ready to install — or let the plugin do it automatically <span style="color:var(--orange);font-weight:600">(Pro &mdash; WordPress only)</span>.</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0;margin-top:2px">&#9636;</span>
+                <div>
+                  <div style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:var(--t-heading);margin-bottom:3px">Create your AI identity file</div>
+                  <p style="font-size:13px;color:var(--t-body);line-height:1.6;margin:0">The file AI systems look for when they visit your site. Without it they are guessing who you are. We create this for you now.</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0;margin-top:2px">&#9678;</span>
+                <div>
+                  <div style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:var(--t-heading);margin-bottom:3px">Strengthen your AI trust signals</div>
+                  <p style="font-size:13px;color:var(--t-body);line-height:1.6;margin:0">AI cross-references your business across the web. Gaps and inconsistencies hurt your score. See what needs fixing today.</p>
+                </div>
+              </div>
+            </div>
+            <span class="ac-btn">Fix it now &rarr; <span class="ac-cost">Starter &pound;5.50/mo &mdash; all three included</span></span>
           </div>
-          <div class="action-card" onclick="doAction('llms')">
-            <span class="ac-icon">&#9636;</span>
-            <div class="ac-title">Create your AI identity file</div>
-            <p class="ac-desc">The file AI systems look for when they visit your site. Without it they are guessing who you are. Generate it in seconds.</p>
-            <span class="ac-btn">Fix this &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
+
+          <!-- PDF — 1/4 width -->
+          <div class="action-card pdf-card" onclick="downloadScorePDF()">
+            <div class="pdf-card-content">
+              <span class="ac-icon">&#8595;</span>
+              <div class="ac-title">Download PDF report</div>
+              <p class="ac-desc">Your Machine-Visibility Score as a professional PDF report. Print it, share it or keep it on file.</p>
+              <span class="ac-btn">Download PDF &rarr; <span class="ac-cost" style="color:var(--green)">FREE</span></span>
+            </div>
           </div>
-          <div class="action-card" onclick="doAction('citations')">
-            <span class="ac-icon">&#9678;</span>
-            <div class="ac-title">Strengthen your AI trust signals</div>
-            <p class="ac-desc">AI cross-references your business across the web. Gaps and inconsistencies hurt your score. See what needs fixing.</p>
-            <span class="ac-btn">Fix this &rarr; <span class="ac-cost">Starter &pound;5.50/mo</span></span>
-          </div>
-          <div class="action-card" onclick="downloadScorePDF()">
-            <span class="ac-icon">&#8595;</span>
-            <div class="ac-title">Download PDF report</div>
-            <p class="ac-desc">Your Machine-Visibility Score as a professional PDF report. Print it, share it or keep it on file.</p>
-            <span class="ac-btn">Download PDF &rarr; <span class="ac-cost" style="color:var(--green)">FREE</span></span>
-          </div>
+
         </div>
       </div>
 
@@ -1488,7 +1523,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <div class="fix-panel" style="margin-top:20px;border-radius:var(--radius-lg)">
         <h3>Fix it now</h3>
         <p class="fp-sub">Choose the path that fits you. Cancel any time.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="fix-opts-3col" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
 
           <div class="fix-opt" onclick="handleUpgrade('starter')">
             <div class="fix-opt-hd">
@@ -2121,24 +2156,41 @@ async function runScore(){
 }
 
 function calcScore(url,raw){
-  const seed=raw.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-  const rnd=(mn,mx)=>mn+(seed%(mx-mn+1));
-  const https=url.startsWith('https://');
-  const cats={
-    ChatGPT:{score:rnd(2,13),max:20},
-    Perplexity:{score:rnd(1,10),max:20},
-    'Google AIO':{score:rnd(2,12),max:20},
-    Technical:{score:https?rnd(4,10):rnd(1,5),max:20},
-    Citations:{score:rnd(3,12),max:20},
+  // Generate a deterministic but varied seed from the full domain
+  const seed=raw.split('').reduce((a,c,i)=>a+(c.charCodeAt(0)*(i+7)),0);
+  const rnd=(mn,mx,salt)=>{
+    const s=(seed+(salt||0))*2654435761;
+    return mn+((s>>>0)%(mx-mn+1));
   };
-  const rawTotal=Object.values(cats).reduce((a,c)=>a+c.score,0);
-  const overall=Math.max(50,rawTotal);
+  const https=url.startsWith('https://');
+
+  // Score each category independently with different salts for variation
+  const chatgpt   = rnd(1,18,1);
+  const perplexity= rnd(1,16,2);
+  const googleaio = rnd(1,17,3);
+  const technical = https ? rnd(5,14,4) : rnd(1,6,4);
+  const citations = rnd(2,15,5);
+
+  const cats={
+    ChatGPT:    {score:chatgpt,   max:20},
+    Perplexity: {score:perplexity,max:20},
+    'Google AIO':{score:googleaio,max:20},
+    Technical:  {score:technical, max:20},
+    Citations:  {score:citations, max:20},
+  };
+
+  // Total out of 100 — no artificial floor
+  const overall=Object.values(cats).reduce((a,c)=>a+c.score,0);
+
+  // Issues — based on actual category scores
   const issues=[];
   if(!https)issues.push({p:'critical',t:'Security signal affecting AI trust score',cta:true});
-  issues.push({p:'critical',t:'AI visibility signal missing — fix this first',cta:true});
-  issues.push({p:'critical',t:'AI identity file not found on your domain',cta:true});
-  if(cats.ChatGPT.score<8)issues.push({p:'high',t:'Low ChatGPT visibility — competitors are being recommended instead'});
-  if(cats.Citations.score<8)issues.push({p:'high',t:'Directory presence needs attention',cta:true});
+  if(technical<8)issues.push({p:'critical',t:'AI visibility signal missing — fix this first',cta:true});
+  if(chatgpt<8) issues.push({p:'critical',t:'AI identity file not found on your domain',cta:true});
+  if(googleaio<8)issues.push({p:'high',t:'Google AI Overviews not showing your business',cta:true});
+  if(citations<8)issues.push({p:'high',t:'Directory presence needs attention',cta:true});
+  if(perplexity<8)issues.push({p:'high',t:'Low Perplexity visibility — AI search results missing you',cta:true});
+
   return{overall,cats,issues,url,domain:raw,ts:new Date()};
 }
 
@@ -2320,6 +2372,14 @@ async function doRegister(){
           email:e,name:n,business:b,website:u,
           phone:ph,town:tw,postcode:pc,plan:'free'
         });
+      }
+      // Check if email confirmation required
+      if(data.user && !data.user.confirmed_at){
+        if(btn){btn.disabled=false;btn.textContent='Create free account →';}
+        showErr(err,'');
+        document.getElementById('regErr').style.color='var(--green)';
+        document.getElementById('regErr').textContent='✓ Account created! Check your email and click the confirmation link before logging in.';
+        return;
       }
       S.user={id:data.user?.id,name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
     }catch(ex){
