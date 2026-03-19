@@ -3565,7 +3565,7 @@ initSupabase();
   // Handle Supabase email confirmation redirect
   const hash=window.location.hash;
   if(hash&&hash.includes('access_token')){
-    // Supabase confirmed the email — get the session
+    history.replaceState(null,'',window.location.pathname);
     if(SB){
       try{
         const {data}=await SB.auth.getSession();
@@ -3580,26 +3580,27 @@ initSupabase();
             plan:'free'
           };
           S.plan='free';saveS();
-          // Clear the hash
-          history.replaceState(null,'',window.location.pathname);
-          // Check pending plan
-          const pp=sessionStorage.getItem('pendingPlan');
-          if(pp){
-            sessionStorage.removeItem('pendingPlan');
-            S.billing=sessionStorage.getItem('pendingBilling')||'mo';
-            sessionStorage.removeItem('pendingBilling');
-            showPage('dashboard');
-            setTimeout(()=>handleUpgrade(pp),300);
-          } else {
-            showPage('dashboard');
+          // Pre-fill login form with email
+          const liEmail=document.getElementById('liEmail');
+          if(liEmail)liEmail.value=u.email;
+          // Show success message on login page
+          const loginErr=document.getElementById('loginErr');
+          if(loginErr){
+            loginErr.style.background='#F0FBF4';
+            loginErr.style.borderColor='#1A8A40';
+            loginErr.style.color='#1A8A40';
+            loginErr.classList.add('show');
+            loginErr.textContent='✓ Email confirmed! Enter your password to log in.';
           }
+          showPage('login');
           setTimeout(initConsent,300);
           return;
         }
       }catch(ex){console.warn('Confirmation session error:',ex);}
     }
-    // Fallback — show login
-    history.replaceState(null,'',window.location.pathname);
+    // Fallback
+    const liEmail=document.getElementById('liEmail');
+    if(liEmail&&liEmail.value==='')liEmail.value='';
     showPage('login');
     setTimeout(initConsent,300);
     return;
