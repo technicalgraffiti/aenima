@@ -1890,6 +1890,27 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   </footer>
 </div>
 
+<!-- PAGE: CONFIRM EMAIL -->
+<div class="page" id="page-confirm">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-size:48px;margin-bottom:16px">✉️</div>
+        <h2 style="margin-bottom:8px">Check your email</h2>
+        <p style="color:var(--t-support);font-size:15px;line-height:1.6">We've sent a confirmation link to <strong id="confirmEmail"></strong>.<br>Click the link in the email to activate your account.</p>
+        <p style="color:var(--t-support);font-size:14px;margin-top:12px">Once confirmed, log in below.</p>
+      </div>
+      <div style="border-top:1.5px solid var(--border-lt);padding-top:24px">
+        <h3 style="font-size:16px;margin-bottom:16px;color:var(--t-heading)">Log in to your account</h3>
+        <div class="auth-err" id="confirmLoginErr"></div>
+        <div class="fg"><label>Email</label><input type="email" id="clEmail" placeholder="you@yourbusiness.co.uk" autocomplete="email"></div>
+        <div class="fg"><label>Password</label><input type="password" id="clPass" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="btn btn-primary btn-full" onclick="doConfirmLogin()">Log in →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- PAGE: LOGIN -->
 <div class="page" id="page-login">
   <div class="auth-wrap">
@@ -2346,12 +2367,21 @@ async function doLogin(){
   showErr(err,'No account found. Please register first.');
 }
 async function doRegister(){
-  if(!document.getElementById('rgConsent')?.checked){
-    const re=document.getElementById('regErr');
-    re.style.color='var(--red)';
-    re.textContent='Please tick the box to agree to our Privacy Policy and Terms of Service.';
+  const consentBox=document.getElementById('rgConsent');
+  const regErrEl=document.getElementById('regErr');
+  if(!consentBox?.checked){
+    regErrEl.style.color='#CC2200';
+    regErrEl.style.fontWeight='600';
+    regErrEl.style.padding='10px 14px';
+    regErrEl.style.background='#FFF0EE';
+    regErrEl.style.borderRadius='6px';
+    regErrEl.style.border='1.5px solid #CC2200';
+    regErrEl.textContent='⚠ You must tick the box to confirm you have read and agreed to our Privacy Policy and Terms of Service before continuing.';
+    consentBox.focus();
     return;
   }
+  regErrEl.textContent='';
+  regErrEl.style='';
   const n=document.getElementById('rgName').value.trim();
   const b=document.getElementById('rgBiz').value.trim();
   const e=document.getElementById('rgEmail').value.trim();
@@ -2388,12 +2418,14 @@ async function doRegister(){
           phone:ph,town:tw,postcode:pc,plan:'free'
         });
       }
-      // Check if email confirmation required
+      // Email confirmation required — show confirm page with login form
       if(data.user && !data.user.confirmed_at){
         if(btn){btn.disabled=false;btn.textContent='Create free account →';}
-        showErr(err,'');
-        document.getElementById('regErr').style.color='var(--green)';
-        document.getElementById('regErr').textContent='✓ Account created! Check your email and click the confirmation link before logging in.';
+        const confirmEl=document.getElementById('confirmEmail');
+        if(confirmEl)confirmEl.textContent=e;
+        const clEmail=document.getElementById('clEmail');
+        if(clEmail)clEmail.value=e;
+        showPage('confirm');
         return;
       }
       S.user={id:data.user?.id,name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
@@ -2408,8 +2440,20 @@ async function doRegister(){
   S.plan='free';saveS();
   saveProfile({name:n,business:b,email:e,url:rawU,phone:ph,town:tw,postcode:pc});
   if(btn){btn.disabled=false;btn.textContent='Create free account →';}
+  // If we get here without Supabase, go to dashboard
   showPage('dashboard');
 }
+function doConfirmLogin(){
+  const e=document.getElementById('clEmail').value.trim();
+  const p=document.getElementById('clPass').value;
+  const err=document.getElementById('confirmLoginErr');
+  if(!e||!p){err.style.color='#CC2200';err.textContent='Please enter your email and password.';return;}
+  // Reuse doLogin logic by populating the login form and calling it
+  document.getElementById('liEmail').value=e;
+  document.getElementById('liPass').value=p;
+  doLogin();
+}
+
 function gatedAction(action){
   if(S.plan==='free'){
     showDp('billing',null);
@@ -3522,6 +3566,50 @@ function toast(msg){
 initSupabase();
 (async()=>{
   await loadS();
+
+  // Handle Supabase email confirmation redirect
+  const hash=window.location.hash;
+  if(hash&&hash.includes('access_token')){
+    // Supabase confirmed the email — get the session
+    if(SB){
+      try{
+        const {data}=await SB.auth.getSession();
+        if(data.session){
+          const u=data.session.user;
+          const meta=u.user_metadata||{};
+          S.user={
+            id:u.id,email:u.email,
+            name:meta.name||'',business:meta.business||'',
+            url:meta.website||'',phone:meta.phone||'',
+            town:meta.town||'',postcode:meta.postcode||'',
+            plan:'free'
+          };
+          S.plan='free';saveS();
+          // Clear the hash
+          history.replaceState(null,'',window.location.pathname);
+          // Check pending plan
+          const pp=sessionStorage.getItem('pendingPlan');
+          if(pp){
+            sessionStorage.removeItem('pendingPlan');
+            S.billing=sessionStorage.getItem('pendingBilling')||'mo';
+            sessionStorage.removeItem('pendingBilling');
+            showPage('dashboard');
+            setTimeout(()=>handleUpgrade(pp),300);
+          } else {
+            showPage('dashboard');
+          }
+          setTimeout(initConsent,300);
+          return;
+        }
+      }catch(ex){console.warn('Confirmation session error:',ex);}
+    }
+    // Fallback — show login
+    history.replaceState(null,'',window.location.pathname);
+    showPage('login');
+    setTimeout(initConsent,300);
+    return;
+  }
+
   const _up=new URLSearchParams(window.location.search);
   if(_up.get('upgraded')==='1'&&_up.get('plan')&&S.user){
     S.plan=_up.get('plan');
