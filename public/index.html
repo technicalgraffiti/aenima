@@ -1995,7 +1995,7 @@ const CFG={
   DOMAIN:'aenima.co.uk',
   STRIPE_KEY:'pk_live_51TCFrBJB2Su5DD2stmbNEYIoJsBvnXZ5S7tgRMFDHClp6q8CHWjd2tm4QIDhpwqrQHBZBuD6NkHyc2RGdgYrvOhA00YBjXMj31',
   CHECKOUT:'/api/create-checkout',
-  CLAUDE_KEY:'YOUR_CLAUDE_API_KEY',
+  CLAUDE_KEY:'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',
   HARDSHIP_LINK:'https://buy.stripe.com/14A4gA7Gz9fl520bqK0Ny00',
   SUPABASE_URL:'https://vnbjwffkvpvpmdpiumyy.supabase.co',
   SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuYmp3ZmZrdnB2cG1kcGl1bXl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTk3ODAsImV4cCI6MjA4OTM5NTc4MH0.7abpF9daa0o6G7EzjIcYuak8t_9ELK2-Bpen2WAesFo',
@@ -2155,68 +2155,83 @@ function gotoAnchor(id){
 /* ═══════════════════════════════════════
    SCORE CHECK
 ═══════════════════════════════════════ */
-async function runScore(){
+async async function runScore(){
   let raw=document.getElementById('pubUrl').value.trim();
   if(!raw){alert('Please enter your website address.');return;}
-  // Normalise — strip protocol if entered, add https
-  raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'');
-  const url='https://'+raw;
+  raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
+  if(!raw){alert('Please enter a valid website address.');return;}
 
   const btn=document.getElementById('scoreBtn');
   const prog=document.getElementById('scoreProgWrap');
   const bar=document.getElementById('scoreProgBar');
   const txt=document.getElementById('scoreProgText');
   btn.disabled=true;btn.textContent='Checking...';
-  prog.style.display='block';
+  if(prog)prog.style.display='block';
 
-  const steps=[[15,'Checking site availability...'],[32,'Looking for Schema markup...'],[50,'Checking llms.txt...'],[66,'Analysing citation signals...'],[82,'Simulating AI visibility...'],[100,'Done.']];
-  for(const[p,m]of steps){await wait(350+Math.random()*250);bar.style.width=p+'%';txt.textContent=m;}
+  // Progress steps while API runs
+  const steps=[
+    [15,'Checking site availability...'],
+    [32,'Looking for Schema markup...'],
+    [50,'Checking llms.txt...'],
+    [66,'Checking AI crawler access...'],
+    [82,'Checking search signals...'],
+    [95,'Calculating score...']
+  ];
+  let stepIdx=0;
+  const stepTimer=setInterval(()=>{
+    if(stepIdx<steps.length){
+      const[p,m]=steps[stepIdx++];
+      if(bar)bar.style.width=p+'%';
+      if(txt)txt.textContent=m;
+    }
+  },600);
 
-  const r=calcScore(url,raw);
-  S.score=r;
-  btn.disabled=false;btn.textContent='Check free →';
-  prog.style.display='none';bar.style.width='0%';
-  renderScore(r);
+  try{
+    const resp=await fetch('/api/check-domain',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({domain:raw})
+    });
+
+    clearInterval(stepTimer);
+    if(bar)bar.style.width='100%';
+    if(txt)txt.textContent='Done.';
+
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({error:'Server error'}));
+      throw new Error(err.error||'Check failed');
+    }
+
+    const data=await resp.json();
+    // Build result object matching existing renderScore format
+    const r={
+      overall: data.overall,
+      cats: data.cats,
+      issues: data.issues,
+      checks: data.checks,
+      url: 'https://'+data.domain,
+      domain: data.domain,
+      ts: new Date(data.ts),
+      real: true,
+    };
+    S.score=r;
+    btn.disabled=false;btn.textContent='Check free →';
+    if(prog)prog.style.display='none';
+    if(bar)bar.style.width='0%';
+    renderScore(r);
+
+  }catch(err){
+    clearInterval(stepTimer);
+    console.error('Score check failed:',err);
+    btn.disabled=false;btn.textContent='Check free →';
+    if(prog)prog.style.display='none';
+    if(bar)bar.style.width='0%';
+    if(txt)txt.textContent='';
+    alert('Could not check '+raw+'. Please check the domain and try again. Error: '+err.message);
+  }
 }
 
-function calcScore(url,raw){
-  // Generate a deterministic but varied seed from the full domain
-  const seed=raw.split('').reduce((a,c,i)=>a+(c.charCodeAt(0)*(i+7)),0);
-  const rnd=(mn,mx,salt)=>{
-    const s=(seed+(salt||0))*2654435761;
-    return mn+((s>>>0)%(mx-mn+1));
-  };
-  const https=url.startsWith('https://');
-
-  // Score each category independently with different salts for variation
-  const chatgpt   = rnd(1,18,1);
-  const perplexity= rnd(1,16,2);
-  const googleaio = rnd(1,17,3);
-  const technical = https ? rnd(5,14,4) : rnd(1,6,4);
-  const citations = rnd(2,15,5);
-
-  const cats={
-    ChatGPT:    {score:chatgpt,   max:20},
-    Perplexity: {score:perplexity,max:20},
-    'Google AIO':{score:googleaio,max:20},
-    Technical:  {score:technical, max:20},
-    Citations:  {score:citations, max:20},
-  };
-
-  // Total out of 100 — no artificial floor
-  const overall=Object.values(cats).reduce((a,c)=>a+c.score,0);
-
-  // Issues — based on actual category scores
-  const issues=[];
-  if(!https)issues.push({p:'critical',t:'Security signal affecting AI trust score',cta:true});
-  if(technical<8)issues.push({p:'critical',t:'AI visibility signal missing — fix this first',cta:true});
-  if(chatgpt<8) issues.push({p:'critical',t:'AI identity file not found on your domain',cta:true});
-  if(googleaio<8)issues.push({p:'high',t:'Google AI Overviews not showing your business',cta:true});
-  if(citations<8)issues.push({p:'high',t:'Directory presence needs attention',cta:true});
-  if(perplexity<8)issues.push({p:'high',t:'Low Perplexity visibility — AI search results missing you',cta:true});
-
-  return{overall,cats,issues,url,domain:raw,ts:new Date()};
-}
+/* calcScore replaced by real API check-domain */
 
 function renderScore(r){
   // Ring
@@ -2231,7 +2246,7 @@ function renderScore(r){
     const pct=Math.round((c.score/c.max)*100);
     const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
     const col=pct<40?'var(--red)':pct<65?'var(--amber)':'var(--green)';
-    return`<div class="cat-row"><div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${c.score}/${c.max}</span></div><div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div></div>`;
+    return`<div class="cat-row"><div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${c.score}/${c.max}</span></div><div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div>${c.detail?`<div style="font-size:12px;color:var(--t-support);margin-top:3px;padding-left:2px">${c.detail}</div>`:''}</div>`;
   }).join('');
 
   // Issues
@@ -2349,8 +2364,8 @@ async function doLogin(){
         sessionStorage.removeItem('pendingPlan');
         S.billing=sessionStorage.getItem('pendingBilling')||'mo';
         sessionStorage.removeItem('pendingBilling');
-        showPage('dashboard');
-        setTimeout(()=>handleUpgrade(pp),300);
+        // Go straight to Stripe — no dashboard flash
+        handleUpgrade(pp);
         return;
       }
       showPage('dashboard');
@@ -3022,7 +3037,7 @@ async function runDScore(){
       const pct=Math.round((c.score/c.max)*100);
       const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
       const col=pct<40?'var(--red)':pct<65?'var(--amber)':'var(--green)';
-      return`<div class="cat-row"><div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${c.score}/${c.max}</span></div><div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div></div>`;
+      return`<div class="cat-row"><div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${c.score}/${c.max}</span></div><div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div>${c.detail?`<div style="font-size:12px;color:var(--t-support);margin-top:3px;padding-left:2px">${c.detail}</div>`:''}</div>`;
     }).join('');
   }
   // Show new 50/50 layout
