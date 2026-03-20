@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Visibility Check — Technical Graffiti</title>
+<meta name="description" content="Free AI visibility check for local businesses. See exactly what's stopping AI from finding you. From Technical Graffiti.">
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Work+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange: #DD5827;
+  --orange-dk: #C04820;
+  --orange-lt: #FDF0EB;
+  --black: #0A0A0A;
+  --bg: #F8F7F5;
+  --bg-white: #FFFFFF;
+  --border: #E5E5E5;
+  --t-heading: #0A0A0A;
+  --t-body: #3D3D3D;
+  --t-support: #777777;
+  --green: #1A8A40;
+  --red: #CC2200;
+  --amber: #CC6600;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t-body);overflow-x:hidden}
+
+/* ── NAV ── */
+.tg-nav{
+  background:var(--black);
+  padding:0 24px;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.tg-logo{
+  font-family:'DM Mono',monospace;
+  font-size:18px;
+  color:#FFFFFF;
+  text-decoration:none;
+  letter-spacing:-0.02em;
+}
+.tg-logo span{color:var(--orange)}
+.tg-back{
+  font-size:14px;
+  color:rgba(255,255,255,0.5);
+  text-decoration:none;
+  transition:color 0.15s;
+}
+.tg-back:hover{color:#FFFFFF}
+
+/* ── SCORE SECTION ── */
+.score-wrap{
+  max-width:680px;
+  margin:0 auto;
+  padding:72px 24px 48px;
+  text-align:center;
+}
+.eyebrow{
+  font-family:'Work Sans',sans-serif;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--orange);
+  display:block;
+  margin-bottom:20px;
+}
+.score-h{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:clamp(36px,6vw,64px);
+  letter-spacing:-0.03em;
+  line-height:1;
+  color:var(--t-heading);
+  margin-bottom:20px;
+}
+.score-sub{
+  font-size:18px;
+  color:var(--t-support);
+  line-height:1.6;
+  margin-bottom:32px;
+}
+.url-wrap{
+  display:flex;
+  align-items:stretch;
+  background:var(--bg-white);
+  border:2px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  max-width:540px;
+  margin:0 auto 16px;
+  transition:border-color 0.2s;
+}
+.url-wrap:focus-within{border-color:var(--orange)}
+.url-pre{
+  font-family:'DM Mono',monospace;
+  font-size:14px;
+  color:var(--t-support);
+  padding:0 14px;
+  background:var(--bg);
+  border-right:1.5px solid var(--border);
+  display:flex;
+  align-items:center;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.url-input{
+  flex:1;
+  border:none;
+  outline:none;
+  padding:14px 16px;
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  color:var(--t-heading);
+  background:transparent;
+}
+.url-btn{
+  background:var(--orange);
+  color:#FFFFFF;
+  border:none;
+  padding:0 28px;
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background 0.15s;
+  letter-spacing:-0.01em;
+}
+.url-btn:hover{background:var(--orange-dk)}
+.url-btn:disabled{opacity:0.6;cursor:not-allowed}
+.score-note{
+  font-size:16px;
+  font-weight:600;
+  color:var(--t-body);
+  letter-spacing:-0.01em;
+}
+
+/* ── PROGRESS ── */
+.prog-wrap{display:none;max-width:540px;margin:16px auto 0}
+.prog-txt{font-size:14px;color:var(--t-support);margin-bottom:6px}
+.prog-track{background:var(--border);border-radius:99px;height:4px;overflow:hidden}
+.prog-bar{height:100%;background:var(--orange);width:0%;transition:width 0.4s ease;border-radius:99px}
+
+/* ── RESULTS ── */
+.result-wrap{display:none;max-width:680px;margin:0 auto;padding:0 24px 80px}
+
+.score-panel{
+  background:var(--bg-white);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:32px;
+  text-align:center;
+}
+.score-ring{
+  width:160px;height:160px;
+  border-radius:50%;
+  border:8px solid var(--border);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  margin:0 auto 16px;
+  transition:border-color 0.5s;
+}
+.score-ring.low{border-color:var(--red)}
+.score-ring.mid{border-color:var(--amber)}
+.score-ring.good{border-color:var(--green)}
+.score-num{font-family:'Work Sans',sans-serif;font-weight:800;font-size:64px;letter-spacing:-0.04em;line-height:1;color:var(--t-heading)}
+.score-denom{font-size:16px;color:var(--t-support)}
+.score-grade{font-family:'Work Sans',sans-serif;font-weight:700;font-size:20px;color:var(--t-heading);letter-spacing:-0.01em}
+
+.cats-panel{
+  background:var(--bg-white);
+  border:1.5px solid var(--border);
+  border-top:none;
+  padding:28px 32px;
+}
+.cats-panel h3{font-family:'Work Sans',sans-serif;font-weight:700;font-size:18px;color:var(--t-heading);margin-bottom:20px;letter-spacing:-0.01em}
+.cat-row{margin-bottom:14px}
+.cat-hd{display:flex;justify-content:space-between;margin-bottom:5px}
+.cat-name{font-size:14px;font-weight:600;color:var(--t-heading)}
+.cat-score{font-size:14px;font-weight:700}
+.cat-track{background:var(--border);border-radius:99px;height:6px;overflow:hidden}
+.cat-fill{height:100%;border-radius:99px;transition:width 0.6s ease}
+.cat-fill.cat-low{background:var(--red)}
+.cat-fill.cat-mid{background:var(--amber)}
+.cat-fill.cat-ok{background:var(--green)}
+.cat-detail{font-size:12px;color:var(--t-support);margin-top:3px}
+
+.issues-panel{
+  background:var(--bg-white);
+  border:1.5px solid var(--border);
+  border-top:none;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  padding:28px;
+}
+.issues-panel h3{font-family:'Work Sans',sans-serif;font-weight:700;font-size:18px;color:var(--t-heading);margin-bottom:20px;letter-spacing:-0.01em}
+.issue-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.issue-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.badge-crit{background:#FFF0EE;color:var(--red)}
+.badge-high{background:#FFF8E6;color:var(--amber)}
+.issue-text{font-size:15px;color:var(--t-body);line-height:1.5}
+
+/* ── ACTION CARDS ── */
+.action-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:14px;
+}
+.action-card{
+  background:var(--bg-white);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  cursor:pointer;
+  transition:border-color 0.15s;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  text-decoration:none;
+}
+.action-card:hover{border-color:var(--orange)}
+.ac-icon{font-size:24px;margin-bottom:10px;display:block}
+.ac-title{font-family:'Work Sans',sans-serif;font-weight:700;font-size:16px;color:var(--t-heading);margin-bottom:6px}
+.ac-desc{font-size:14px;color:var(--t-support);line-height:1.6;margin-bottom:14px;flex:1}
+.ac-cta{font-family:'Work Sans',sans-serif;font-size:13px;font-weight:700;color:var(--orange);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ac-free{font-size:11px;font-weight:600;color:var(--green);background:#E6F7ED;padding:2px 8px;border-radius:10px}
+
+/* ── TG CTA STRIP ── */
+.tg-strip{
+  background:var(--black);
+  margin-top:32px;
+  border-radius:var(--radius-lg);
+  padding:28px 32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:16px;
+}
+.tg-strip p{font-size:16px;color:rgba(255,255,255,0.7);line-height:1.5}
+.tg-strip strong{color:#FFFFFF}
+.tg-strip-btn{
+  background:var(--orange);
+  color:#FFFFFF;
+  border:none;
+  padding:12px 24px;
+  border-radius:8px;
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:background 0.15s;
+  flex-shrink:0;
+}
+.tg-strip-btn:hover{background:var(--orange-dk)}
+
+/* ── FOOTER ── */
+.tg-footer{
+  background:var(--black);
+  padding:24px;
+  text-align:center;
+  font-size:13px;
+  color:rgba(255,255,255,0.3);
+  margin-top:48px;
+}
+.tg-footer a{color:rgba(255,255,255,0.4);text-decoration:none}
+.tg-footer a:hover{color:#FFFFFF}
+
+@media(max-width:600px){
+  .action-row{grid-template-columns:1fr}
+  .tg-strip{flex-direction:column;text-align:center}
+  .score-wrap{padding:48px 16px 32px}
+  .url-wrap{flex-direction:column;border-radius:var(--radius)}
+  .url-pre{border-right:none;border-bottom:1.5px solid var(--border);padding:12px 14px;justify-content:center}
+  .url-btn{padding:14px;border-radius:0}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="tg-nav">
+  <a href="https://technicalgraffiti.co.uk" class="tg-logo">Technical<span>.</span>Graffiti</a>
+  <a href="https://technicalgraffiti.co.uk" class="tg-back">← Back to Technical Graffiti</a>
+</nav>
+
+<!-- SCORE CHECK -->
+<div class="score-wrap">
+  <span class="eyebrow">Free — No Account Needed</span>
+  <h1 class="score-h">Find out if AI can find your business</h1>
+  <p class="score-sub">Enter your website address. See your score and exactly what's wrong — in under 60 seconds.</p>
+  <div class="url-wrap">
+    <div class="url-pre">yoursite</div>
+    <input type="text" id="tgUrl" class="url-input" placeholder=".co.uk" autocomplete="off" onkeydown="if(event.key==='Enter')runTGScore()">
+    <button class="url-btn" id="tgBtn" onclick="runTGScore()">Check free →</button>
+  </div>
+  <p class="score-note">We run five real checks on your domain. Your score is based on what's actually there — not a guess.</p>
+  <div class="prog-wrap" id="tgProg">
+    <p class="prog-txt" id="tgProgTxt">Checking...</p>
+    <div class="prog-track"><div class="prog-bar" id="tgProgBar"></div></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="result-wrap" id="tgResults">
+
+  <!-- Score ring -->
+  <div class="score-panel">
+    <div class="score-ring" id="tgRing">
+      <span class="score-num" id="tgNum">0</span>
+      <span class="score-denom">/100</span>
+    </div>
+    <p class="score-grade" id="tgGrade">—</p>
+  </div>
+
+  <!-- Category breakdown -->
+  <div class="cats-panel">
+    <h3>Category breakdown</h3>
+    <div id="tgCats"></div>
+  </div>
+
+  <!-- Issues -->
+  <div class="issues-panel">
+    <h3 id="tgIssuesTitle">Issues found</h3>
+    <div id="tgIssues"></div>
+  </div>
+
+  <!-- Action cards -->
+  <div class="action-row">
+    <!-- Fix it -->
+    <a href="https://aenima.co.uk/#register" class="action-card">
+      <div>
+        <span class="ac-icon">▲</span>
+        <div class="ac-title">Fix what's missing</div>
+        <p class="ac-desc">Generate the exact files that fix your AI visibility. Download and install yourself, or let the WordPress plugin handle it automatically.</p>
+      </div>
+      <span class="ac-cta">Fix it now → <span style="font-size:11px;font-weight:600;color:var(--orange);background:var(--orange-lt);padding:2px 8px;border-radius:10px">from £5.50/mo</span></span>
+    </a>
+    <!-- PDF -->
+    <div class="action-card" onclick="downloadTGPDF()">
+      <div>
+        <span class="ac-icon">↓</span>
+        <div class="ac-title">Download PDF report</div>
+        <p class="ac-desc">Your AI visibility score as a professional PDF report. Print it, share it or keep it on file.</p>
+      </div>
+      <span class="ac-cta">Download PDF → <span class="ac-free">FREE</span></span>
+    </div>
+  </div>
+
+  <!-- TG CTA strip -->
+  <div class="tg-strip">
+    <p><strong>Want someone to fix it for you?</strong><br>Stewart at Technical Graffiti handles everything personally. Fixed prices, plain English, no contracts.</p>
+    <a href="https://technicalgraffiti.co.uk" class="tg-strip-btn">Talk to Stewart →</a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="tg-footer">
+  <p>© 2026 Technical Graffiti Ltd · Company No. 07180346 · <a href="https://technicalgraffiti.co.uk">technicalgraffiti.co.uk</a> · <a href="mailto:ai@technicalgraffiti.co.uk">ai@technicalgraffiti.co.uk</a></p>
+</footer>
+
+<script>
+const CFG={CHECK:'/api/check-domain'};
+
+async function runTGScore(){
+  let raw=document.getElementById('tgUrl').value.trim();
+  if(!raw){alert('Please enter your website address.');return;}
+  raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
+  if(!raw){alert('Please enter a valid domain.');return;}
+
+  const btn=document.getElementById('tgBtn');
+  const prog=document.getElementById('tgProg');
+  const bar=document.getElementById('tgProgBar');
+  const txt=document.getElementById('tgProgTxt');
+  btn.disabled=true;btn.textContent='Checking...';
+  prog.style.display='block';
+
+  const steps=[[20,'Checking site availability...'],[40,'Looking for business signals...'],[60,'Checking AI identity file...'],[80,'Checking AI crawler access...'],[95,'Calculating score...']];
+  let si=0;
+  const st=setInterval(()=>{if(si<steps.length){const[p,m]=steps[si++];bar.style.width=p+'%';txt.textContent=m;}},700);
+
+  try{
+    const resp=await fetch(CFG.CHECK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:raw})});
+    clearInterval(st);bar.style.width='100%';txt.textContent='Done.';
+    if(!resp.ok)throw new Error('Check failed');
+    const data=await resp.json();
+    window._tgScore=data;
+    renderTGScore(data);
+    btn.disabled=false;btn.textContent='Check free →';
+    prog.style.display='none';bar.style.width='0%';
+  }catch(err){
+    clearInterval(st);
+    btn.disabled=false;btn.textContent='Check free →';
+    prog.style.display='none';bar.style.width='0%';
+    alert('Could not check '+raw+'. Please verify the domain and try again.');
+  }
+}
+
+function renderTGScore(data){
+  const o=data.overall;
+  const gr=o<30?'low':o<55?'mid':'good';
+  document.getElementById('tgRing').className='score-ring '+gr;
+  document.getElementById('tgNum').textContent=o;
+  document.getElementById('tgGrade').textContent=o<30?'Not visible to AI search':o<55?'Limited AI visibility':o<80?'Moderate visibility':'Good visibility';
+
+  // Categories
+  document.getElementById('tgCats').innerHTML=Object.entries(data.cats).map(([name,cat])=>{
+    const pct=Math.round((cat.score/cat.max)*100);
+    const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
+    const col=pct<40?'var(--red)':pct<65?'var(--amber)':'var(--green)';
+    return`<div class="cat-row">
+      <div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${cat.score}/${cat.max}</span></div>
+      <div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div>
+      ${cat.detail?`<div class="cat-detail">${cat.detail}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Issues
+  document.getElementById('tgIssuesTitle').textContent=`Issues found (${data.issues.length})`;
+  document.getElementById('tgIssues').innerHTML=data.issues.length
+    ? data.issues.map(i=>`<div class="issue-row"><span class="issue-badge ${i.p==='critical'?'badge-crit':'badge-high'}">${i.p.toUpperCase()}</span><span class="issue-text">${i.t}</span></div>`).join('')
+    : '<p style="color:var(--green);font-weight:600">✓ No issues found — good AI visibility signals detected.</p>';
+
+  // Show results
+  const rw=document.getElementById('tgResults');
+  rw.style.display='block';
+  setTimeout(()=>rw.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function downloadTGPDF(){
+  const data=window._tgScore;
+  if(!data){alert('Run a check first.');return;}
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AI Visibility Report — ${data.domain}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}
+    .hdr{background:#0A0A0A;color:#DD5827;padding:32px;border-radius:8px;margin-bottom:36px}
+    .hdr h1{font-size:26px;margin:0 0 6px;letter-spacing:-0.02em;color:#DD5827}
+    .hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}
+    .score{font-size:88px;font-weight:800;color:#DD5827;line-height:1;letter-spacing:-0.04em;margin:0 0 4px}
+    .grade{font-size:20px;color:#777;margin-bottom:36px}
+    h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:28px 0 12px;border-bottom:1px solid #EEE;padding-bottom:10px}
+    .issue{display:flex;gap:12px;margin-bottom:10px;font-size:16px;color:#3D3D3D;align-items:flex-start}
+    .bdg{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+    .crit{background:#FFF0EE;color:#CC2200}.high{background:#FFF8E6;color:#CC6600}
+    .foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A0A0A;font-size:13px;color:#AAA;display:flex;justify-content:space-between}
+    @media print{body{margin:20px}}
+  </style></head><body>
+  <div class="hdr"><h1>AI Visibility Report</h1><p>${data.domain} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Technical Graffiti</p></div>
+  <div class="score">${data.overall}</div>
+  <div class="grade">${data.overall<30?'Not visible to AI search engines.':data.overall<55?'Limited AI visibility.':data.overall<80?'Moderate visibility — improvements available.':'Good visibility — keep it maintained.'}</div>
+  <h3>Issues found</h3>
+  ${data.issues.map(i=>`<div class="issue"><span class="bdg ${i.p==='critical'?'crit':'high'}">${i.p.toUpperCase()}</span>${i.t}</div>`).join('')}
+  <h3>Next steps</h3>
+  <p style="font-size:16px;color:#3D3D3D;line-height:1.7">Contact Technical Graffiti to fix these issues — or use Aenima at aenima.co.uk to generate and download the files yourself from £5.50/month.</p>
+  <div class="foot"><span>Technical Graffiti Ltd · Company No. 07180346</span><span>technicalgraffiti.co.uk</span></div>
+  </body></html>`);
+  w.document.close();setTimeout(()=>{w.focus();w.print();},400);
+}
+</script>
+</body>
+</html>

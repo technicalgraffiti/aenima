@@ -19,6 +19,10 @@
       "dest": "/api/$1"
     },
     {
+      "src": "/tg-check",
+      "dest": "/public/tg-check.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
