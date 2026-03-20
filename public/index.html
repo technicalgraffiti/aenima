@@ -3620,7 +3620,7 @@ initSupabase();
   // Handle Supabase email confirmation redirect
   const hash=window.location.hash;
   if(hash&&hash.includes('access_token')){
-    history.replaceState({page:'marketing'},'',' ');
+    history.replaceState({page:'marketing'},'',window.location.pathname);
     if(SB){
       try{
         const {data}=await SB.auth.getSession();
@@ -3647,16 +3647,24 @@ initSupabase();
             loginErr.classList.add('show');
             loginErr.textContent='✓ Email confirmed! Enter your password to log in.';
           }
-          showPage('login');
+          // Show login directly — bypass hash navigation
+          document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+          document.getElementById('page-login').classList.add('active');
+          syncNav(false);
+          window.scrollTo(0,0);
+          history.replaceState({page:'login'},'',window.location.pathname);
           setTimeout(initConsent,300);
           return;
         }
       }catch(ex){console.warn('Confirmation session error:',ex);}
     }
-    // Fallback
+    // Fallback — show login directly
     const liEmail=document.getElementById('liEmail');
     if(liEmail&&liEmail.value==='')liEmail.value='';
-    showPage('login');
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-login').classList.add('active');
+    syncNav(false);
+    history.replaceState({page:'login'},'',window.location.pathname);
     setTimeout(initConsent,300);
     return;
   }
