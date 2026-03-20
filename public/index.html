@@ -2029,22 +2029,16 @@ function initSupabase(){
     // Listen for email confirmation — fires when user clicks confirmation link
     SB.auth.onAuthStateChange(async(event,session)=>{
       if(event==='SIGNED_IN'&&session&&!S.user){
-        // User just confirmed their email and signed in
+        // Email confirmed — show login page with email pre-filled
+        // DO NOT set S.user or saveS() — user must enter password manually
         const u=session.user;
-        const meta=u.user_metadata||{};
-        S.user={
-          id:u.id,email:u.email,
-          name:meta.name||'',business:meta.business||'',
-          url:meta.website||'',phone:meta.phone||'',
-          town:meta.town||'',postcode:meta.postcode||'',
-          plan:'free'
-        };
-        S.plan='free';saveS();
-        // Clear any hash/token from URL
+        // Sign out immediately to prevent auto-login
+        await SB.auth.signOut();
+        // Store email temporarily for pre-fill only
+        const confirmedEmail=u.email;
         history.replaceState({page:'login'},'',window.location.pathname);
-        // Pre-fill email and show success on login page
         const liEmail=document.getElementById('liEmail');
-        if(liEmail)liEmail.value=u.email;
+        if(liEmail)liEmail.value=confirmedEmail;
         const loginErr=document.getElementById('loginErr');
         if(loginErr){
           loginErr.style.background='#F0FBF4';
@@ -2053,7 +2047,6 @@ function initSupabase(){
           loginErr.classList.add('show');
           loginErr.textContent='✓ Email confirmed! Enter your password to log in.';
         }
-        // Show login page directly
         document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
         document.getElementById('page-login').classList.add('active');
         syncNav(false);
@@ -3716,9 +3709,8 @@ initSupabase();
         });
         if(!error&&data.session){
           const u=data.session.user;
-          const meta=u.user_metadata||{};
-          S.user={id:u.id,email:u.email,name:meta.name||'',business:meta.business||'',url:meta.website||'',phone:meta.phone||'',town:meta.town||'',postcode:meta.postcode||'',plan:'free'};
-          S.plan='free';saveS();
+          // Sign out immediately — user must log in manually with password
+          await SB.auth.signOut();
           history.replaceState({page:'login'},'',window.location.pathname);
           const liEmail=document.getElementById('liEmail');
           if(liEmail)liEmail.value=u.email;
