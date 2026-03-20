@@ -2144,6 +2144,7 @@ function syncNav(in_){
     nl.innerHTML=`<a onclick="gotoAnchor('how')">How it works</a><a onclick="gotoAnchor('pricing')">Pricing</a><button onclick="showPage('login')">Log in</button><button class="btn btn-primary btn-sm" onclick="showPage('register')">Get my free score →</button>`;
   }
 }
+
 function gotoAnchor(id){
   showPage('marketing');
   setTimeout(()=>{
@@ -2151,11 +2152,11 @@ function gotoAnchor(id){
     if(el)el.scrollIntoView({behavior:'smooth'});
   },50);
 }
-
 /* ═══════════════════════════════════════
    SCORE CHECK
 ═══════════════════════════════════════ */
-async async function runScore(){
+function runScore(){_runScore().catch(e=>console.error(e));}
+async function _runScore(){
   let raw=document.getElementById('pubUrl').value.trim();
   if(!raw){alert('Please enter your website address.');return;}
   raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
@@ -3008,7 +3009,8 @@ function renderScoreOverview(r){
 /* ═══════════════════════════════════════
    DASHBOARD SCORE
 ═══════════════════════════════════════ */
-async function runDScore(){
+function runDScore(){_runDScore().catch(e=>console.error(e));}
+async function _runDScore(){
   let raw=v('dUrl');if(!raw){alert('Please enter your website address.');return;}
   raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
   const btn=document.getElementById('dScoreBtn');
