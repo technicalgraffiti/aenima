@@ -55,8 +55,15 @@ module.exports = async (req, res) => {
 
   // ── CHECK 2: SCHEMA MARKUP ───────────────────────────────────────────────
   const homepageBody = httpsCheck.body || '';
-  const hasSchema = homepageBody.includes('application/ld+json') || homepageBody.includes('itemtype') || homepageBody.includes('schema.org');
-  const hasLocalBizSchema = homepageBody.includes('LocalBusiness') || homepageBody.includes('Organization') || homepageBody.includes('Person');
+  // PageSpeed removes quotes: type=application/ld+json or type="application/ld+json"
+  const hasSchema = homepageBody.includes('application/ld+json') || 
+    homepageBody.includes('application\/ld+json') ||
+    homepageBody.includes('itemtype') || 
+    homepageBody.includes('schema.org');
+  const hasLocalBizSchema = homepageBody.includes('LocalBusiness') || 
+    homepageBody.includes('Organization') || 
+    homepageBody.includes('ProfessionalService') ||
+    homepageBody.includes('Person');
   results.schema = {
     pass: hasSchema,
     hasLocalBiz: hasLocalBizSchema,
@@ -115,10 +122,11 @@ module.exports = async (req, res) => {
   };
 
   // ── CHECK 5: META DESCRIPTION ────────────────────────────────────────────
-  const metaMatch = homepageBody.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']{10,})["']/i)
-    || homepageBody.match(/<meta[^>]+content=["']([^"']{10,})["'][^>]+name=["']description["']/i);
+  // Match meta description with or without quotes (PageSpeed removes quotes)
+  const metaMatch = homepageBody.match(/<meta[^>]+name=["']?description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i)
+    || homepageBody.match(/<meta[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?[^>]+name=["']?description["']?/i);
   const metaDesc = metaMatch ? metaMatch[1] : null;
-  const ogDesc = homepageBody.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']{10,})["']/i);
+  const ogDesc = homepageBody.match(/<meta[^>]+property=["']?og:description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i);
   results.meta = {
     pass: !!(metaDesc || ogDesc),
     content: metaDesc || (ogDesc ? ogDesc[1] : null),
