@@ -2142,11 +2142,10 @@ function showPage(n){
   if(n==='dashboard'){buildDash();syncDash();syncNav(true);}
   else syncNav(false);
   window.scrollTo(0,0);
-  // Push state so browser back button returns to marketing page
   if(n==='marketing'){
     history.replaceState({page:'marketing'},'',window.location.pathname);
   } else {
-    history.pushState({page:n},'',window.location.pathname);
+    history.pushState({page:n},'','#'+n);
   }
 }
 function syncNav(in_){
@@ -3676,10 +3675,16 @@ initSupabase();
   }
   setTimeout(initConsent,300);
   window.addEventListener('popstate',function(e){
-    if(document.getElementById('page-dashboard').classList.contains('active')||
-       document.getElementById('page-login').classList.contains('active')||
-       document.getElementById('page-register').classList.contains('active')){
-      showPage('marketing');
+    const pg=e.state&&e.state.page?e.state.page:null;
+    const hash=window.location.hash.replace('#','');
+    const target=pg||hash;
+    if(!target||target==='marketing'){
+      // Clear hash and show marketing
+      history.replaceState({page:'marketing'},'',window.location.pathname);
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById('page-marketing').classList.add('active');
+      syncNav(false);
+      window.scrollTo(0,0);
     }
   });
 })();
