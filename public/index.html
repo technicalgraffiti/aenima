@@ -390,9 +390,11 @@ nav{
   margin-bottom:32px;
 }
 .score-note{
-  font-size:14px;
-  color:#BBBBBB;
-  margin-top:12px;
+  font-size:16px;
+  font-weight:600;
+  color:var(--t-body);
+  margin-top:16px;
+  letter-spacing:-0.01em;
 }
 .prog-wrap{
   background:var(--border-lt);
@@ -911,7 +913,7 @@ nav{
   gap:64px;
   align-items:center;
 }
-.diff-left .section-h{color:#FFFFFF!important;font-size:clamp(20px,2.5vw,32px)!important;margin-bottom:8px}
+.diff-left .section-h{color:#FFFFFF;font-size:clamp(20px,2.5vw,32px)!important;margin-bottom:8px}
 .diff-left .eyebrow{color:var(--orange)}
 .diff-left p{font-size:17px;color:var(--t-white70);line-height:1.75;margin-bottom:20px}
 .diff-left strong{color:#FFFFFF;font-weight:500}
@@ -1416,7 +1418,8 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
     <div class="hero-inner">
       <span class="eyebrow">GEO &amp; AEO — AI Search Visibility</span>
       <h1 class="display">Is your business<br><em>showing up in AI search?</em></h1>
-      <h2 class="hero-statement">Most local businesses don't.<br><span class="white">We check your AI visibility in 60 seconds &mdash; and generate the files that fix it.</span></h2>
+      <h2 class="hero-statement">Most local businesses don't.</h2>
+      <h2 class="hero-statement hero-sub-bold" style="margin-top:12px;color:#FFFFFF">We check your AI visibility in 60 seconds &mdash; and generate the files that fix it.</h2>
       <div class="hero-cta">
         <button class="btn btn-primary btn-lg" onclick="gotoAnchor('score')">Check my score free →</button>
         <button class="btn btn-outline-white btn-lg" onclick="gotoAnchor('how')">See how it works</button>
@@ -1480,7 +1483,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <!-- Fix panel — designed value card -->
           <div class="action-card fix-value-card" onclick="S.user?showDp('billing',null):gotoAnchor('pricing')" style="cursor:pointer">
             <div style="margin-bottom:20px">
-              <div class="ac-title" style="font-size:18px;margin-bottom:6px">Fix what's missing</div>
+              <div class="ac-title" style="font-size:22px;margin-bottom:8px">Fix what's missing</div>
               <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:0">Three fixes. One subscription. From £5.50/month.</p>
             </div>
             <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
@@ -1513,7 +1516,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <div class="action-card pdf-card" onclick="downloadScorePDF()">
             <div class="pdf-card-content">
               <span class="ac-icon">&#8595;</span>
-              <div class="ac-title">Download PDF report</div>
+              <div class="ac-title" style="font-size:22px">Download PDF report — <span style="color:var(--green)">Free</span></div>
               <p class="ac-desc">Your Machine-Visibility Score as a professional PDF report. Print it, share it or keep it on file.</p>
               <span class="ac-btn">Download PDF &rarr; <span class="ac-cost" style="color:var(--green)">FREE</span></span>
             </div>
@@ -1643,8 +1646,8 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   <section class="how-section">
     <div class="wrap">
       <span class="eyebrow">Under the bonnet</span>
-      <h2 class="section-h" style="color:#FFFFFF">Why most local businesses are invisible to AI — and how to fix it</h2>
-      <p class="how-intro">When someone asks an AI assistant for the best plumber in Wellingborough or a recommended accountant in Northampton, AI doesn't search Google. It looks for structured signals it can trust. Most local business websites have none of them. That's not a content problem. It's a technical gap. And it's fixable today.</p>
+      <h2 class="section-h" style="color:#FFFFFF">Why most local businesses are invisible to AI<br><span style="color:var(--orange)">— and how to fix it</span></h2>
+      <p class="how-intro">When someone asks an AI assistant for the best plumber in Wellingborough, a solicitor in Bristol, a dentist in Manchester, or a recommended accountant in Northampton, AI doesn't search Google. It looks for structured signals it can trust. Most local business websites have none of them. That's not a content problem. It's a technical gap. And it's fixable today.</p>
     </div>
     <div class="how-grid" style="padding:0 5vw">
       <div class="how-card" style="border-top:3px solid var(--orange)">
@@ -1659,8 +1662,12 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <span class="how-n">02</span>
         <div class="how-badge how-badge-paid">From £5.50/mo</div>
         <h3 class="how-h">Get the files that fix it</h3>
-        <p class="how-p">We generate the specific visibility files your business needs. Download and install yourself, or let the WordPress plugin handle everything automatically.</p>
-        <p class="how-p" style="margin-top:12px;color:var(--t-support)">Starter — download and install yourself, any website. Pro — WordPress plugin installs and updates automatically. Compatible with most standard WordPress hosting. No code required.</p>
+        <p class="how-p">We generate the specific visibility files your business needs — and keep them updated every month as your business changes.</p>
+        <ul class="how-p" style="margin-top:12px;color:var(--t-support);padding-left:20px;line-height:2">
+          <li><strong>Starter</strong> — download and install yourself. Works on any website.</li>
+          <li><strong>Pro</strong> — WordPress plugin installs and updates automatically. No code required.</li>
+          <li><strong>Both plans</strong> — monthly re-score, files regenerated if anything has changed, report to your inbox.</li>
+        </ul>
         <button onclick="gotoAnchor('pricing')" style="margin-top:20px;background:var(--bg-navy);color:#FFFFFF;border:none;border-radius:6px;padding:11px 20px;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--bg-navy2)'" onmouseout="this.style.background='var(--bg-navy)'">See how it works →</button>
       </div>
       <div class="how-card" style="border-top:3px solid var(--orange)">
@@ -1786,7 +1793,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <div class="diff-left">
         <span class="eyebrow">Why we're different</span>
         <h2 class="section-h" style="color:#FFFFFF;margin-bottom:8px">Every other tool shows you the problem.</h2>
-        <h2 class="section-h" style="color:#FFFFFF;margin-bottom:24px">We fix it.</h2>
+        <h2 class="section-h" style="color:#F05A22;margin-bottom:24px">We fix it.</h2>
         <p><strong>Not one of them fixes it.</strong> Tools like Peec AI and SE Visible tell you whether you appear in AI search. They start at £85 a month. That's their product — a dashboard that shows you the problem, month after month.</p>
         <p>We generate the files that fix it. Specific to your business, ready to install. We built the only WordPress plugin that installs and updates these files automatically, every month, while you sleep. And we priced it so a plumber in Wellingborough can afford it — not just an enterprise marketing team with a £500/month tools budget.</p>
       </div>
@@ -1827,7 +1834,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       </div>
       <div class="extra-card consult">
         <span class="eyebrow">Technical Graffiti Consultancy</span>
-        <h3>Want someone to do it for you?</h3>
+        <h3 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(28px,3vw,40px);letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:16px;line-height:1.05">Want someone to do it for you?</h3>
         <ul style="list-style:none;margin-bottom:20px;display:flex;flex-direction:column;gap:10px">
           <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:var(--t-body)"><span style="color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px">✓</span><span><strong>Telephone AI Visibility Consultation</strong> (30 mins) — £65</span></li>
           <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:var(--t-body)"><span style="color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px">✓</span><span><strong>AI Visibility Audit</strong> — £195</span></li>
@@ -2562,7 +2569,7 @@ function buildDash(){
 
   <!-- SCORE -->
   <div class="dp" id="dp-score">
-    <div class="dh"><h2>My Score</h2><p>Check your current AI visibility across ChatGPT, Perplexity and Google AI.</p></div>
+    <div class="dh"><h2>My Score</h2><p>Check your technical AI visibility signals — five real checks on your domain.</p></div>
 
     <!-- Run a check — full width -->
     <div class="dcard" style="margin-bottom:20px">
@@ -3608,7 +3615,7 @@ initSupabase();
   // Handle Supabase email confirmation redirect
   const hash=window.location.hash;
   if(hash&&hash.includes('access_token')){
-    history.replaceState(null,'',window.location.pathname);
+    history.replaceState({page:'marketing'},'',' ');
     if(SB){
       try{
         const {data}=await SB.auth.getSession();
@@ -3662,6 +3669,13 @@ initSupabase();
     showPage('marketing');
   }
   setTimeout(initConsent,300);
+  window.addEventListener('popstate',function(e){
+    if(document.getElementById('page-dashboard').classList.contains('active')||
+       document.getElementById('page-login').classList.contains('active')||
+       document.getElementById('page-register').classList.contains('active')){
+      showPage('marketing');
+    }
+  });
 })();
 
 function renderIssues(issues){
