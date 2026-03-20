@@ -13,18 +13,24 @@
       "maxDuration": 25
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "check.technicalgraffiti.co.uk"
+        }
+      ],
+      "destination": "/public/tg-check.html"
     },
     {
-      "src": "/tg-check",
-      "dest": "/public/tg-check.html"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
     {
-      "src": "/(.*)",
-      "dest": "/public/index.html"
+      "source": "/(.*)",
+      "destination": "/public/index.html"
     }
   ]
 }
