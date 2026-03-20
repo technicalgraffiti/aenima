@@ -2026,33 +2026,7 @@ function initSupabase(){
   if(typeof supabase==='undefined'||!CFG.SUPABASE_URL||!CFG.SUPABASE_KEY)return;
   try{
     SB=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);
-    // Listen for email confirmation — fires when user clicks confirmation link
-    SB.auth.onAuthStateChange(async(event,session)=>{
-      if(event==='SIGNED_IN'&&session&&!S.user){
-        // Email confirmed — show login page with email pre-filled
-        // DO NOT set S.user or saveS() — user must enter password manually
-        const u=session.user;
-        // Sign out immediately to prevent auto-login
-        await SB.auth.signOut();
-        // Store email temporarily for pre-fill only
-        const confirmedEmail=u.email;
-        history.replaceState({page:'login'},'',window.location.pathname);
-        const liEmail=document.getElementById('liEmail');
-        if(liEmail)liEmail.value=confirmedEmail;
-        const loginErr=document.getElementById('loginErr');
-        if(loginErr){
-          loginErr.style.background='#F0FBF4';
-          loginErr.style.borderColor='#1A8A40';
-          loginErr.style.color='#1A8A40';
-          loginErr.classList.add('show');
-          loginErr.textContent='✓ Email confirmed! Enter your password to log in.';
-        }
-        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-        document.getElementById('page-login').classList.add('active');
-        syncNav(false);
-        window.scrollTo(0,0);
-      }
-    });
+// Email confirmation disabled — no auth state listener needed
   }
   catch(e){console.warn('Supabase init failed:',e);}
 }
