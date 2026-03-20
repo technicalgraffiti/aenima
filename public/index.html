@@ -2024,7 +2024,43 @@ const CFG={
 let SB=null;
 function initSupabase(){
   if(typeof supabase==='undefined'||!CFG.SUPABASE_URL||!CFG.SUPABASE_KEY)return;
-  try{SB=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);}
+  try{
+    SB=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);
+    // Listen for email confirmation — fires when user clicks confirmation link
+    SB.auth.onAuthStateChange(async(event,session)=>{
+      if(event==='SIGNED_IN'&&session&&!S.user){
+        // User just confirmed their email and signed in
+        const u=session.user;
+        const meta=u.user_metadata||{};
+        S.user={
+          id:u.id,email:u.email,
+          name:meta.name||'',business:meta.business||'',
+          url:meta.website||'',phone:meta.phone||'',
+          town:meta.town||'',postcode:meta.postcode||'',
+          plan:'free'
+        };
+        S.plan='free';saveS();
+        // Clear any hash/token from URL
+        history.replaceState({page:'login'},'',window.location.pathname);
+        // Pre-fill email and show success on login page
+        const liEmail=document.getElementById('liEmail');
+        if(liEmail)liEmail.value=u.email;
+        const loginErr=document.getElementById('loginErr');
+        if(loginErr){
+          loginErr.style.background='#F0FBF4';
+          loginErr.style.borderColor='#1A8A40';
+          loginErr.style.color='#1A8A40';
+          loginErr.classList.add('show');
+          loginErr.textContent='✓ Email confirmed! Enter your password to log in.';
+        }
+        // Show login page directly
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page-login').classList.add('active');
+        syncNav(false);
+        window.scrollTo(0,0);
+      }
+    });
+  }
   catch(e){console.warn('Supabase init failed:',e);}
 }
 
@@ -3670,6 +3706,33 @@ initSupabase();
   }
 
   const _up=new URLSearchParams(window.location.search);
+  // Handle Supabase PKCE confirmation (token_hash in query params)
+  if(_up.get('token_hash')&&_up.get('type')==='signup'){
+    if(SB){
+      try{
+        const{data,error}=await SB.auth.verifyOtp({
+          token_hash:_up.get('token_hash'),
+          type:'signup'
+        });
+        if(!error&&data.session){
+          const u=data.session.user;
+          const meta=u.user_metadata||{};
+          S.user={id:u.id,email:u.email,name:meta.name||'',business:meta.business||'',url:meta.website||'',phone:meta.phone||'',town:meta.town||'',postcode:meta.postcode||'',plan:'free'};
+          S.plan='free';saveS();
+          history.replaceState({page:'login'},'',window.location.pathname);
+          const liEmail=document.getElementById('liEmail');
+          if(liEmail)liEmail.value=u.email;
+          const loginErr=document.getElementById('loginErr');
+          if(loginErr){loginErr.style.background='#F0FBF4';loginErr.style.borderColor='#1A8A40';loginErr.style.color='#1A8A40';loginErr.classList.add('show');loginErr.textContent='✓ Email confirmed! Enter your password to log in.';}
+          document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+          document.getElementById('page-login').classList.add('active');
+          syncNav(false);window.scrollTo(0,0);
+          setTimeout(initConsent,300);
+          return;
+        }
+      }catch(ex){console.warn('PKCE confirm error:',ex);}
+    }
+  }
   if(_up.get('upgraded')==='1'&&_up.get('plan')&&S.user){
     S.plan=_up.get('plan');
     S.user.plan=S.plan;
