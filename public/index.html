@@ -2142,6 +2142,12 @@ function showPage(n){
   if(n==='dashboard'){buildDash();syncDash();syncNav(true);}
   else syncNav(false);
   window.scrollTo(0,0);
+  // Push state so browser back button returns to marketing page
+  if(n==='marketing'){
+    history.replaceState({page:'marketing'},'',window.location.pathname);
+  } else {
+    history.pushState({page:n},'',window.location.pathname);
+  }
 }
 function syncNav(in_){
   const nl=document.getElementById('navLinks');
