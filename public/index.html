@@ -2470,16 +2470,7 @@ async function doRegister(){
           phone:ph,town:tw,postcode:pc,plan:'free'
         });
       }
-      // Email confirmation required — show confirm page with login form
-      if(data.user && !data.user.confirmed_at){
-        if(btn){btn.disabled=false;btn.textContent='Create free account →';}
-        const confirmEl=document.getElementById('confirmEmail');
-        if(confirmEl)confirmEl.textContent=e;
-        const clEmail=document.getElementById('clEmail');
-        if(clEmail)clEmail.value=e;
-        showPage('confirm');
-        return;
-      }
+      // Email confirmation disabled — proceed directly
       S.user={id:data.user?.id,name:n,business:b,email:e,url:u,plan:'free',joined:new Date().toISOString()};
     }catch(ex){
       console.warn('Supabase register failed, using local:',ex);
