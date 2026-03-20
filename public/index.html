@@ -2246,7 +2246,7 @@ function renderScore(r){
     const pct=Math.round((c.score/c.max)*100);
     const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
     const col=pct<40?'var(--red)':pct<65?'var(--amber)':'var(--green)';
-    return`<div class="cat-row"><div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${c.score}/${c.max}</span></div><div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div>${c.detail?`<div style="font-size:12px;color:var(--t-support);margin-top:3px;padding-left:2px">${c.detail}</div>`:''}</div>`;
+    return'<div class="cat-row"><div class="cat-hd"><span class="cat-name">'+name+'</span><span class="cat-score" style="color:'+col+'">'+c.score+'/'+c.max+'</span></div><div class="cat-track"><div class="cat-fill '+cls+'" style="width:'+pct+'%"></div></div>'+(c.detail?'<div style="font-size:12px;color:#888;margin-top:3px">'+c.detail+'</div>':'')+'</div>';
   }).join('');
 
   // Issues
@@ -3010,17 +3010,43 @@ function renderScoreOverview(r){
 ═══════════════════════════════════════ */
 async function runDScore(){
   let raw=v('dUrl');if(!raw){alert('Please enter your website address.');return;}
-  raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'');
-  const url='https://'+raw;
+  raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
   const btn=document.getElementById('dScoreBtn');
   const prog=document.getElementById('dProg');
   const bar=document.getElementById('dProgBar');
   const txt=document.getElementById('dProgTxt');
   btn.disabled=true;btn.innerHTML='<span class="spin"></span>Checking...';
   prog.style.display='block';
-  const steps=[[20,'Checking technical layer...'],[40,'Analysing schema...'],[60,'Checking citations...'],[80,'Simulating AI checks...'],[100,'Done.']];
-  for(const[p,m]of steps){await wait(360+Math.random()*260);bar.style.width=p+'%';txt.textContent=m;}
-  const r=calcScore(url,raw);
+
+  const steps=[[20,'Checking site availability...'],[40,'Looking for Schema markup...'],[60,'Checking llms.txt...'],[80,'Checking AI crawler access...'],[95,'Calculating score...']];
+  let stepIdx=0;
+  const stepTimer=setInterval(()=>{
+    if(stepIdx<steps.length){const[p,m]=steps[stepIdx++];if(bar)bar.style.width=p+'%';if(txt)txt.textContent=m;}
+  },700);
+
+  let r;
+  try{
+    const resp=await fetch('/api/check-domain',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({domain:raw})
+    });
+    clearInterval(stepTimer);
+    if(!resp.ok)throw new Error('Check failed');
+    const data=await resp.json();
+    r={
+      overall:data.overall,cats:data.cats,issues:data.issues,
+      checks:data.checks,url:'https://'+data.domain,
+      domain:data.domain,ts:new Date(data.ts),real:true,
+    };
+  }catch(err){
+    clearInterval(stepTimer);
+    btn.disabled=false;btn.innerHTML='Run score check →';
+    prog.style.display='none';if(bar)bar.style.width='0%';
+    alert('Could not check '+raw+'. Please verify the domain and try again.');
+    return;
+  }
+
   r.bizName=v('dBiz')||raw;r.type=v('dType');r.town=v('dTown');
   S.score=r;
   btn.disabled=false;btn.innerHTML='Run score check →';
@@ -3037,7 +3063,7 @@ async function runDScore(){
       const pct=Math.round((c.score/c.max)*100);
       const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
       const col=pct<40?'var(--red)':pct<65?'var(--amber)':'var(--green)';
-      return`<div class="cat-row"><div class="cat-hd"><span class="cat-name">${name}</span><span class="cat-score" style="color:${col}">${c.score}/${c.max}</span></div><div class="cat-track"><div class="cat-fill ${cls}" style="width:${pct}%"></div></div>${c.detail?`<div style="font-size:12px;color:var(--t-support);margin-top:3px;padding-left:2px">${c.detail}</div>`:''}</div>`;
+      return'<div class="cat-row"><div class="cat-hd"><span class="cat-name">'+name+'</span><span class="cat-score" style="color:'+col+'">'+c.score+'/'+c.max+'</span></div><div class="cat-track"><div class="cat-fill '+cls+'" style="width:'+pct+'%"></div></div>'+(c.detail?'<div style="font-size:12px;color:#888;margin-top:3px">'+c.detail+'</div>':'')+'</div>';
     }).join('');
   }
   // Show new 50/50 layout
