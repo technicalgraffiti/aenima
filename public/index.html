@@ -2457,7 +2457,15 @@ async function doRegister(){
   S.plan='free';saveS();
   saveProfile({name:n,business:b,email:e,url:rawU,phone:ph,town:tw,postcode:pc});
   if(btn){btn.disabled=false;btn.textContent='Create free account →';}
-  // If we get here without Supabase, go to dashboard
+  // Check for pending upgrade — fire Stripe immediately
+  const pp=sessionStorage.getItem('pendingPlan');
+  if(pp){
+    sessionStorage.removeItem('pendingPlan');
+    S.billing=sessionStorage.getItem('pendingBilling')||'mo';
+    sessionStorage.removeItem('pendingBilling');
+    handleUpgrade(pp);
+    return;
+  }
   showPage('dashboard');
 }
 function doConfirmLogin(){
