@@ -92,8 +92,9 @@ module.exports = async (req, res) => {
   const blocksPerplexity = robotsBody.includes('perplexitybot') && (robotsBody.includes('disallow: /') || robotsBody.includes('disallow:/'));
   const anyAiBlocked = blocksGPTBot || blocksClaudeBot || blocksPerplexity;
 
-  // Check for wildcard block with no AI exceptions
-  const hasWildcardBlock = robotsBody.includes('user-agent: *') && robotsBody.includes('disallow: /');
+  // Check for wildcard block — must be exact 'disallow: /' not 'disallow: /something'
+  const hasWildcardBlock = robotsBody.includes('user-agent: *') && 
+    /disallow:\s*\/\s*(\r?\n|$)/m.test(robotsBody);
 
   results.robots = {
     pass: !anyAiBlocked && !hasWildcardBlock,
