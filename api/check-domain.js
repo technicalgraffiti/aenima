@@ -6,7 +6,7 @@ const https = require('https');
 const http = require('http');
 
 // Fetch a URL with timeout, return {status, body, error}
-function fetchUrl(url, timeoutMs = 8000) {
+function fetchUrl(url, timeoutMs = 15000) {
   return new Promise((resolve) => {
     const protocol = url.startsWith('https') ? https : http;
     const req = protocol.get(url, {
