@@ -2447,6 +2447,35 @@ async function doLogin(){
   showErr(err,'No account found. Please register first.');
 }
 
+
+async function openBillingPortal(){
+  const btn=document.getElementById('cancelBtn');
+  if(btn){btn.disabled=true;btn.textContent='Opening Stripe...';}
+  try{
+    const customerId=S.user?.stripeCustomerId||S.stripeCustomerId;
+    if(!customerId){
+      // No customer ID — send them to Stripe directly to find their subscription
+      window.open('https://billing.stripe.com','_blank');
+      if(btn){btn.disabled=false;btn.textContent='Manage / Cancel subscription →';}
+      return;
+    }
+    const resp=await fetch('/api/customer-portal',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({customerId})
+    });
+    const data=await resp.json();
+    if(data.url){
+      window.location.href=data.url;
+    } else {
+      throw new Error(data.error||'Could not open billing portal');
+    }
+  }catch(err){
+    if(btn){btn.disabled=false;btn.textContent='Manage / Cancel subscription →';}
+    alert('Could not open billing portal. Please contact ai@aenima.co.uk to cancel.');
+  }
+}
+
 async function doReset(){
   const e=document.getElementById('resetEmail').value.trim();
   const err=document.getElementById('resetErr');
@@ -3566,7 +3595,7 @@ function updBilling(){
   const bb=document.getElementById('bBadge');const bd=document.getElementById('bDesc');const ba=document.getElementById('bActions');
   if(bb){bb.className=`pb pb-${S.plan}`;bb.textContent=S.plan;}
   if(bd)bd.textContent=desc[S.plan]||'';
-  if(ba&&S.plan!=='free')ba.innerHTML=`<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" onclick="if(confirm('Cancel subscription?')){S.plan='free';if(S.user)S.user.plan='free';saveS();updBilling();}">Cancel subscription</button>`;
+  if(ba&&S.plan!=='free')ba.innerHTML=`<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" id="cancelBtn" onclick="openBillingPortal()">Manage / Cancel subscription →</button>`;
 }
 
 /* ═══════════════════════════════════════

@@ -11,26 +11,28 @@
     "api/check-domain.js": {
       "memory": 256,
       "maxDuration": 25
+    },
+    "api/customer-portal.js": {
+      "memory": 256,
+      "maxDuration": 10
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "check.technicalgraffiti.co.uk"
-        }
-      ],
-      "destination": "/public/tg-check.html"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "src": "/tg-check",
+      "dest": "/public/tg-check.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/public/index.html"
+      "src": "/tg-check.html",
+      "dest": "/public/tg-check.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.html"
     }
   ]
 }
