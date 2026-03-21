@@ -3059,14 +3059,8 @@ function buildDash(){
         <div id="bActions"></div>
       </div>
       <div class="dcard">
-        <h3>Upgrade</h3>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-start">Starter</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£5.50/mo</span></div><p style="font-size:14px;color:var(--t-support);margin-bottom:4px">or £14/quarter · £49/year</p><p style="font-size:15px;color:var(--t-support);margin-bottom:14px">Schema code, llms.txt, citation list, monthly tracking.</p><button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')">Upgrade to Starter →</button></div>
-          <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£7.50/mo</span></div><p style="font-size:14px;color:var(--t-support);margin-bottom:4px">or £19.50/quarter · £79/year</p><p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin auto-installs everything. No code needed.</p><button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Upgrade to Pro →</button></div>
-          <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-agency">Agency</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£89/mo</span></div><p style="font-size:15px;color:var(--t-support);margin-bottom:14px">10 sites, white-label reports, onboarding, support.</p><button class="btn btn-secondary btn-full btn-sm" onclick="showContact()">Get in touch →</button></div>
-        </div>
-      </div>
-    </div>
+        <h3 id="bUpgradeTitle">Upgrade</h3>
+        <div id="bUpgradeCards" style="display:flex;flex-direction:column;gap:14px"></div>
 
   </div>`;
 }
@@ -3591,11 +3585,51 @@ function updatePlanStatus(){
 }
 
 function updBilling(){
-  const desc={free:'Score check only',starter:'Schema, llms.txt, tracking',pro:'Plugin auto-installs everything',agency:'10 sites, white-label, support'};
+  const desc={free:'Score check only',starter:'AI visibility files + monthly tracking',pro:'WordPress plugin — everything automated',agency:'10 sites, white-label, support'};
   const bb=document.getElementById('bBadge');const bd=document.getElementById('bDesc');const ba=document.getElementById('bActions');
-  if(bb){bb.className=`pb pb-${S.plan}`;bb.textContent=S.plan;}
+  const uc=document.getElementById('bUpgradeCards');const ut=document.getElementById('bUpgradeTitle');
+  if(bb){bb.className=`pb pb-${S.plan}`;bb.textContent=S.plan.charAt(0).toUpperCase()+S.plan.slice(1);}
   if(bd)bd.textContent=desc[S.plan]||'';
   if(ba&&S.plan!=='free')ba.innerHTML=`<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" id="cancelBtn" onclick="openBillingPortal()">Manage / Cancel subscription →</button>`;
+
+  if(!uc)return;
+  const plan=S.plan||'free';
+
+  // Free — show both Starter and Pro
+  if(plan==='free'){
+    if(ut)ut.textContent='Upgrade';
+    uc.innerHTML=`
+      <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-start">Starter</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£5.50/mo</span></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">AI visibility files generated for your site. Download and install yourself. Monthly re-score and report.</p>
+        <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')">Upgrade to Starter →</button>
+      </div>
+      <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£7.50/mo</span></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin installs and updates everything automatically. Nothing to do.</p>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Upgrade to Pro →</button>
+      </div>`;
+  }
+
+  // Starter — show Pro upgrade only
+  else if(plan==='starter'){
+    if(ut)ut.textContent='Upgrade to Pro';
+    uc.innerHTML=`
+      <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£7.50/mo</span></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin installs and updates everything automatically. Nothing to do — cancel Starter and switch.</p>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Switch to Pro →</button>
+      </div>`;
+  }
+
+  // Pro or Agency — no upgrade options, just confirmation
+  else if(plan==='pro'||plan==='agency'){
+    if(ut)ut.textContent='Your plan';
+    uc.innerHTML=`<div style="background:#F0FBF4;border:1.5px solid var(--green);border-radius:var(--radius);padding:20px;text-align:center">
+      <p style="font-weight:700;color:var(--green);font-size:16px;margin-bottom:6px">✓ You are on the ${plan.charAt(0).toUpperCase()+plan.slice(1)} plan</p>
+      <p style="font-size:15px;color:var(--t-support)">To make changes to your subscription use the button above.</p>
+    </div>`;
+  }
 }
 
 /* ═══════════════════════════════════════
