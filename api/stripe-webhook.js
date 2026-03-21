@@ -1,6 +1,3 @@
-// api/stripe-webhook.js
-// Stripe webhook handler — updates user plan in Supabase after payment
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
 
@@ -9,11 +6,8 @@ const SB = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// CRITICAL: Disable Vercel body parsing — Stripe needs raw body for signature verification
 module.exports.config = {
-  api: {
-    bodyParser: false,
-  },
+  api: { bodyParser: false },
 };
 
 const PLAN_MAP = {
@@ -27,7 +21,6 @@ const PLAN_MAP = {
   'price_1TCGKFJB2Su5DD2sQSkAf0Tz': 'starter',
 };
 
-// Read raw body from stream
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -38,9 +31,7 @@ function getRawBody(req) {
 }
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -62,35 +53,35 @@ module.exports = async (req, res) => {
       const customerId = session.customer;
       const subId = session.subscription;
 
-      if (!subId) break;
+      console.log(`Checkout completed — email: ${email}, customer: ${customerId}, sub: ${subId}`);
+
+      if (!subId) { console.log('No subscription ID — skipping'); break; }
 
       const sub = await stripe.subscriptions.retrieve(subId);
       const priceId = sub.items.data[0]?.price?.id;
       const plan = PLAN_MAP[priceId] || 'starter';
+      console.log(`Price: ${priceId}, Plan: ${plan}`);
 
-      // Update by customer ID first, fall back to email
-      let error;
-      if (customerId) {
-        const r = await SB.from('users').update({
+      // Try update by email
+      const { data, error, count } = await SB
+        .from('users')
+        .update({
           plan,
           stripe_customer_id: customerId,
           stripe_subscription_id: subId,
           plan_updated_at: new Date().toISOString()
-        }).eq('stripe_customer_id', customerId);
-        error = r.error;
-      }
-      if ((error || !customerId) && email) {
-        const r = await SB.from('users').update({
-          plan,
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subId,
-          plan_updated_at: new Date().toISOString()
-        }).eq('email', email);
-        error = r.error;
-      }
+        })
+        .eq('email', email)
+        .select();
+
+      console.log(`Supabase update — rows affected: ${data?.length}, error: ${JSON.stringify(error)}`);
 
       if (error) console.error('Supabase update failed:', error);
-      else console.log(`Plan updated: ${email} → ${plan}`);
+      else if (!data || data.length === 0) {
+        console.error(`No user found with email: ${email}`);
+      } else {
+        console.log(`Plan updated: ${email} → ${plan}`);
+      }
       break;
     }
 
