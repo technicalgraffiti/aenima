@@ -2283,6 +2283,7 @@ async function _runScore(){
     if(prog)prog.style.display='none';
     if(bar)bar.style.width='0%';
     renderScore(r);
+    saveScoreToSupabase(r);
 
   }catch(err){
     clearInterval(stepTimer);
@@ -2473,6 +2474,22 @@ async function openBillingPortal(){
   }catch(err){
     if(btn){btn.disabled=false;btn.textContent='Manage / Cancel subscription →';}
     alert('Could not open billing portal. Please contact ai@aenima.co.uk to cancel.');
+  }
+}
+
+
+async function saveScoreToSupabase(score){
+  if(!SB||!S.user?.id)return;
+  try{
+    await SB.from('scores').insert({
+      user_id: S.user.id,
+      url: score.domain,
+      score: score.overall,
+      results: {cats: score.cats, issues: score.issues},
+      created_at: new Date().toISOString()
+    });
+  }catch(ex){
+    console.warn('Score save failed:',ex);
   }
 }
 
@@ -3187,6 +3204,7 @@ async function _runDScore(){
   S.score=r;
   btn.disabled=false;btn.innerHTML='Run score check →';
   prog.style.display='none';bar.style.width='0%';
+  saveScoreToSupabase(r);
   // Render result
   const res=document.getElementById('dScoreResult');
   if(res){
