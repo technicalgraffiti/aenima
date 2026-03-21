@@ -1,6 +1,3 @@
-// api/monthly-cron.js
-// Monthly cron job — reruns score checks for all paid users, sends reports via Resend
-
 const { createClient } = require('@supabase/supabase-js');
 
 const SB = createClient(
@@ -30,76 +27,139 @@ async function runScoreCheck(domain) {
 async function sendMonthlyReport(user, score, previousScore) {
   if (!RESEND_API_KEY || !user.email) return;
 
-  const change = previousScore ? score.overall - previousScore : null;
-  const changeText = change === null ? '' : change > 0 ? `▲ Up ${change} points` : change < 0 ? `▼ Down ${Math.abs(change)} points` : '→ No change';
+  const change = previousScore !== null ? score.overall - previousScore : null;
+  const changeText = change === null ? '' : change > 0 ? `▲ Up ${change} points from last month` : change < 0 ? `▼ Down ${Math.abs(change)} points from last month` : '→ No change from last month';
   const changeColour = change > 0 ? '#1A8A40' : change < 0 ? '#CC2200' : '#777777';
+  const changeBg = change > 0 ? '#E6F7ED' : change < 0 ? '#FFF0EE' : '#F5F5F5';
 
-  // Find top priority issue
   const criticals = score.issues?.filter(i => i.p === 'critical') || [];
   const highs = score.issues?.filter(i => i.p === 'high') || [];
   const topIssue = criticals[0] || highs[0] || null;
 
-  // Score colour
   const scoreColour = score.overall < 30 ? '#CC2200' : score.overall < 55 ? '#CC6600' : '#1A8A40';
   const scoreLabel = score.overall < 30 ? 'Not visible to AI search' : score.overall < 55 ? 'Limited AI visibility' : score.overall < 80 ? 'Moderate visibility' : 'Good visibility';
-
   const monthName = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const name = user.name || user.business || 'there';
+
+  const catRows = score.cats ? Object.entries(score.cats).map(([catName, cat]) => {
+    const pct = Math.round((cat.score / cat.max) * 100);
+    const barColour = pct < 40 ? '#CC2200' : pct < 65 ? '#CC6600' : '#1A8A40';
+    return `
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px solid #F0F0F0">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="font-size:14px;color:#3D3D3D;font-weight:600;width:50%">${catName}</td>
+            <td style="text-align:right;font-size:14px;font-weight:700;color:${barColour};width:50%">${cat.score}/${cat.max}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding-top:6px">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#EEEEEE;border-radius:4px;height:6px">
+                    <table width="${pct}%" cellpadding="0" cellspacing="0"><tr><td style="background:${barColour};border-radius:4px;height:6px;display:block">&nbsp;</td></tr></table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`;
+  }).join('') : '';
 
   const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F8F7F5;font-family:'Helvetica Neue',Arial,sans-serif">
-<div style="max-width:600px;margin:0 auto;padding:32px 16px">
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your AI Visibility Report — ${monthName}</title>
+</head>
+<body style="margin:0;padding:0;background:#F0EFed;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased">
 
-  <!-- Header -->
-  <div style="background:#0A1628;border-radius:12px 12px 0 0;padding:32px;margin-bottom:0">
-    <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4)">Monthly AI Visibility Report</p>
-    <h1 style="margin:0;font-size:28px;font-weight:800;color:#FFFFFF;letter-spacing:-0.03em">Aenima<span style="color:#F05A22">.</span></h1>
-    <p style="margin:8px 0 0;font-size:15px;color:rgba(255,255,255,0.5)">${monthName} · ${score.domain}</p>
-  </div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0EFed;padding:40px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
 
-  <!-- Score -->
-  <div style="background:#FFFFFF;border-left:1.5px solid #E5E5E5;border-right:1.5px solid #E5E5E5;padding:32px;text-align:center">
-    <p style="margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#777">Your score this month</p>
-    <div style="font-size:88px;font-weight:800;color:${scoreColour};line-height:1;letter-spacing:-0.04em;margin-bottom:4px">${score.overall}</div>
-    <div style="font-size:18px;color:#777;margin-bottom:8px">/100 — ${scoreLabel}</div>
-    ${change !== null ? `<div style="display:inline-block;background:${changeColour}20;color:${changeColour};font-size:14px;font-weight:700;padding:4px 14px;border-radius:20px">${changeText} from last month</div>` : ''}
-  </div>
+  <!-- HEADER -->
+  <tr><td style="background:#0A1628;border-radius:14px 14px 0 0;padding:36px 40px 32px">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Monthly AI Visibility Report · ${monthName}</p>
+          <h1 style="margin:0 0 2px;font-size:32px;font-weight:800;color:#FFFFFF;letter-spacing:-0.04em;line-height:1">Aenima<span style="color:#F05A22">.</span></h1>
+          <p style="margin:10px 0 0;font-size:15px;color:rgba(255,255,255,0.45)">${score.domain}</p>
+        </td>
+        <td align="right" valign="top">
+          <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:14px 20px;text-align:center;display:inline-block">
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Score</p>
+            <p style="margin:4px 0 0;font-size:42px;font-weight:800;color:${scoreColour};letter-spacing:-0.04em;line-height:1">${score.overall}</p>
+            <p style="margin:2px 0 0;font-size:12px;color:rgba(255,255,255,0.35)">/100</p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
 
-  <!-- Priority Action -->
-  ${topIssue ? `
-  <div style="background:#FFF8E6;border-left:4px solid #CC6600;border-right:1.5px solid #E5E5E5;padding:24px 28px">
-    <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#CC6600">This month's priority action</p>
-    <p style="margin:0;font-size:17px;color:#1A1A1A;line-height:1.5">${topIssue.t}</p>
-  </div>` : `
-  <div style="background:#E6F7ED;border-left:4px solid #1A8A40;border-right:1.5px solid #E5E5E5;padding:24px 28px">
-    <p style="margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#1A8A40">Great news</p>
-    <p style="margin:0;font-size:17px;color:#1A1A1A;line-height:1.5">No critical issues found this month. Keep your files updated to maintain your visibility.</p>
-  </div>`}
+  <!-- SCORE BAND -->
+  <tr><td style="background:#FFFFFF;padding:28px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0A1628;letter-spacing:-0.02em">Hi ${name},</p>
+          <p style="margin:0;font-size:16px;color:#555555;line-height:1.6">Here's your AI visibility update for ${monthName}. Your domain scored <strong style="color:${scoreColour}">${score.overall}/100</strong> — ${scoreLabel.toLowerCase()}.</p>
+        </td>
+      </tr>
+      ${change !== null ? `<tr><td style="padding-top:16px">
+        <table cellpadding="0" cellspacing="0">
+          <tr><td style="background:${changeBg};color:${changeColour};font-size:14px;font-weight:700;padding:8px 18px;border-radius:20px">${changeText}</td></tr>
+        </table>
+      </td></tr>` : ''}
+    </table>
+  </td></tr>
 
-  <!-- Issues summary -->
-  <div style="background:#FFFFFF;border-left:1.5px solid #E5E5E5;border-right:1.5px solid #E5E5E5;padding:28px">
-    <p style="margin:0 0 16px;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#777">Issues found (${score.issues?.length || 0})</p>
-    ${score.issues?.length > 0 ? score.issues.slice(0,4).map(i => `
-    <div style="display:flex;gap:12px;margin-bottom:10px;align-items:flex-start">
-      <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:${i.p==='critical'?'#FFF0EE':'#FFF8E6'};color:${i.p==='critical'?'#CC2200':'#CC6600'}">${i.p.toUpperCase()}</span>
-      <span style="font-size:15px;color:#3D3D3D;line-height:1.5">${i.t}</span>
-    </div>`).join('') : '<p style="margin:0;font-size:15px;color:#1A8A40;font-weight:600">✓ No issues found</p>'}
-  </div>
+  <!-- PRIORITY ACTION -->
+  <tr><td style="background:${topIssue ? '#FFFBF0' : '#F0FBF4'};border-left:4px solid ${topIssue ? '#CC6600' : '#1A8A40'};border-right:1px solid #E8E8E8;padding:24px 40px">
+    <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${topIssue ? '#CC6600' : '#1A8A40'}">${topIssue ? "This month's priority action" : "All clear"}</p>
+    <p style="margin:0;font-size:17px;font-weight:600;color:#1A1A1A;line-height:1.5">${topIssue ? topIssue.t : 'No critical issues found this month. Keep your files updated to maintain your position.'}</p>
+  </td></tr>
+
+  <!-- CATEGORY BREAKDOWN -->
+  <tr><td style="background:#FFFFFF;padding:28px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8">
+    <p style="margin:0 0 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAAAAA">Category breakdown</p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${catRows}
+    </table>
+  </td></tr>
+
+  <!-- ISSUES -->
+  <tr><td style="background:#FAFAFA;padding:24px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8">
+    <p style="margin:0 0 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAAAAA">Issues found (${score.issues?.length || 0})</p>
+    ${score.issues?.length > 0 ? score.issues.slice(0,5).map(i => `
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px">
+      <tr>
+        <td valign="top" style="width:90px;padding-top:1px">
+          <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:${i.p==='critical'?'#FFF0EE':'#FFF8E6'};color:${i.p==='critical'?'#CC2200':'#CC6600'}">${i.p.toUpperCase()}</span>
+        </td>
+        <td style="font-size:15px;color:#3D3D3D;line-height:1.5;padding-left:8px">${i.t}</td>
+      </tr>
+    </table>`).join('') : '<p style="margin:0;font-size:15px;color:#1A8A40;font-weight:600">✓ No issues found this month</p>'}
+  </td></tr>
 
   <!-- CTA -->
-  <div style="background:#FFFFFF;border:1.5px solid #E5E5E5;border-top:none;border-radius:0 0 12px 12px;padding:28px;text-align:center">
-    <p style="margin:0 0 20px;font-size:16px;color:#3D3D3D">Your updated visibility files are ready in your dashboard.</p>
-    <a href="${APP_URL}" style="display:inline-block;background:#F05A22;color:#FFFFFF;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:700;letter-spacing:-0.01em">Open my dashboard →</a>
-  </div>
+  <tr><td style="background:#FFFFFF;padding:32px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8;text-align:center">
+    <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#0A1628;letter-spacing:-0.01em">Your updated visibility files are ready.</p>
+    <p style="margin:0 0 24px;font-size:15px;color:#777777">Log in to your dashboard to download and install them.</p>
+    <a href="${APP_URL}" style="display:inline-block;background:#F05A22;color:#FFFFFF;text-decoration:none;padding:16px 40px;border-radius:8px;font-size:16px;font-weight:800;letter-spacing:-0.02em">Open my dashboard →</a>
+  </td></tr>
 
-  <!-- Footer -->
-  <div style="padding:24px;text-align:center">
-    <p style="margin:0 0 4px;font-size:13px;color:#AAAAAA">Aenima · AI Visibility for local businesses</p>
-    <p style="margin:0;font-size:12px;color:#CCCCCC">Powered by <a href="https://technicalgraffiti.co.uk" style="color:#CCCCCC">Technical Graffiti Ltd</a> · Company No. 07180346</p>
-  </div>
+  <!-- FOOTER -->
+  <tr><td style="background:#0A1628;border-radius:0 0 14px 14px;padding:24px 40px;text-align:center">
+    <p style="margin:0 0 4px;font-size:13px;color:rgba(255,255,255,0.3)">Aenima · AI Visibility for local businesses</p>
+    <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.2)">Powered by <a href="https://technicalgraffiti.co.uk" style="color:rgba(255,255,255,0.3);text-decoration:none">Technical Graffiti Ltd</a> · Company No. 07180346</p>
+  </td></tr>
 
-</div>
+</table>
+</td></tr>
+</table>
 </body>
 </html>`;
 
@@ -124,7 +184,6 @@ async function sendMonthlyReport(user, score, previousScore) {
 }
 
 module.exports = async (req, res) => {
-  // Security — only allow Vercel cron or manual trigger with secret
   const authHeader = req.headers['authorization'];
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
@@ -133,7 +192,6 @@ module.exports = async (req, res) => {
 
   console.log('Monthly cron started');
 
-  // Get all paid users with a website
   const { data: users, error } = await SB
     .from('users')
     .select('id, email, name, business, website, plan')
@@ -146,12 +204,10 @@ module.exports = async (req, res) => {
   }
 
   console.log(`Processing ${users.length} paid users`);
-
   const results = [];
 
   for (const user of users) {
     try {
-      // Clean domain from website URL
       const domain = user.website
         .replace(/^https?:\/\//i, '')
         .replace(/^www\./i, '')
@@ -160,7 +216,6 @@ module.exports = async (req, res) => {
 
       if (!domain) continue;
 
-      // Get previous score
       const { data: prevScores } = await SB
         .from('scores')
         .select('score')
@@ -168,16 +223,11 @@ module.exports = async (req, res) => {
         .order('created_at', { ascending: false })
         .limit(2);
 
-      const previousScore = prevScores?.[1]?.score || null;
+      const previousScore = prevScores?.[1]?.score ?? null;
 
-      // Run new score check
       const score = await runScoreCheck(domain);
-      if (!score) {
-        console.warn(`Score check failed for ${domain}`);
-        continue;
-      }
+      if (!score) { console.warn(`Score check failed for ${domain}`); continue; }
 
-      // Save to Supabase
       await SB.from('scores').insert({
         user_id: user.id,
         url: domain,
@@ -186,13 +236,11 @@ module.exports = async (req, res) => {
         created_at: new Date().toISOString()
       });
 
-      // Send email report
       await sendMonthlyReport(user, score, previousScore);
-
       results.push({ email: user.email, domain, score: score.overall });
 
     } catch(e) {
-      console.error(`Error processing user ${user.email}:`, e.message);
+      console.error(`Error processing ${user.email}:`, e.message);
     }
   }
 
