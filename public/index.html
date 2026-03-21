@@ -1897,6 +1897,43 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   </footer>
 </div>
 
+
+  <!-- PAGE: RESET PASSWORD -->
+  <div class="page" id="page-reset">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:40px;margin-bottom:12px">🔑</div>
+          <h2 style="margin-bottom:8px">Reset your password</h2>
+          <p style="color:var(--t-support);font-size:15px">Enter your email and we'll send you a reset link.</p>
+        </div>
+        <div class="auth-err" id="resetErr"></div>
+        <div id="resetSuccess" style="display:none;background:#F0FBF4;border:1.5px solid var(--green);border-radius:8px;padding:14px;color:var(--green);font-size:15px;margin-bottom:16px;text-align:center"></div>
+        <div class="fg"><label>Email address</label><input type="email" id="resetEmail" placeholder="you@yourbusiness.co.uk" onkeydown="if(event.key==='Enter')doReset()"></div>
+        <button class="btn btn-primary btn-full" id="resetBtn" onclick="doReset()">Send reset link →</button>
+        <p style="text-align:center;margin-top:16px;font-size:14px"><a onclick="showPage('login')" style="color:var(--orange);cursor:pointer;text-decoration:none">← Back to login</a></p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PAGE: NEW PASSWORD -->
+  <div class="page" id="page-newpass">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:40px;margin-bottom:12px">🔒</div>
+          <h2 style="margin-bottom:8px">Choose a new password</h2>
+          <p style="color:var(--t-support);font-size:15px">Enter your new password below.</p>
+        </div>
+        <div class="auth-err" id="newpassErr"></div>
+        <div class="fg"><label>New password</label><input type="password" id="newpassInput" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter')doNewPass()"></div>
+        <div class="fg"><label>Confirm password</label><input type="password" id="newpassConfirm" placeholder="Repeat your new password" onkeydown="if(event.key==='Enter')doNewPass()"></div>
+        <button class="btn btn-primary btn-full" id="newpassBtn" onclick="doNewPass()">Set new password →</button>
+      </div>
+    </div>
+  </div>
+
 <!-- PAGE: CONFIRM EMAIL -->
 <div class="page" id="page-confirm">
   <div class="auth-wrap">
@@ -1928,6 +1965,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <div class="fg"><label>Email</label><input type="email" id="liEmail" placeholder="you@yourbusiness.co.uk" autocomplete="email"></div>
       <div class="fg"><label>Password</label><input type="password" id="liPass" placeholder="••••••••" autocomplete="current-password"></div>
       <button class="btn btn-primary btn-full" onclick="doLogin()">Log in →</button>
+      <p style="text-align:center;margin-top:12px;font-size:14px"><a onclick="showPage('reset')" style="color:var(--orange);cursor:pointer;text-decoration:none">Forgot your password?</a></p>
       <div class="auth-switch">No account? <a onclick="showPage('register')">Create one free</a></div>
     </div>
   </div>
@@ -2027,6 +2065,16 @@ function initSupabase(){
   try{
     SB=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);
 // Email confirmation disabled — no auth state listener needed
+    // Listen for password reset session
+    SB.auth.onAuthStateChange((event,session)=>{
+      if(event==='PASSWORD_RECOVERY'){
+        history.replaceState({page:'newpass'},'',window.location.pathname);
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page-newpass').classList.add('active');
+        syncNav(false);
+        window.scrollTo(0,0);
+      }
+    });
   }
   catch(e){console.warn('Supabase init failed:',e);}
 }
@@ -2345,17 +2393,18 @@ async function doLogin(){
         // If profile missing, create it now
         if(!profile){
           const meta=data.user.user_metadata||{};
-          await SB.from('users').upsert({
+          const {error:upsertErr}=await SB.from('users').upsert({
             id:data.user.id,
             email:e,
-            name:meta.name||'',
-            business:meta.business||'',
-            website:meta.website||'',
-            phone:meta.phone||'',
-            town:meta.town||'',
-            postcode:meta.postcode||'',
+            name:n||meta.name||'',
+            business:b||meta.business||'',
+            website:u||meta.website||'',
+            phone:ph||meta.phone||'',
+            town:tw||meta.town||'',
+            postcode:pc||meta.postcode||'',
             plan:'free'
-          });
+          },{onConflict:'id'});
+          if(upsertErr)console.warn('User upsert error:',upsertErr);
           profile={name:meta.name||'',business:meta.business||'',website:meta.website||'',phone:meta.phone||'',town:meta.town||'',postcode:meta.postcode||'',plan:'free'};
         }
       }catch(pe){console.warn('Profile fetch error:',pe);}
@@ -2397,6 +2446,54 @@ async function doLogin(){
   if(btn){btn.disabled=false;btn.textContent='Log in →';}
   showErr(err,'No account found. Please register first.');
 }
+
+async function doReset(){
+  const e=document.getElementById('resetEmail').value.trim();
+  const err=document.getElementById('resetErr');
+  const ok=document.getElementById('resetSuccess');
+  const btn=document.getElementById('resetBtn');
+  if(!e){err.textContent='Please enter your email address.';err.classList.add('show');return;}
+  if(!SB){err.textContent='Service unavailable. Please try again.';err.classList.add('show');return;}
+  err.classList.remove('show');
+  btn.disabled=true;btn.textContent='Sending...';
+  try{
+    const{error}=await SB.auth.resetPasswordForEmail(e,{
+      redirectTo:window.location.origin+'/#newpass'
+    });
+    btn.disabled=false;btn.textContent='Send reset link →';
+    if(error){err.textContent=error.message;err.classList.add('show');return;}
+    ok.textContent='✓ Reset link sent to '+e+'. Check your inbox.';
+    ok.style.display='block';
+    document.getElementById('resetEmail').value='';
+  }catch(ex){
+    btn.disabled=false;btn.textContent='Send reset link →';
+    err.textContent='Something went wrong. Please try again.';err.classList.add('show');
+  }
+}
+
+async function doNewPass(){
+  const p=document.getElementById('newpassInput').value;
+  const p2=document.getElementById('newpassConfirm').value;
+  const err=document.getElementById('newpassErr');
+  const btn=document.getElementById('newpassBtn');
+  if(!p||p.length<8){err.textContent='Password must be at least 8 characters.';err.classList.add('show');return;}
+  if(p!==p2){err.textContent='Passwords do not match.';err.classList.add('show');return;}
+  err.classList.remove('show');
+  btn.disabled=true;btn.textContent='Saving...';
+  try{
+    const{error}=await SB.auth.updateUser({password:p});
+    btn.disabled=false;btn.textContent='Set new password →';
+    if(error){err.textContent=error.message;err.classList.add('show');return;}
+    // Password updated — go to login with success message
+    const liErr=document.getElementById('loginErr');
+    if(liErr){liErr.style.background='#F0FBF4';liErr.style.borderColor='var(--green)';liErr.style.color='var(--green)';liErr.classList.add('show');liErr.textContent='✓ Password updated. Please log in.';}
+    showPage('login');
+  }catch(ex){
+    btn.disabled=false;btn.textContent='Set new password →';
+    err.textContent='Something went wrong. Please try again.';err.classList.add('show');
+  }
+}
+
 async function doRegister(){
   const consentBox=document.getElementById('rgConsent');
   const regErrEl=document.getElementById('regErr');
