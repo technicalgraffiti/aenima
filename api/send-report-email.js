@@ -13,22 +13,23 @@ module.exports = async (req, res) => {
     const scoreLabel = score < 30 ? 'Not visible to AI search' : score < 55 ? 'Limited AI visibility' : score < 80 ? 'Moderate visibility' : 'Good visibility';
     const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    const html = `<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif">
-      <div style="background:#0A0A0A;padding:28px;border-radius:8px 8px 0 0">
-        <h1 style="color:#DD5827;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px">AI Visibility Audit Report</h1>
-        <h2 style="color:#FFFFFF;font-size:24px;font-weight:800;margin:0;letter-spacing:-0.02em">${bizName}</h2>
-        <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:6px 0 0">${domain} &middot; ${date}</p>
+    const html = `<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#F5F5F5">
+      <div style="background:#0A0A0A;padding:32px 36px;border-radius:8px 8px 0 0">
+        <p style="color:#DD5827;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px">AI Visibility Audit Report</p>
+        <h2 style="color:#FFFFFF;font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.02em">${bizName}</h2>
+        <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0">${domain} &middot; ${date}</p>
       </div>
-      <div style="background:#FFFFFF;border:1px solid #EEE;padding:28px;text-align:center">
+      <div style="background:#FFFFFF;border-left:1px solid #EEE;border-right:1px solid #EEE;padding:28px 36px">
+        <p style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAAAAA;margin:0 0 8px">Your score this month</p>
         <div style="font-size:72px;font-weight:800;color:${scoreColour};line-height:1;letter-spacing:-0.04em">${score}</div>
-        <div style="font-size:16px;color:#777;margin-top:4px">/100 &mdash; ${scoreLabel}</div>
+        <div style="font-size:16px;color:#777;margin-top:6px">/100 &mdash; ${scoreLabel}</div>
       </div>
-      <div style="background:#FFFFFF;border:1px solid #EEE;border-top:none;padding:28px">
-        ${note ? `<p style="font-size:15px;color:#3D3D3D;border-left:3px solid #DD5827;padding-left:14px;margin-bottom:20px">${note}</p>` : ''}
-        <pre style="white-space:pre-wrap;font-family:Arial,sans-serif;font-size:15px;color:#3D3D3D;line-height:1.8">${reportText}</pre>
+      <div style="background:#FFFFFF;border:1px solid #EEE;border-top:none;padding:28px 36px">
+        ${note ? `<p style="font-size:15px;color:#3D3D3D;border-left:3px solid #DD5827;padding-left:14px;margin-bottom:24px;line-height:1.6">${note}</p>` : ''}
+        <pre style="white-space:pre-wrap;font-family:Arial,sans-serif;font-size:15px;color:#3D3D3D;line-height:1.8;margin:0">${reportText}</pre>
       </div>
-      <div style="background:#0A0A0A;padding:20px 28px;border-radius:0 0 8px 8px;text-align:center">
-        <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0">Technical Graffiti Ltd &middot; Company No. 07180346 &middot; technicalgraffiti.co.uk &middot; 07726 318601</p>
+      <div style="background:#0A0A0A;padding:24px 36px;border-radius:0 0 8px 8px;margin-top:0">
+        <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0;line-height:1.8">Technical Graffiti Ltd &middot; Company No. 07180346 &middot; ICO No. C1894540<br>technicalgraffiti.co.uk &middot; 07726 318601</p>
       </div>
     </div>`;
 
