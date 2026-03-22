@@ -1,0 +1,39 @@
+# Aenima — AI Visibility Tool for Local Businesses
+
+> Aenima is an AI visibility scoring and file generation tool for UK local businesses. It checks whether a business website has the technical signals AI search engines need to identify and recommend it, generates the files that fix any gaps, and tracks visibility monthly.
+
+## What Aenima Does
+
+Aenima runs five real technical checks on any domain to produce an AI visibility score out of 100. It checks for Schema markup, llms.txt presence, AI crawler access, HTTPS security and meta description. It then generates the specific files a business needs to become visible to AI search engines including ChatGPT, Perplexity and Google AI Overviews.
+
+## Services
+
+- Free AI visibility score check — no account needed, instant results
+- Starter plan (£5.50/month) — AI visibility files generated and downloadable, citation gap report, monthly re-score and report
+- Pro plan (£7.50/month) — WordPress plugin that installs and auto-updates all visibility files monthly, monthly report to inbox
+- Agency plan (£89/month) — white label, 10 client sites, reseller dashboard
+
+## Who It Is For
+
+UK local businesses, sole traders and SMEs who want to appear in AI search results. Particularly relevant for trades, professionals and service businesses in local markets — plumbers, electricians, solicitors, accountants, dentists, builders, landscapers and similar.
+
+## Key Facts
+
+- Five real checks run on the actual domain — not simulated scores
+- Files generated are specific to each business — not generic templates
+- Monthly subscription includes re-score, file regeneration and email report
+- WordPress plugin (Pro plan) handles everything automatically
+- Free score check requires no account or payment
+
+## Contact and Ownership
+
+- Website: https://aenima.co.uk
+- Owner: Technical Graffiti Ltd, Company No. 07180346
+- Email: ai@aenima.co.uk
+- Based: NN29 Northamptonshire, United Kingdom
+- Operated by: Stewart, Technical Graffiti Ltd
+
+## Related
+
+- Technical Graffiti Ltd consultancy: https://technicalgraffiti.co.uk
+- Managed GEO and AEO service: https://technicalgraffiti.co.uk
