@@ -1,3 +1,28 @@
+function mdToHtmlOutlook(text) {
+  const lines = text.split('\n');
+  let out = '';
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i]
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    if (/^## (.+)/.test(line)) {
+      out += `<p style="margin:24px 0 6px 0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#DD5827">${line.replace(/^## /,'')}</p>`;
+    } else if (/^# (.+)/.test(line)) {
+      out += `<p style="margin:0 0 12px 0;font-family:Arial,sans-serif;font-size:18px;font-weight:bold;color:#1a1a1a">${line.replace(/^# /,'')}</p>`;
+    } else if (/^---$/.test(line)) {
+      out += `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 16px 0"><tr><td style="border-top:1px solid #DDDDDD;font-size:0;line-height:0">&nbsp;</td></tr></table>`;
+    } else if (/^(\d+)\.\s+(.+)/.test(line)) {
+      const m = line.match(/^(\d+)\.\s+(.+)/);
+      out += `<table cellpadding="0" cellspacing="0" border="0" style="margin:5px 0 5px 0"><tr><td width="22" valign="top" style="font-family:Arial,sans-serif;font-size:14px;color:#DD5827;font-weight:bold;padding-right:6px">${m[1]}.</td><td style="font-family:Arial,sans-serif;font-size:14px;color:#3D3D3D;line-height:1.6">${m[2]}</td></tr></table>`;
+    } else if (line.trim() === '') {
+      out += '';
+    } else {
+      out += `<p style="margin:0 0 10px 0;font-family:Arial,sans-serif;font-size:14px;color:#3D3D3D;line-height:1.7">${line}</p>`;
+    }
+  }
+  return out;
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -35,7 +60,7 @@ module.exports = async (req, res) => {
   <!-- REPORT -->
   <tr><td style="background:#FFFFFF;padding:28px 40px 36px 40px;border:1px solid #E5E5E5;border-top:none">
     ${note ? `<p style="font-size:15px;color:#3D3D3D;border-left:4px solid #DD5827;padding:10px 14px;background:#FFF8F5;margin:0 0 24px 0;line-height:1.6">${note}</p>` : ''}
-    <div style="font-size:15px;color:#3D3D3D;line-height:1.8;white-space:pre-wrap">${reportText}</div>
+    ${mdToHtmlOutlook(reportText)}
   </td></tr>
 
   <!-- FOOTER -->
