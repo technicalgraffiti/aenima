@@ -2957,7 +2957,10 @@ function buildDash(){
           <div class="dcard" style="margin-bottom:14px">
             <h3>Your llms.txt</h3>
             <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">Upload to your domain root. Must be accessible at <span style="font-family:'DM Mono',monospace;color:var(--orange);font-size:13px">yourdomain.co.uk/llms.txt</span></p>
-            <div class="alert al-info" style="margin-bottom:12px;padding:10px 14px"><strong>Starter:</strong> Download and upload to your domain root via FTP or cPanel. Test at yourdomain.co.uk/llms.txt — you should see plain text. <strong>Pro:</strong> your WordPress plugin publishes and updates this automatically — nothing to do.</div>
+            <div class="alert al-info" style="margin-bottom:12px;padding:10px 14px">
+  <div><strong>Starter:</strong> Download and upload to your domain root via FTP or cPanel. Test at yourdomain.co.uk/llms.txt — you should see plain text.</div>
+  <div style="margin-top:6px"><strong>Pro:</strong> Your WordPress plugin publishes and updates this automatically — nothing to do.</div>
+</div>
             <div class="codebl"><button class="copy-btn" onclick="cpEl('llmsOut',this)">Copy</button><pre id="llmsOut" style="font-size:13px;color:var(--t-white45)">Fill in your details to generate llms.txt</pre></div>
             <div style="text-align:center;margin-top:14px"><button class="btn btn-primary btn-sm" onclick="dlLlms()">Download llms.txt</button></div>
           </div>
