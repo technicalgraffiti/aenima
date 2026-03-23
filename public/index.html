@@ -2740,6 +2740,14 @@ function buildDash(){
         <span class="qa-sub">Find missing directory listings with fix links</span>
       </button>
     </div>
+    <!-- Getting started banner — shown when no score exists -->
+    <div id="gettingStarted" style="display:none;background:linear-gradient(135deg,#0A1628 0%,#1a2a45 100%);border-radius:12px;padding:32px 36px;margin-bottom:20px;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">○</div>
+      <h3 style="font-size:24px;font-weight:800;color:#FFFFFF;margin:0 0 10px;letter-spacing:-0.02em">Check your AI visibility score</h3>
+      <p style="font-size:16px;color:rgba(255,255,255,0.65);margin:0 0 24px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto">Start here. Run a free score check to see exactly how visible your business is to AI search engines — and what needs fixing.</p>
+      <button onclick="showDp('score',document.querySelectorAll('.sb-item')[1])" style="background:#DD5827;color:#fff;border:none;padding:14px 32px;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.2px;box-shadow:0 4px 20px rgba(221,88,39,0.4)">Run my free score check →</button>
+      <p style="font-size:13px;color:rgba(255,255,255,0.35);margin:12px 0 0">Free — no subscription needed. Takes 30 seconds.</p>
+    </div>
     <div class="dcard">
       <h3>Priority fixes</h3>
       <div id="priFixes"><p style="font-size:16px;color:var(--t-support)">Run a score check to see your priority fixes.</p></div>
@@ -2852,7 +2860,7 @@ function buildDash(){
     <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head, or use a WordPress schema plugin.</p></div>
     <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
-      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — schema installs automatically</span> — your WordPress plugin generates and installs your schema on your site every month. You don't need to do anything. This tool is here if you want to review or edit the code manually.</div>
+      <div id="proSchemaNote" style="display:none"></div>
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
@@ -2891,8 +2899,10 @@ function buildDash(){
         <div class="dcard">
           <h3>FAQ Schema</h3>
           <div style="background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:14px 16px;margin-bottom:20px;font-size:14px;color:var(--t-body);line-height:1.7">
-            <strong>Why FAQ schema matters:</strong> When someone asks an AI assistant a question your business can answer — "who does emergency plumbing in Wellingborough?" — FAQ schema gives AI the exact answer to cite. Without it, AI guesses or uses a competitor.<br><br>
-            <strong>What to do:</strong> Create 3–5 questions your customers actually ask. Write clear, direct answers below — the schema code generates automatically. <strong>Two things you need to do:</strong> (1) Install the generated schema code on your website, and (2) Add an actual FAQ section to a page on your website with the same questions and answers — this reinforces the signal for both AI and human visitors.
+            <strong>Why FAQ schema matters:</strong> When someone asks an AI assistant a question — "who does emergency plumbing in Wellingborough?" — FAQ schema gives AI a specific answer to use. Without it, AI guesses or uses a competitor who has it.<br><br>
+            <strong>Important — two separate things:</strong><br>
+            <strong>1. Schema code (we generate this):</strong> Write your Q&amp;As below. We generate the technical schema code. Install it on your website — this is what AI reads.<br>
+            <strong>2. FAQ page content (you create this):</strong> Add a visible FAQ section to a page on your website with the same questions and answers. We do not create this for you — it is your content. Both are needed for maximum AI visibility.
           </div>
           <p style="font-size:16px;color:var(--t-support);margin-bottom:22px">AI engines extract FAQs directly from your pages. One of the highest-impact GEO changes you can make.</p>
           <div id="faqItems">
@@ -2998,7 +3008,7 @@ function buildDash(){
           <div class="fg"><label>Town</label><input type="text" id="rto" placeholder="Wellingborough"></div>
           <div class="fg">
             <label>Keywords your customers search for</label>
-            <p style="font-size:12px;color:var(--t-support);margin:-4px 0 6px;line-height:1.5">These help the AI report focus on the searches that matter to your business. Enter one per line — think what your customers type into Google.</p>
+            <p style="font-size:12px;color:var(--t-support);margin:-4px 0 6px;line-height:1.5">Optional but worth filling in. These make the report more specific to your trade — Claude uses them to reference real searches your customers make. Leave blank and the report uses your business type and town instead. Does not affect your score or your files.</p>
             <textarea id="rte" placeholder="best plumber wellingborough&#10;emergency plumber northamptonshire&#10;boiler repair NN8" style="min-height:70px"></textarea>
           </div>
         </div>
@@ -3016,7 +3026,7 @@ function buildDash(){
       <div class="report-out" id="rptContent"></div>
       <div style="display:flex;gap:12px;margin-top:16px">
         <button class="btn btn-primary btn-sm" onclick="printRpt(false)">Print →</button>
-        <button class="btn btn-primary btn-sm" onclick="printRpt(true)">Save as PDF →</button>
+        <button class="btn btn-primary btn-sm" onclick="saveRpt()">Save file →</button>
       </div>
     </div>
   </div>
@@ -3321,7 +3331,11 @@ function syncDash(){
   if(S.user.url){const u=S.user.url.replace(/^https?:\/\//,'');['dUrl','su','lu'].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=u;});}
   if(S.user.business){['sn','ln'].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=S.user.business;});}
   if(S.score)renderScoreOverview(S.score);
-  else loadLastScore();
+  else{
+    loadLastScore();
+    const gs=document.getElementById('gettingStarted');
+    if(gs)gs.style.display='block';
+  }
   // Autopopulate all forms from profile
   const prof=getProfile();
   if(!prof.business&&S.user&&S.user.business)saveProfile({business:S.user.business});
@@ -3332,6 +3346,9 @@ function syncDash(){
 }
 function renderScoreOverview(r){
   const ms=document.getElementById('mScore');const md=document.getElementById('mDate');const mi=document.getElementById('mIssues');
+  // Hide getting started banner once score exists
+  const gs=document.getElementById('gettingStarted');
+  if(gs)gs.style.display='none';
   if(ms)ms.textContent=r.overall;
   if(md){
     const d=r.ts?new Date(r.ts):null;
@@ -3698,6 +3715,55 @@ ${el.innerHTML}
     w.onafterprint=function(){w.close();URL.revokeObjectURL(url);};
     setTimeout(()=>{w.focus();w.print();},400);
   });
+}
+function saveRpt(){
+  const el=document.getElementById('rptContent');
+  if(!el||!el.innerHTML.trim()){alert('No report to save — generate a report first.');return;}
+  const bizName=(v('rn')||'Business').replace(/[^a-z0-9]/gi,'-').toLowerCase();
+  const dateStr=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-');
+  const html=`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Visibility Report — ${v('rn')||'Business'}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;max-width:760px;margin:0 auto;padding:32px 40px;color:#1A1A1A;background:#fff}
+body *{color:#1A1A1A}
+.hdr{background:#0A1628;padding:36px 40px;border-radius:10px;margin-bottom:40px}
+.hdr *{color:#fff}
+.hdr-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#DD5827;margin-bottom:10px;display:block}
+.hdr h1{font-size:32px;font-weight:800;margin:0 0 6px}
+.hdr p{font-size:14px;opacity:0.5;margin:0}
+h2{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#777;margin:28px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}
+h3{font-size:15px;font-weight:700;color:#DD5827;margin:20px 0 8px}
+p{font-size:15px;line-height:1.8;margin:0 0 12px}
+strong{font-weight:700}
+ul,ol{padding-left:20px;margin:0 0 12px}
+li{font-size:15px;line-height:1.8;margin-bottom:4px}
+hr{border:none;border-top:1px solid #EEE;margin:20px 0}
+.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:12px;color:#AAA;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-label">AI Visibility Audit Report</div>
+  <h1>${v('rn')||'Business'}</h1>
+  <p>${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Technical Graffiti Ltd</p>
+</div>
+${el.innerHTML}
+<div class="foot">
+  <span>Technical Graffiti Ltd · Co. No. 07180346 · ICO: C1894540</span>
+  <span>technicalgraffiti.co.uk</span>
+</div>
+</body>
+</html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`ai-visibility-report-${bizName}-${dateStr}.html`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
 }
 function saveProfileFromPanel(){
   const fields={
