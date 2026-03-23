@@ -2156,6 +2156,7 @@ const PROFILE_MAP={
   postcode: ['spc','lpost','cpc'],
   description:['sd','ld'],
   services: ['ss','ls','rte'],
+  type:     ['st','rty'],
 };
 
 function fillForms(){
@@ -2814,7 +2815,7 @@ function buildDash(){
     <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head, or use a WordPress schema plugin.</p></div>
     <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
-      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan active</span> — your WordPress plugin installs and updates your schema automatically every month. You don't need to do anything here unless you want to review or customise your schema manually.</div>
+      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Your schema is active and up to date</span> — generated from your profile and installed automatically. Review or customise it below if needed.</div>
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
@@ -2838,14 +2839,14 @@ function buildDash(){
           <div>
             <div class="dcard" style="margin-bottom:14px">
               <h3>Generated JSON-LD</h3>
-              <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">Paste inside a script tag with <span style="font-family:'DM Mono',monospace;font-size:13px">type="application/ld+json"</span> in your site head.</p>
+              <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">Paste inside a script tag with <span style="font-family:'DM Mono',monospace;font-size:13px">type="application/ld+json"</span> in your site head.</p>
+              <div class="alert al-info" style="margin-bottom:12px;padding:10px 14px">Code updates live as you type. Download when ready and paste into your site, or your WordPress plugin handles this automatically on Pro.</div>
               <div class="codebl"><button class="copy-btn" onclick="cpEl('schOut',this)">Copy</button><pre id="schOut">Fill in your business details to generate schema code.</pre></div>
               <div style="display:flex;gap:10px;margin-top:14px;justify-content:center">
                 <button class="btn btn-primary btn-sm" onclick="dlSch()">Download .json</button>
-                <button class="btn btn-outline btn-sm" onclick="window.open('https://search.google.com/test/rich-results','_blank')">Validate →</button>
+                <button class="btn btn-outline btn-sm" onclick="validateSchema()">Validate on Google →</button>
               </div>
             </div>
-            <div class="alert al-info">Code updates live as you type. Download when ready and paste into your site, or install via the WordPress plugin on the Pro plan.</div>
           </div>
         </div>
       </div>
@@ -2887,6 +2888,7 @@ function buildDash(){
       <div id="llmsProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
+      <div class="d2col">
         <div class="dcard" style="margin-bottom:0">
           <h3>Business details</h3>
           <div class="fg"><label>Business name</label><input type="text" id="ln" oninput="genLlms()" placeholder="Smith Plumbing Ltd"></div>
@@ -2906,11 +2908,11 @@ function buildDash(){
             <div class="codebl"><button class="copy-btn" onclick="cpEl('llmsOut',this)">Copy</button><pre id="llmsOut" style="font-size:13px;color:var(--t-white45)">Fill in your details to generate llms.txt</pre></div>
             <div style="text-align:center;margin-top:14px"><button class="btn btn-primary btn-sm" onclick="dlLlms()">Download llms.txt</button></div>
           </div>
-          <div class="alert al-info"><strong>How to install:</strong> Download the file. Upload via FTP or cPanel File Manager to your domain root. Test by visiting yourdomain.co.uk/llms.txt in a browser — you should see plain text.</div>
+          <div class="alert al-info" style="margin-top:14px"><strong>How to install:</strong> Download the file. Upload via FTP or cPanel File Manager to your domain root. Test by visiting yourdomain.co.uk/llms.txt in a browser — you should see plain text.</div>
         </div>
-      </div>
-    </div>
-  </div>
+      </div><!-- end d2col -->
+    </div><!-- end llmsContent -->
+  </div><!-- end dp-llms -->
 
   <div class="dp" id="dp-cit">
     <div class="dh"><h2>Citation Checker</h2><p>AI trusts businesses listed consistently across directories. Check yours right now.</p></div>
@@ -2962,7 +2964,7 @@ function buildDash(){
       <div class="report-out" id="rptContent"></div>
       <div style="display:flex;gap:12px;margin-top:16px">
         <button class="btn btn-primary btn-sm" onclick="printRpt()">Print / Save as PDF</button>
-        <button class="btn btn-outline btn-sm" onclick="document.getElementById('rptOut').style.display='none'">Generate another</button>
+        <button class="btn btn-outline btn-sm" onclick="resetReport()">Generate another</button>
       </div>
     </div>
   </div>
@@ -3435,6 +3437,12 @@ function genSvc(){
   const el=document.getElementById('svcOut');if(el)el.textContent=JSON.stringify(JSON.parse(JSON.stringify(s)),null,2);
 }
 function dlSch(){const c=document.getElementById('schOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('schema.json',c,'application/json');}
+function validateSchema(){
+  const u=v('su')||getProfile().url||'';
+  const domain=u.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
+  const url=domain?`https://search.google.com/test/rich-results?url=https%3A%2F%2F${encodeURIComponent(domain)}`:'https://search.google.com/test/rich-results';
+  window.open(url,'_blank');
+}
 
 /* ═══════════════════════════════════════
    LLMS GENERATOR
@@ -3503,8 +3511,28 @@ function runCit(){
 /* ═══════════════════════════════════════
    REPORT GENERATOR
 ═══════════════════════════════════════ */
+function resetReport(){
+  document.getElementById('rptOut').style.display='none';
+  document.getElementById('rptOut').scrollIntoView({behavior:'smooth'});
+  // Re-lock to registered domain
+  const p=getProfile();
+  if(p.url){
+    const clean=p.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
+    const ru=document.getElementById('ru');
+    if(ru){ru.value=clean;ru.setAttribute('readonly','readonly');}
+  }
+  if(p.business){const rn=document.getElementById('rn');if(rn)rn.value=p.business;}
+}
 async function genReport(){
-  const n=v('rn');const u=v('ru');if(!n||!u){alert('Please enter a business name and website address.');return;}
+  // Always use registered domain — cannot run reports for other sites
+  const p=getProfile();
+  if(p.url){
+    const clean=p.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
+    const ruEl=document.getElementById('ru');
+    if(ruEl){ruEl.value=clean;ruEl.setAttribute('readonly','readonly');}
+  }
+  if(p.business){const rnEl=document.getElementById('rn');if(rnEl&&!rnEl.value)rnEl.value=p.business;}
+  const n=v('rn');const u=v('ru');if(!n||!u){alert('Please complete your profile with business name and website first.');return;}
   const btn=document.getElementById('rptBtn');
   btn.disabled=true;btn.innerHTML='<span class="spin"></span>Generating report...';
   try{
@@ -3552,17 +3580,63 @@ function mdToHtml(text){
     .replace(/<p[^>]*><\/p>/g,'');
 }
 function printRpt(){
-  const el=document.getElementById('rptContent');if(!el)return;
-  const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Machine-Visibility Certificate</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}.hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}.hdr h1{font-size:26px;margin:0 0 6px}.hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}h4{display:none}.rs h5{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:24px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}.rs p,.rs li{font-size:16px;color:#3D3D3D;line-height:1.7}.rs ul{padding-left:20px}.hl{color:#E8500A;font-weight:600}.rw{color:#CC6600}.rok{color:#0A6E2E}.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}button{display:none!important}@media print{body{margin:20px}}</style>  <script
-
-</head><body>
-  <div class="hdr"><h1>Machine-Visibility Certificate</h1><p>${v('rn')||'Business'} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Technical Graffiti</p></div>
-  ${el.innerHTML}
-  <div class="foot"><span>Technical Graffiti Ltd · Co. No. 07180346</span><span>technicalgraffiti.co.uk</span></div>
-  
-</body></html>`);
-  w.document.close();setTimeout(()=>{w.focus();w.print();},400);
+  const el=document.getElementById('rptContent');
+  if(!el||!el.innerHTML.trim()){alert('No report to print — generate a report first.');return;}
+  const bizName=v('rn')||document.getElementById('rptTitle')||'Business';
+  const dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  // Decode HTML entities from mdToHtml output so print shows clean text
+  const tmp=document.createElement('div');
+  tmp.innerHTML=el.innerHTML;
+  // Build clean print HTML with all styles inlined — no CSS variables
+  const html=`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Machine-Visibility Certificate — ${bizName}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;max-width:760px;margin:0 auto;padding:32px 40px;color:#1A1A1A;background:#fff}
+.hdr{background:#0A1628;color:#fff;padding:36px 40px;border-radius:10px;margin-bottom:40px;page-break-inside:avoid}
+.hdr-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#DD5827;margin-bottom:10px}
+.hdr h1{font-size:32px;font-weight:800;margin:0 0 6px;color:#fff}
+.hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}
+h2{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;margin:28px 0 10px;border-bottom:1px solid #EEE;padding-bottom:8px}
+h3{font-size:15px;font-weight:700;color:#DD5827;margin:20px 0 8px}
+p{font-size:15px;color:#333;line-height:1.8;margin:0 0 12px}
+strong{color:#1A1A1A;font-weight:700}
+ul,ol{padding-left:20px;margin:0 0 12px}
+li{font-size:15px;color:#333;line-height:1.8;margin-bottom:4px}
+hr{border:none;border-top:1px solid #EEE;margin:20px 0}
+.foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:12px;color:#AAA;display:flex;justify-content:space-between}
+@media print{
+  body{padding:20px;max-width:100%}
+  .hdr{background:#0A1628!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}
+  @page{margin:15mm}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-label">AI Visibility Audit Report</div>
+  <h1>${bizName}</h1>
+  <p>${dateStr} · Technical Graffiti Ltd</p>
+</div>
+${tmp.innerHTML}
+<div class="foot">
+  <span>Technical Graffiti Ltd · Co. No. 07180346 · ICO: C1894540</span>
+  <span>technicalgraffiti.co.uk</span>
+</div>
+</body>
+</html>`;
+  // Use blob URL — no about:blank, no empty window
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  if(!w){alert('Please allow popups for aenima.co.uk to print reports.');return;}
+  w.addEventListener('load',function(){
+    setTimeout(()=>{w.focus();w.print();},300);
+  });
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 function saveProfileFromPanel(){
   const fields={
