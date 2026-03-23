@@ -2652,7 +2652,8 @@ function showErr(el,msg){el.textContent=msg;el.classList.add('show');setTimeout(
 ═══════════════════════════════════════ */
 function buildDash(){
   const m=document.getElementById('dashMain');
-  if(m.children.length>0)return;
+  if(m.dataset.built)return;
+  m.dataset.built='1';
   m.innerHTML=`
   <!-- OVERVIEW -->
   <div class="dp on" id="dp-overview">
@@ -3086,7 +3087,8 @@ function buildDash(){
       <div class="dcard">
         <h3 id="bUpgradeTitle">Upgrade</h3>
         <div id="bUpgradeCards" style="display:flex;flex-direction:column;gap:14px"></div>
-
+      </div>
+    </div>
   </div>
 
   <div class="dp" id="dp-apitoken"></div>
