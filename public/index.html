@@ -3808,14 +3808,24 @@ function handleUpgrade(plan){
   const billing=S.billing||'mo';
   const btn=event?.target;
   if(btn){btn.disabled=true;btn.textContent='Redirecting to payment...';}
-  fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user.email})})
+  fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user.email,user_id:S.user.id})})
     .then(r=>{
       if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});
       return r.json();
     })
     .then(d=>{
-      if(d.url){window.location.href=d.url;}
-      else{throw new Error('No checkout URL returned');}
+      if(d.upgraded){
+        // Upgrade handled server-side via proration — no redirect needed
+        S.plan=d.plan;
+        syncNav(true);
+        updBilling();
+        showDp('billing',document.querySelector('.sb-item[onclick*="billing"]'));
+        showToast('Upgraded to '+d.plan+' — you were only charged the difference.');
+      } else if(d.url){
+        window.location.href=d.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
     })
     .catch(err=>{
       console.error('Checkout error:',err);
