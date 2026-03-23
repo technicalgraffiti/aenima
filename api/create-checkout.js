@@ -52,38 +52,32 @@ module.exports = async (req, res) => {
             user.stripe_subscription_id
           );
 
-          // Verify subscription is actually active in Stripe
-          if (subscription.status !== 'active' && subscription.status !== 'trialing') {
-            console.log('Subscription not active in Stripe, falling back to new checkout');
-            // Fall through to new checkout
-          } else {
-            const subscriptionItemId = subscription.items.data[0]?.id;
+          const subscriptionItemId = subscription.items.data[0]?.id;
 
-            if (subscriptionItemId) {
-              // Update subscription — Stripe prorates automatically
-              const updated = await stripe.subscriptions.update(user.stripe_subscription_id, {
-                items: [{
-                  id: subscriptionItemId,
-                  price: price,
-                }],
-                proration_behavior: 'create_prorations',
-                metadata: { plan, billing: billing || 'mo' },
-              });
+          if (subscriptionItemId) {
+            // Update subscription — Stripe prorates automatically
+            await stripe.subscriptions.update(user.stripe_subscription_id, {
+              items: [{
+                id: subscriptionItemId,
+                price: price,
+              }],
+              proration_behavior: 'always_invoice',
+              payment_behavior: 'error_if_incomplete',
+              metadata: { plan, billing: billing || 'mo' },
+            });
 
-              // Only update Supabase if Stripe confirmed the update
-              if (updated.id) {
-                await SB
-                  .from('users')
-                  .update({ plan, plan_updated_at: new Date().toISOString() })
-                  .eq('id', user_id);
+            // Update Supabase plan immediately
+            await SB
+              .from('users')
+              .update({ plan })
+              .eq('id', user_id);
 
-                return res.status(200).json({
-                  upgraded: true,
-                  plan,
-                  message: `Upgraded to ${plan}. You have only been charged the difference.`
-                });
-              }
-            }
+            // Return success — no redirect needed, subscription updated directly
+            return res.status(200).json({
+              upgraded: true,
+              plan,
+              message: `Upgraded to ${plan}. You have only been charged the difference.`
+            });
           }
         } catch (upgradeErr) {
           console.error('Upgrade error, falling back to new checkout:', upgradeErr.message);
