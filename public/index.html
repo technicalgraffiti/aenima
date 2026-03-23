@@ -2032,6 +2032,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <div class="sb-div"></div>
       <div class="sb-sect">Account</div>
       <button class="sb-item" onclick="showDp('billing',this)">♥ Plan &amp; Billing</button>
+      <button class="sb-item" onclick="showDp('apitoken',this)">⚿ API Token</button>
       <button class="sb-item" onclick="doLogout()">← Log out</button>
     </div>
     <div class="main" id="dashMain"></div>
@@ -3086,7 +3087,96 @@ function buildDash(){
         <h3 id="bUpgradeTitle">Upgrade</h3>
         <div id="bUpgradeCards" style="display:flex;flex-direction:column;gap:14px"></div>
 
+  </div>
+
+  <div class="dp" id="dp-apitoken"></div>
+
   </div>`;
+}
+
+function buildApiTokenPanel(){
+  const p=document.getElementById('dp-apitoken');
+  if(!p||p.dataset.built)return;
+  p.dataset.built='1';
+  const plan=S.plan||'free';
+  const isPaid=plan==='starter'||plan==='pro'||plan==='agency';
+  p.innerHTML=`
+  <div class="dh"><h2>API Token</h2><p>Use this token to connect the Aenima WordPress plugin to your account.</p></div>
+  <div class="dcard" style="max-width:700px">
+    ${!isPaid?`
+    <div style="background:#fff8f0;border:1.5px solid var(--orange);border-radius:var(--radius);padding:20px;margin-bottom:20px">
+      <p style="font-weight:700;color:var(--orange);margin-bottom:6px">Active subscription required</p>
+      <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">API tokens are available on Starter and Pro plans. Upgrade to get your token and activate the WordPress plugin.</p>
+      <button class="btn btn-primary btn-sm" onclick="showDp('billing',document.querySelector('.sb-item[onclick*=billing]'))">View plans →</button>
+    </div>`:`
+    <div style="background:#F0FBF4;border:1.5px solid var(--green);border-radius:8px;padding:16px;margin-bottom:24px">
+      <p style="font-size:14px;color:var(--green);margin:0;font-weight:700">✓ Your plan: ${plan.charAt(0).toUpperCase()+plan.slice(1)} — API token available</p>
+    </div>
+    <h3 style="font-size:16px;margin-bottom:8px">What is this?</h3>
+    <p style="font-size:15px;color:var(--t-support);margin-bottom:20px;line-height:1.7">Your API token links the Aenima WordPress plugin to your subscription. Paste it into the plugin settings page on your WordPress site. The plugin uses it to verify your account before generating or updating your visibility files.</p>
+    <h3 style="font-size:16px;margin-bottom:8px">Your API Token</h3>
+    <div id="tokenDisplay" style="background:var(--bg-dark,#0A0A0A);border-radius:8px;padding:20px;margin-bottom:16px">
+      <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:10px">Click Generate to create your token. Keep it private — anyone with this token can activate the plugin on a site linked to your account.</p>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <code id="tokenValue" style="font-family:monospace;font-size:14px;color:#DD5827;background:rgba(221,88,39,0.1);padding:10px 16px;border-radius:6px;flex:1;min-width:200px;word-break:break-all">—</code>
+        <button class="btn btn-outline btn-sm" id="copyTokenBtn" onclick="copyToken()" style="display:none">Copy</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" id="genTokenBtn" onclick="generateToken()">Generate token →</button>
+      <button class="btn btn-outline btn-sm" id="regenTokenBtn" onclick="regenToken()" style="display:none;color:var(--red);border-color:var(--red)">Regenerate (invalidates old token)</button>
+    </div>
+    <div style="background:#fff8f0;border-radius:6px;padding:14px;margin-top:20px">
+      <p style="font-size:14px;color:var(--t-body);margin:0;line-height:1.7"><strong>How to use it:</strong> In your WordPress admin, go to Settings → Aenima. Paste this token in the API Token field. Click Save. Your site will be AI-visible within seconds.</p>
+    </div>`}
+  </div>`;
+
+  if(isPaid)loadExistingToken();
+}
+
+async function loadExistingToken(){
+  try{
+    const {data}=await SB.from('users').select('api_token').eq('id',S.user.id).single();
+    if(data&&data.api_token){
+      document.getElementById('tokenValue').textContent=data.api_token;
+      document.getElementById('copyTokenBtn').style.display='inline-block';
+      document.getElementById('genTokenBtn').style.display='none';
+      document.getElementById('regenTokenBtn').style.display='inline-block';
+    }
+  }catch(e){console.log('No token yet');}
+}
+
+function generateToken(){return _doGenToken(false);}
+function regenToken(){
+  if(!confirm('Regenerating your token will invalidate the old one. The WordPress plugin on your site will stop working until you paste the new token into its settings. Continue?'))return;
+  _doGenToken(true);
+}
+
+async function _doGenToken(regen){
+  const btn=document.getElementById(regen?'regenTokenBtn':'genTokenBtn');
+  if(btn){btn.disabled=true;btn.textContent='Generating...';}
+  try{
+    const token='aenima_tok_'+([...Array(32)].map(()=>Math.random().toString(36)[2]).join(''));
+    await SB.from('users').update({api_token:token}).eq('id',S.user.id);
+    document.getElementById('tokenValue').textContent=token;
+    document.getElementById('copyTokenBtn').style.display='inline-block';
+    document.getElementById('genTokenBtn').style.display='none';
+    document.getElementById('regenTokenBtn').style.display='inline-block';
+    if(btn){btn.disabled=false;btn.textContent=regen?'Regenerate (invalidates old token)':'Generate token →';}
+  }catch(e){
+    alert('Could not generate token. Please try again or contact support.');
+    if(btn){btn.disabled=false;btn.textContent=regen?'Regenerate (invalidates old token)':'Generate token →';}
+  }
+}
+
+function copyToken(){
+  const t=document.getElementById('tokenValue').textContent;
+  if(!t||t==='—')return;
+  navigator.clipboard.writeText(t).then(()=>{
+    const btn=document.getElementById('copyTokenBtn');
+    const orig=btn.textContent;btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent=orig,2000);
+  });
 }
 
 function showDp(n,btn){
@@ -3096,6 +3186,7 @@ function showDp(n,btn){
   if(btn)btn.classList.add('on');
   applyGates(n);
   if(n==='profile')setTimeout(fillProfilePanel,50);
+  if(n==='apitoken')setTimeout(buildApiTokenPanel,50);
   if(['schema','llms','cit','report','score'].includes(n))setTimeout(fillForms,50);
   // Show Pro notes on relevant panels
   const isPro=S.plan==='pro'||S.plan==='agency';
@@ -3637,14 +3728,15 @@ function updBilling(){
       </div>`;
   }
 
-  // Starter — show Pro upgrade only
+  // Starter — show Pro upgrade as £2.50/mo top-up
   else if(plan==='starter'){
     if(ut)ut.textContent='Upgrade to Pro';
     uc.innerHTML=`
       <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£7.50/mo</span></div>
-        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin installs and updates everything automatically. Nothing to do — cancel Starter and switch.</p>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Switch to Pro →</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><div style="text-align:right"><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em;color:var(--orange)">+£2.50/mo</span><br><span style="font-size:13px;color:var(--t-support)">£7.50/mo total — you already pay £5.50</span></div></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:8px;line-height:1.6">WordPress plugin installs and updates everything automatically. You only pay the difference — <strong>£2.50/mo extra</strong>, not £7.50. Your current billing date stays the same.</p>
+        <p style="font-size:13px;color:var(--t-support);margin-bottom:14px">No cancellation needed. No refunds on partial periods. Upgrade takes effect immediately.</p>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Upgrade to Pro — add £2.50/mo →</button>
       </div>`;
   }
 
