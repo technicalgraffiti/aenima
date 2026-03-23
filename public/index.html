@@ -2721,7 +2721,7 @@ function buildDash(){
       <div class="mc hi"><div class="ml">Visibility score</div><div class="mv" id="mScore">—</div><div class="ms">out of 100</div></div>
       <div class="mc"><div class="ml">Last checked</div><div class="mv" id="mDate" style="font-size:22px;margin-top:6px">—</div><div class="ms">&nbsp;</div></div>
       <div class="mc"><div class="ml">Critical issues</div><div class="mv" id="mIssues" style="color:var(--red)">—</div><div class="ms">need fixing</div></div>
-      <div class="mc"><div class="ml">Your plan</div><div class="mv" style="font-size:22px;margin-top:6px" id="mPlan">Free</div><div class="ms"><a onclick="showDp('billing',null)" style="color:var(--orange);cursor:pointer;font-size:13px">Upgrade →</a></div></div>
+      <div class="mc"><div class="ml">Your plan</div><div class="mv" style="font-size:22px;margin-top:6px" id="mPlan">Free</div><div class="ms"><a onclick="showDp('billing',null)" style="color:var(--orange);cursor:pointer;font-size:13px" id="mPlanLink">Upgrade →</a></div></div>
     </div>
     <div class="qa-row">
       <button class="qa-btn" onclick="showDp('score',document.querySelectorAll('.sb-item')[1])">
@@ -3312,6 +3312,8 @@ function syncDash(){
   if(sp)sp.innerHTML=`<span class="pb pb-${S.plan}">${S.plan}</span>`;
   if(dw)dw.textContent='Welcome back, '+(S.user.business||S.user.name||'')+'.';
   if(mp)mp.textContent=S.plan.charAt(0).toUpperCase()+S.plan.slice(1);
+  const mpl=document.getElementById('mPlanLink');
+  if(mpl)mpl.textContent=S.plan==='pro'||S.plan==='agency'?'Manage subscription →':'Upgrade →';
   updBilling();
   // Pre-fill fields
   if(S.user.url){const u=S.user.url.replace(/^https?:\/\//,'');['dUrl','su','lu'].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=u;});}
