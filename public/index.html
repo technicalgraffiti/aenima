@@ -2826,7 +2826,7 @@ function buildDash(){
     <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head, or use a WordPress schema plugin.</p></div>
     <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
-      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Your schema is active and up to date</span> — generated from your profile and installed automatically. Review or customise it below if needed.</div>
+      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — schema is managed automatically</span> — your WordPress plugin generates and installs your schema every month. You only need this tool if you want to manually review or edit the code.</div>
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
@@ -2901,6 +2901,7 @@ function buildDash(){
   <!-- LLMS -->
   <div class="dp" id="dp-llms">
     <div class="dh"><h2>llms.txt Generator</h2><p>The file AI systems look for when they visit your site. Without it they are guessing who you are. Generate it in seconds.</p></div>
+    <div id="proLlmsNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — llms.txt is managed automatically</span> — your WordPress plugin generates and publishes your llms.txt every month. You only need this tool to manually review or edit the file.</div>
     <div id="llmsGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">llms.txt Generator — Starter plan</strong><p>Download your llms.txt file with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="llmsContent">
       <div id="llmsProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
@@ -2974,7 +2975,7 @@ function buildDash(){
         </div>
         <div class="dcard">
           <h3>Audit findings</h3>
-          <p style="font-size:14px;color:var(--t-support);margin-bottom:16px;line-height:1.6">The report is generated automatically from a live score check on the client's domain. No manual input needed — fill in client details on the left and click Generate.</p>
+          <p style="font-size:14px;color:var(--t-support);margin-bottom:16px;line-height:1.6">Fill in your business details on the left. The report runs a live score check on your domain and generates a full AI-powered certificate automatically.</p>
           <div class="fg"><label>Keywords / services to find them for</label><textarea id="rte" placeholder="best plumber wellingborough&#10;emergency plumber northamptonshire&#10;plumber NN9" style="min-height:80px"></textarea></div>
           <div class="fg"><label>Additional notes (optional)</label><textarea id="rte2" placeholder="Any context you want included..." style="min-height:60px"></textarea></div>
         </div>
@@ -2987,7 +2988,6 @@ function buildDash(){
       <div style="display:flex;gap:12px;margin-top:16px">
         <button class="btn btn-primary btn-sm" onclick="printRpt(false)">Print →</button>
         <button class="btn btn-primary btn-sm" onclick="printRpt(true)">Save as PDF →</button>
-        <button class="btn btn-outline btn-sm" onclick="resetReport()">Generate another</button>
       </div>
     </div>
   </div>
@@ -3576,7 +3576,8 @@ async function genReport(){
         town:v('rto')||'',
         domain,
         keywords:v('rte')||'',
-        scoreData
+        scoreData,
+        plan:S.plan||'free'
       })
     });
     const rptData=await rptResp.json();
