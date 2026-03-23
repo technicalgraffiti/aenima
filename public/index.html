@@ -1101,8 +1101,12 @@ nav{
 .al-warn{background:#FFF8E6;color:var(--amber);border:1px solid #FAC775}
 
 /* Report */
-.report-out{background:var(--bg-navy);border-radius:var(--radius-lg);padding:32px;margin-top:24px}
+.report-out{background:var(--bg-navy);border-radius:var(--radius-lg);padding:32px;margin-top:24px;color:rgba(255,255,255,0.85)}
 .report-out h4{font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--orange);margin-bottom:20px}
+.report-out h2,.report-out h3{color:var(--orange)}
+.report-out p,.report-out li,.report-out span{color:rgba(255,255,255,0.85)}
+.report-out strong{color:#fff}
+.report-out hr{border-color:rgba(255,255,255,0.15)}
 /* Inline version (dashboard quick analysis on white card) */
 #dReport h4{font-size:20px;color:var(--t-heading);margin-bottom:14px}
 #dReport .rs{border-bottom:1px solid var(--border-lt)}
@@ -2142,7 +2146,7 @@ function saveProfile(updates){
 
 // Map: profile key → array of element IDs that should receive it
 const PROFILE_MAP={
-  business: ['rgBiz','sn','ln','cit_name','rpt_name','dBiz','sch_name','llms_name'],
+  business: ['rgBiz','sn','ln','cit_name','rpt_name','rn','dBiz','sch_name','llms_name','cn'],
   url:      ['rgUrl','dUrl','su','lu','sch_url','llms_url','svc_url','vpr_url','ru','pf_url'],
   name:     ['rgName','pf_name'],
   email:    ['rgEmail','sem','lem','pf_email'],
@@ -2151,6 +2155,7 @@ const PROFILE_MAP={
   county:   ['sco','lcounty'],
   postcode: ['spc','lpost','cpc'],
   description:['sd','ld'],
+  services: ['ss','ls','rte'],
 };
 
 function fillForms(){
@@ -2293,7 +2298,7 @@ async function _runScore(){
       checks: data.checks,
       url: 'https://'+data.domain,
       domain: data.domain,
-      ts: new Date(data.ts),
+      ts: data.ts ? new Date(data.ts) : new Date(),
       real: true,
     };
     S.score=r;
@@ -2806,10 +2811,10 @@ function buildDash(){
 
   <!-- SCHEMA -->
   <div class="dp" id="dp-schema">
-    <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head, or use a WordPress schema plugin.</p>
-    <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:12px 16px;margin-top:12px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan active</span> — your WordPress plugin installs and updates your schema automatically every month. You don't need to do anything here. This tool is available if you ever want to review or customise your schema manually.</div></div>
+    <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head, or use a WordPress schema plugin.</p></div>
     <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
+      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan active</span> — your WordPress plugin installs and updates your schema automatically every month. You don't need to do anything here unless you want to review or customise your schema manually.</div>
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
@@ -3273,7 +3278,10 @@ function syncDash(){
 function renderScoreOverview(r){
   const ms=document.getElementById('mScore');const md=document.getElementById('mDate');const mi=document.getElementById('mIssues');
   if(ms)ms.textContent=r.overall;
-  if(md)md.textContent=new Date(r.ts).toLocaleDateString('en-GB');
+  if(md){
+    const d=r.ts?new Date(r.ts):null;
+    md.textContent=(d&&!isNaN(d))?d.toLocaleDateString('en-GB'):new Date().toLocaleDateString('en-GB');
+  }
   const crit=r.issues.filter(i=>i.p==='critical').length;
   if(mi)mi.textContent=crit;
   const pf=document.getElementById('priFixes');
@@ -3379,6 +3387,12 @@ function dDlPDF(){if(S.score)downloadScorePDF();}
    SCHEMA GENERATOR
 ═══════════════════════════════════════ */
 function genSch(){
+  // Sync to llms fields
+  const syncMap={sn:'ln',sph:'lph',sem:'lem',su:'lu',sd:'ld',ss:'ls',stw:'ltw',sa:'la'};
+  Object.entries(syncMap).forEach(([src,dst])=>{
+    const s=document.getElementById(src);const d=document.getElementById(dst);
+    if(s&&d&&s.value&&!d.dataset.userEdited)d.value=s.value;
+  });
   const n=v('sn')||'Your Business';const t=v('st')||'LocalBusiness';
   const u=v('su');const ph=v('sph');const em=v('sem');
   const st=v('sst');const tw=v('stw');const co=v('sco');const pc=v('spc');
@@ -3426,6 +3440,12 @@ function dlSch(){const c=document.getElementById('schOut')?.textContent;if(!c||c
    LLMS GENERATOR
 ═══════════════════════════════════════ */
 function genLlms(){
+  // Sync to schema fields
+  const syncMap={ln:'sn',lph:'sph',lem:'sem',lu:'su',ld:'sd',ls:'ss',la:'sa'};
+  Object.entries(syncMap).forEach(([src,dst])=>{
+    const s=document.getElementById(src);const d=document.getElementById(dst);
+    if(s&&d&&s.value&&!d.dataset.userEdited)d.value=s.value;
+  });
   const n=v('ln')||'Your Business';const t=v('lt');const d=v('ld');
   const ph=v('lph');const em=v('lem');const u=v('lu');
   const svcs=v('ls').split('\n').map(x=>x.trim()).filter(Boolean);
@@ -3522,13 +3542,13 @@ async function genReport(){
 function mdToHtml(text){
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^## (.+)$/gm,'<h3 style="font-size:16px;font-weight:700;color:var(--orange);margin:20px 0 8px">$1</h3>')
-    .replace(/^# (.+)$/gm,'<h2 style="font-size:20px;font-weight:800;color:var(--t-heading);margin:0 0 12px">$1</h2>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^(\d+)\. (.+)$/gm,'<div style="display:flex;gap:10px;margin:6px 0"><span style="color:var(--orange);font-weight:700;min-width:20px">$1.</span><span>$2</span></div>')
-    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border-lt);margin:16px 0">')
-    .replace(/\n\n/g,'</p><p style="font-size:15px;color:var(--t-body);line-height:1.8;margin:0 0 10px">')
-    .replace(/^(?!<)(.+)$/gm,'<p style="font-size:15px;color:var(--t-body);line-height:1.8;margin:0 0 10px">$1</p>')
+    .replace(/^## (.+)$/gm,'<h3 style="font-size:16px;font-weight:700;color:#DD5827;margin:20px 0 8px">$1</h3>')
+    .replace(/^# (.+)$/gm,'<h2 style="font-size:20px;font-weight:800;color:#FFFFFF;margin:0 0 12px">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#FFFFFF">$1</strong>')
+    .replace(/^(\d+)\. (.+)$/gm,'<div style="display:flex;gap:10px;margin:6px 0"><span style="color:#DD5827;font-weight:700;min-width:20px">$1.</span><span style="color:rgba(255,255,255,0.85)">$2</span></div>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:16px 0">')
+    .replace(/\n\n/g,'</p><p style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.8;margin:0 0 10px">')
+    .replace(/^(?!<)(.+)$/gm,'<p style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.8;margin:0 0 10px">$1</p>')
     .replace(/<p[^>]*><\/p>/g,'');
 }
 function printRpt(){
