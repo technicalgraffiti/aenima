@@ -2164,6 +2164,17 @@ function fillForms(){
       }
     });
   });
+  // Always lock dUrl to registered domain — cannot be changed
+  const dUrl=document.getElementById('dUrl');
+  if(dUrl&&p.url){
+    const clean=p.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
+    dUrl.value=clean;
+  }
+  // Show placeholder notices on schema/llms generators if profile incomplete
+  const schNote=document.getElementById('schProfileNote');
+  const llmsNote=document.getElementById('llmsProfileNote');
+  if(schNote)schNote.style.display=(!p.business||!p.town)?'block':'none';
+  if(llmsNote)llmsNote.style.display=(!p.business||!p.town)?'block':'none';
 }
 
 // Mark a field as user-edited so we don't overwrite their changes
@@ -2738,7 +2749,7 @@ function buildDash(){
           <label>Website address</label>
           <div style="display:flex;align-items:center;gap:6px;background:var(--bg-white);border:1.5px solid var(--border-lt);border-radius:8px;padding:0 12px;transition:border-color 0.2s">
             <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--t-support);white-space:nowrap;flex-shrink:0">https://</span>
-            <input type="text" id="dUrl" placeholder="yourwebsite.co.uk" style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--t-heading);padding:11px 0">
+            <input type="text" id="dUrl" placeholder="yourwebsite.co.uk" style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--t-heading);padding:11px 0" readonly title="Checks run against your registered website">
           </div>
         </div>
         <div class="fg" style="margin-bottom:0"><label>Business type</label><select id="dType"><option value="">Select...</option><option>Plumber</option><option>Electrician</option><option>Builder</option><option>Roofer</option><option>Solicitor</option><option>Accountant</option><option>Architect</option><option>Surveyor</option><option>Dentist</option><option>Restaurant</option><option>Shop / Retail</option><option>Mechanic</option><option>Landscaper</option><option>Other trade</option><option>Other professional</option></select></div>
@@ -2799,6 +2810,9 @@ function buildDash(){
     <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:12px 16px;margin-top:12px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan active</span> — your WordPress plugin installs and updates your schema automatically every month. You don't need to do anything here. This tool is available if you ever want to review or customise your schema manually.</div></div>
     <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
+      <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
+        <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
+      </div>
       <div class="tabs"><button class="tab on" onclick="swTab('sch','local',this)">Local Business</button><button class="tab" onclick="swTab('sch','faq',this)">FAQ Page</button><button class="tab" onclick="swTab('sch','svc',this)">Service</button></div>
       <div class="tabp on" id="sch-local">
         <div class="d2col">
@@ -2865,7 +2879,9 @@ function buildDash(){
     <div class="dh"><h2>llms.txt Generator</h2><p>The file AI systems look for when they visit your site. Without it they are guessing who you are. Generate it in seconds.</p></div>
     <div id="llmsGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">llms.txt Generator — Starter plan</strong><p>Download your llms.txt file with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="llmsContent">
-      <div class="d2col">
+      <div id="llmsProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
+        <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
+      </div>
         <div class="dcard" style="margin-bottom:0">
           <h3>Business details</h3>
           <div class="fg"><label>Business name</label><input type="text" id="ln" oninput="genLlms()" placeholder="Smith Plumbing Ltd"></div>
@@ -2891,9 +2907,13 @@ function buildDash(){
     </div>
   </div>
 
-  <!-- CITATIONS -->
   <div class="dp" id="dp-cit">
     <div class="dh"><h2>Citation Checker</h2><p>AI trusts businesses listed consistently across directories. Check yours right now.</p></div>
+    <div style="background:#f9f9f9;border:1px solid #e5e5e5;border-radius:8px;padding:16px 20px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px">What it does</div><div style="font-size:14px;color:#333;line-height:1.6">Checks whether your business is listed on the directories AI engines use to verify and recommend local businesses.</div></div>
+      <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px">Why it matters</div><div style="font-size:14px;color:#333;line-height:1.6">AI cross-references your name, address and phone across the web. Gaps or inconsistencies reduce your visibility score and your chances of being recommended.</div></div>
+      <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px">How to use it</div><div style="font-size:14px;color:#333;line-height:1.6">Enter your exact business name, phone and address below. Click Generate. Work through the checklist — each directory link opens directly so you can check or add your listing.</div></div>
+    </div>
     <div id="citGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Citation Checker — Starter plan</strong><p>See exactly which directories you're missing at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="citContent">
       <div class="dcard">
@@ -2925,11 +2945,9 @@ function buildDash(){
         </div>
         <div class="dcard">
           <h3>Audit findings</h3>
-          <div class="fg"><label>ChatGPT result</label><textarea id="rcg" placeholder="Not mentioned in 5/5 queries." style="min-height:60px"></textarea></div>
-          <div class="fg"><label>Perplexity result</label><textarea id="rpl" placeholder="Mentioned once, no citation." style="min-height:60px"></textarea></div>
-          <div class="fg"><label>Google AI Overviews</label><textarea id="rgo" placeholder="AI Overview present. Client not featured." style="min-height:60px"></textarea></div>
-          <div class="fg"><label>Technical findings</label><textarea id="rte2" placeholder="No schema. No llms.txt." style="min-height:60px"></textarea></div>
-          <div class="fg"><label>Citation findings</label><textarea id="rci" placeholder="Listed on Google and Yell. NAP inconsistent." style="min-height:60px"></textarea></div>
+          <p style="font-size:14px;color:var(--t-support);margin-bottom:16px;line-height:1.6">The report is generated automatically from a live score check on the client's domain. No manual input needed — fill in client details on the left and click Generate.</p>
+          <div class="fg"><label>Keywords / services to find them for</label><textarea id="rte" placeholder="best plumber wellingborough&#10;emergency plumber northamptonshire&#10;plumber NN9" style="min-height:80px"></textarea></div>
+          <div class="fg"><label>Additional notes (optional)</label><textarea id="rte2" placeholder="Any context you want included..." style="min-height:60px"></textarea></div>
         </div>
       </div>
       <button class="btn btn-primary btn-lg" id="rptBtn" onclick="genReport()">Generate Machine-Visibility Certificate →</button>
@@ -3467,20 +3485,51 @@ function runCit(){
 ═══════════════════════════════════════ */
 async function genReport(){
   const n=v('rn');const u=v('ru');if(!n||!u){alert('Please enter a business name and website address.');return;}
-  const btn=document.getElementById('rptBtn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Generating...';
-  await wait(1500);
-  const tech=v('rte2');const hs=tech.toLowerCase().includes('schema');const hl=tech.toLowerCase().includes('llms');
-  let sc=45;if(!hs)sc-=15;if(!hl)sc-=10;sc=Math.max(10,Math.min(sc,80));
-  const html=`<h4>Machine-Visibility Certificate — ${n}</h4>
-  <div class="rs"><h5>Overall score</h5><p><span class="hl">${sc}/100</span> — ${sc<30?'Not visible to AI.':sc<55?'Limited GEO and AEO visibility.':'Moderate visibility — improvements available.'}</p></div>
-  <div class="rs"><h5>Category scores</h5><p>ChatGPT: <span class="rw">${Math.round(sc*0.18)}/20</span> &nbsp;·&nbsp; Perplexity: <span class="rw">${Math.round(sc*0.16)}/20</span> &nbsp;·&nbsp; Google AIO: <span class="rw">${Math.round(sc*0.20)}/20</span> &nbsp;·&nbsp; Technical: <span class="${hs?'rok':'rw'}">${hs?12:4}/20</span> &nbsp;·&nbsp; Citations: <span class="rw">8/20</span></p></div>
-  <div class="rs"><h5>Key findings</h5><ul>${!hs?'<li><span class="rw">No Schema 3.0 JSON-LD detected.</span> AI engines cannot identify business type, location or services.</li>':''}${!hl?'<li><span class="rw">No llms.txt present.</span> AI systems have no machine-readable business summary.</li>':''}<li>GEO and AEO optimisation not yet implemented.</li></ul></div>
-  <div class="rs"><h5>Priority actions</h5><ul><li>1. Install your AI visibility signals — use the tools below</li><li>2. Create and upload llms.txt — use llms.txt Generator</li><li>3. Standardise NAP across directories — use Citation Checker</li></ul></div>
-  <div class="rs"><h5>Issued by</h5><p>Technical Graffiti · GEO &amp; AEO Specialist · technicalgraffiti.co.uk · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p></div>`;
-  document.getElementById('rptOut').style.display='block';
-  document.getElementById('rptContent').innerHTML=html;
-  document.getElementById('rptOut').scrollIntoView({behavior:'smooth'});
-  btn.disabled=false;btn.innerHTML='Generate Machine-Visibility Certificate →';
+  const btn=document.getElementById('rptBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>Generating report...';
+  try{
+    // First run a live score check
+    const domain=u.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim();
+    const scoreResp=await fetch('/api/check-domain',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({domain})
+    });
+    const scoreData=await scoreResp.json();
+    btn.innerHTML='<span class="spin"></span>Writing report...';
+    // Then generate AI report
+    const rptResp=await fetch('https://aenima.co.uk/api/generate-report',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        bizName:n,
+        bizType:v('rty')||'local business',
+        town:v('rto')||'',
+        domain,
+        keywords:v('rte')||'',
+        scoreData
+      })
+    });
+    const rptData=await rptResp.json();
+    if(!rptData.report)throw new Error('No report returned');
+    document.getElementById('rptOut').style.display='block';
+    document.getElementById('rptContent').innerHTML=mdToHtml(rptData.report);
+    document.getElementById('rptOut').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    alert('Report generation failed: '+e.message+'. Please try again.');
+  }finally{
+    btn.disabled=false;btn.innerHTML='Generate Machine-Visibility Certificate →';
+  }
+}
+function mdToHtml(text){
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^## (.+)$/gm,'<h3 style="font-size:16px;font-weight:700;color:var(--orange);margin:20px 0 8px">$1</h3>')
+    .replace(/^# (.+)$/gm,'<h2 style="font-size:20px;font-weight:800;color:var(--t-heading);margin:0 0 12px">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^(\d+)\. (.+)$/gm,'<div style="display:flex;gap:10px;margin:6px 0"><span style="color:var(--orange);font-weight:700;min-width:20px">$1.</span><span>$2</span></div>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border-lt);margin:16px 0">')
+    .replace(/\n\n/g,'</p><p style="font-size:15px;color:var(--t-body);line-height:1.8;margin:0 0 10px">')
+    .replace(/^(?!<)(.+)$/gm,'<p style="font-size:15px;color:var(--t-body);line-height:1.8;margin:0 0 10px">$1</p>')
+    .replace(/<p[^>]*><\/p>/g,'');
 }
 function printRpt(){
   const el=document.getElementById('rptContent');if(!el)return;
