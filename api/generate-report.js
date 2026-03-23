@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { bizName, bizType, town, domain, keywords, scoreData, plan } = req.body;
+    const { bizName, bizType, town, domain, scoreData, plan } = req.body;
     const isPro = plan === 'pro' || plan === 'agency';
     const isStarter = plan === 'starter';
 
@@ -61,7 +61,7 @@ BUSINESS DETAILS:
 - Business type: ${bizType || 'local business'}
 - Town: ${town || 'UK'}
 - Website: ${domain}
-- Keywords / services they want to be found for: ${keywords || 'not specified'}
+- Keywords / services they want to be found for: derived from business type and location
 
 AUDIT RESULTS:
 - Overall AI visibility score: ${scoreData.overall}/100

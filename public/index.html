@@ -2711,7 +2711,11 @@ function buildDash(){
   m.innerHTML=`
   <!-- OVERVIEW -->
   <div class="dp on" id="dp-overview">
-    <div class="dh"><h2>Dashboard</h2><p id="dhWelcome">Welcome back.</p></div>
+    <div class="dh"><h2>Dashboard</h2><p id="dhWelcome">Welcome back.</p>
+      <div id="gettingStarted" style="display:none;font-size:14px;color:var(--t-support);margin-top:8px;padding:10px 16px;background:#fff8f0;border:1px solid #fde8d8;border-left:3px solid var(--orange);border-radius:6px">
+        → <strong>Start here:</strong> Click <strong>My Score</strong> in the left sidebar to run your first free AI visibility check.
+      </div>
+    </div>
     <div class="metrics">
       <div class="mc hi"><div class="ml">Visibility score</div><div class="mv" id="mScore">—</div><div class="ms">out of 100</div></div>
       <div class="mc"><div class="ml">Last checked</div><div class="mv" id="mDate" style="font-size:22px;margin-top:6px">—</div><div class="ms">&nbsp;</div></div>
@@ -2740,14 +2744,7 @@ function buildDash(){
         <span class="qa-sub">Find missing directory listings with fix links</span>
       </button>
     </div>
-    <!-- Getting started banner — shown when no score exists -->
-    <div id="gettingStarted" style="display:none;background:linear-gradient(135deg,#0A1628 0%,#1a2a45 100%);border-radius:12px;padding:32px 36px;margin-bottom:20px;text-align:center">
-      <div style="font-size:48px;margin-bottom:16px">○</div>
-      <h3 style="font-size:24px;font-weight:800;color:#FFFFFF;margin:0 0 10px;letter-spacing:-0.02em">Check your AI visibility score</h3>
-      <p style="font-size:16px;color:rgba(255,255,255,0.65);margin:0 0 24px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto">Start here. Run a free score check to see exactly how visible your business is to AI search engines — and what needs fixing.</p>
-      <button onclick="showDp('score',document.querySelectorAll('.sb-item')[1])" style="background:#DD5827;color:#fff;border:none;padding:14px 32px;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.2px;box-shadow:0 4px 20px rgba(221,88,39,0.4)">Run my free score check →</button>
-      <p style="font-size:13px;color:rgba(255,255,255,0.35);margin:12px 0 0">Free — no subscription needed. Takes 30 seconds.</p>
-    </div>
+
     <div class="dcard">
       <h3>Priority fixes</h3>
       <div id="priFixes"><p style="font-size:16px;color:var(--t-support)">Run a score check to see your priority fixes.</p></div>
@@ -2901,7 +2898,7 @@ function buildDash(){
           <div style="background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:14px 16px;margin-bottom:20px;font-size:14px;color:var(--t-body);line-height:1.7">
             <strong>Why FAQ schema matters:</strong> When someone asks an AI assistant a question — "who does emergency plumbing in Wellingborough?" — FAQ schema gives AI a specific answer to use. Without it, AI guesses or uses a competitor who has it.<br><br>
             <strong>Important — two separate things:</strong><br>
-            <strong>1. Schema code (we generate this):</strong> Write your Q&amp;As below. We generate the technical schema code. Install it on your website — this is what AI reads.<br>
+            <strong>1. Schema code (we generate this):</strong> Write your Q&amp;As below and we generate the schema code. <strong>Starter:</strong> download and install it on your site yourself. <strong>Pro:</strong> your WordPress plugin handles it automatically.<br>
             <strong>2. FAQ page content (you create this):</strong> Add a visible FAQ section to a page on your website with the same questions and answers. We do not create this for you — it is your content. Both are needed for maximum AI visibility.
           </div>
           <p style="font-size:16px;color:var(--t-support);margin-bottom:22px">AI engines extract FAQs directly from your pages. One of the highest-impact GEO changes you can make.</p>
@@ -2964,8 +2961,7 @@ function buildDash(){
             <div style="text-align:center;margin-top:14px"><button class="btn btn-primary btn-sm" onclick="dlLlms()">Download llms.txt</button></div>
           </div>
           <div class="alert al-info" style="margin-top:14px">
-  <strong>Starter plan:</strong> Download the file. Upload via FTP or cPanel File Manager to your domain root. Test by visiting yourdomain.co.uk/llms.txt — you should see plain text.<br>
-  <strong>Pro plan:</strong> Your WordPress plugin publishes and updates this file automatically every month. Nothing to do.
+  <strong>Starter:</strong> Download and upload to your domain root via FTP or cPanel. Test at yourdomain.co.uk/llms.txt — you should see plain text. <strong>Pro:</strong> your WordPress plugin publishes and updates this automatically — nothing to do.
 </div>
         </div>
       </div><!-- end d2col -->
@@ -3006,18 +3002,9 @@ function buildDash(){
           <div class="fg"><label>Website</label><input type="text" id="ru" placeholder="smithplumbing.co.uk"></div>
           <div class="fg"><label>Business type</label><input type="text" id="rty" placeholder="Plumber"></div>
           <div class="fg"><label>Town</label><input type="text" id="rto" placeholder="Wellingborough"></div>
-          <div class="fg">
-            <label>Keywords your customers search for</label>
-            <p style="font-size:12px;color:var(--t-support);margin:-4px 0 6px;line-height:1.5">Optional but worth filling in. These make the report more specific to your trade — Claude uses them to reference real searches your customers make. Leave blank and the report uses your business type and town instead. Does not affect your score or your files.</p>
-            <textarea id="rte" placeholder="best plumber wellingborough&#10;emergency plumber northamptonshire&#10;boiler repair NN8" style="min-height:70px"></textarea>
-          </div>
+
         </div>
-        <div class="dcard">
-          <h3>Audit findings</h3>
-          <p style="font-size:14px;color:var(--t-support);margin-bottom:16px;line-height:1.6">Fill in your business details on the left. The report runs a live score check on your domain and generates a full AI-powered certificate automatically.</p>
-          <div class="fg"><label>Keywords / services to find them for</label><textarea id="rte" placeholder="best plumber wellingborough&#10;emergency plumber northamptonshire&#10;plumber NN9" style="min-height:80px"></textarea></div>
-          <div class="fg"><label>Additional notes (optional)</label><textarea id="rte2" placeholder="Any context you want included..." style="min-height:60px"></textarea></div>
-        </div>
+
       </div>
       <button class="btn btn-primary btn-lg" id="rptBtn" onclick="genReport()">Generate Machine-Visibility Certificate →</button>
       <div class="alert al-warn" id="rptApiNote" style="display:none;margin-top:16px"><strong>Demo mode:</strong> Add your Claude API key to CFG to generate AI-powered reports.</div>
