@@ -1909,7 +1909,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
     <div class="auth-wrap">
       <div class="auth-card">
         <div style="text-align:center;margin-bottom:24px">
-          <div style="font-size:40px;margin-bottom:12px">🔑</div>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2L13 10"/><path d="M21 2l-4 4"/><path d="M17 6l-2 2"/></svg>
           <h2 style="margin-bottom:8px">Reset your password</h2>
           <p style="color:var(--t-support);font-size:15px">Enter your email and we'll send you a reset link.</p>
         </div>
@@ -1928,7 +1928,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
     <div class="auth-wrap">
       <div class="auth-card">
         <div style="text-align:center;margin-bottom:24px">
-          <div style="font-size:40px;margin-bottom:12px">🔒</div>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <h2 style="margin-bottom:8px">Choose a new password</h2>
           <p style="color:var(--t-support);font-size:15px">Enter your new password below.</p>
         </div>
@@ -3121,15 +3121,20 @@ function buildApiTokenPanel(){
       <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:10px">Click Generate to create your token. Keep it private — anyone with this token can activate the plugin on a site linked to your account.</p>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <code id="tokenValue" style="font-family:monospace;font-size:14px;color:#DD5827;background:rgba(221,88,39,0.1);padding:10px 16px;border-radius:6px;flex:1;min-width:200px;word-break:break-all">—</code>
-        <button class="btn btn-outline btn-sm" id="copyTokenBtn" onclick="copyToken()" style="display:none">Copy</button>
+        <button id="copyTokenBtn" onclick="copyToken()" style="display:none;background:transparent;color:#DD5827;border:2px solid #DD5827;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s ease" onmouseover="this.style.background='#DD5827';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#DD5827'">Copy</button>
       </div>
     </div>
     <div style="display:flex;gap:12px;flex-wrap:wrap">
       <button class="btn btn-primary btn-sm" id="genTokenBtn" onclick="generateToken()">Generate token →</button>
       <button class="btn btn-outline btn-sm" id="regenTokenBtn" onclick="regenToken()" style="display:none;color:var(--red);border-color:var(--red)">Regenerate (invalidates old token)</button>
     </div>
-    <div style="background:#fff8f0;border-radius:6px;padding:14px;margin-top:20px">
-      <p style="font-size:14px;color:var(--t-body);margin:0;line-height:1.7"><strong>How to use it:</strong> In your WordPress admin, go to Settings → Aenima. Paste this token in the API Token field. Click Save. Your site will be AI-visible within seconds.</p>
+    <div style="background:#fff8f0;border-radius:6px;padding:16px;margin-top:20px">
+      <p style="font-size:14px;color:var(--t-body);margin:0 0 12px;line-height:1.7"><strong>How to use your token:</strong> In your WordPress admin, go to Settings → Aenima. Paste this token in the API Token field. Click Save. Your files will generate automatically.</p>
+      <p style="font-size:13px;color:var(--t-support);margin:0 0 12px"><strong>Pro plan only</strong> — the WordPress plugin installs and updates your visibility files every month automatically. No action needed after setup.</p>
+      <a href="https://wordpress.org/plugins/aenima" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download WordPress Plugin →
+      </a>
     </div>`}
   </div>`;
 
