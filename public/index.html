@@ -3355,11 +3355,23 @@ async function _runDScore(){
 }
 function buildReport(r){
   const c=r.issues.filter(i=>i.p==='critical');const h=r.issues.filter(i=>i.p==='high');
+  const allIssues=[...c,...h];
+  const nextActions=allIssues.length
+    ? allIssues.slice(0,3).map(i=>`<li>${i.t}</li>`).join('')
+    : '<li>Your AI visibility is in good shape. Run the Citation Checker to find any directory gaps.</li>';
+  const scoreMsg=r.overall>=100
+    ? '<span class="rok">Perfect score — your site is fully AI-visible.</span>'
+    : r.overall>=80
+    ? '<span class="rok">Good visibility.</span> Minor improvements available.'
+    : r.overall<30?'<span class="rw">Not currently visible to AI search engines.</span>'
+    : r.overall<55?'<span class="rw">Limited AI visibility.</span> Competitors are being recommended more often.'
+    : '<span class="rok">Reasonable visibility.</span> Targeted improvements will strengthen your position.';
   return`<h4>Quick Analysis — ${r.bizName||r.domain}</h4>
-  <div class="rs"><h5>Overall finding</h5><p>Score: <span class="hl">${r.overall}/100</span>. ${r.overall<30?'<span class="rw">Not currently visible to AI search engines.</span>':r.overall<55?'<span class="rw">Limited AI visibility.</span> Competitors with better GEO and AEO are being recommended more often.':'<span class="rok">Reasonable visibility.</span> Targeted improvements will strengthen your position.'}</p></div>
+  <div class="rs"><h5>Overall finding</h5><p>Score: <span class="hl">${r.overall}/100</span>. ${scoreMsg}</p></div>
   ${c.length?`<div class="rs"><h5>Critical issues (${c.length})</h5><ul>${c.map(i=>`<li><span class="rw">${i.t}</span></li>`).join('')}</ul></div>`:''}
   ${h.length?`<div class="rs"><h5>High priority (${h.length})</h5><ul>${h.map(i=>`<li>${i.t}</li>`).join('')}</ul></div>`:''}
-  <div class="rs"><h5>Next actions</h5><ul><li>Install your <span class="hl">AI visibility signals</span></li><li>Create and upload <span class="hl">llms.txt</span></li><li>Fix citation gaps across directories</li></ul></div>`;
+  <div class="rs"><h5>Next actions</h5><ul>${nextActions}</ul></div>`;
+}
 }
 function autoFill(){
   if(!S.score)return;
