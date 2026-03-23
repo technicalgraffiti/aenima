@@ -2944,7 +2944,7 @@ function buildDash(){
       <div class="d2col">
         <div class="dcard">
           <h3>Client details</h3>
-          <div class="fg"><label>Business name</label><input type="text" id="rn" placeholder="Smith Plumbing Ltd"></div>
+          <div class="fg"><label>Business name</label><input type="text" id="rn" placeholder="Smith Plumbing Ltd" readonly></div>
           <div class="fg"><label>Website</label><input type="text" id="ru" placeholder="smithplumbing.co.uk"></div>
           <div class="fg"><label>Business type</label><input type="text" id="rty" placeholder="Plumber"></div>
           <div class="fg"><label>Town</label><input type="text" id="rto" placeholder="Wellingborough"></div>
@@ -3582,11 +3582,20 @@ function mdToHtml(text){
 function printRpt(){
   const el=document.getElementById('rptContent');
   if(!el||!el.innerHTML.trim()){alert('No report to print — generate a report first.');return;}
-  const bizName=v('rn')||document.getElementById('rptTitle')||'Business';
+  const bizName=v('rn')||'Business';
   const dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  // Decode HTML entities from mdToHtml output so print shows clean text
+  // Clone content and convert white/light colours to dark for print
   const tmp=document.createElement('div');
   tmp.innerHTML=el.innerHTML;
+  // Replace white text colours with dark equivalents for print
+  tmp.querySelectorAll('[style]').forEach(el=>{
+    el.style.color=el.style.color
+      .replace(/rgba\(255,255,255,[0-9.]+\)/g,'#1A1A1A')
+      .replace(/rgb\(255,255,255\)/g,'#1A1A1A')
+      .replace(/#FFFFFF/gi,'#1A1A1A')
+      .replace(/#fff/gi,'#1A1A1A');
+    if(el.style.color==='white')el.style.color='#1A1A1A';
+  });
   // Build clean print HTML with all styles inlined — no CSS variables
   const html=`<!DOCTYPE html>
 <html>
