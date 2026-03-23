@@ -2529,6 +2529,32 @@ async function saveScoreToSupabase(score){
   }
 }
 
+async function loadLastScore(){
+  if(!SB||!S.user?.id)return;
+  try{
+    const{data}=await SB.from('scores')
+      .select('score,url,results,created_at')
+      .eq('user_id',S.user.id)
+      .order('created_at',{ascending:false})
+      .limit(1)
+      .single();
+    if(data){
+      const r={
+        overall:data.score,
+        domain:data.url,
+        cats:data.results?.cats||{},
+        issues:data.results?.issues||[],
+        ts:new Date(data.created_at),
+        real:true
+      };
+      S.score=r;
+      renderScoreOverview(r);
+    }
+  }catch(ex){
+    console.warn('Score load failed:',ex);
+  }
+}
+
 async function doReset(){
   const e=document.getElementById('resetEmail').value.trim();
   const err=document.getElementById('resetErr');
@@ -2826,7 +2852,7 @@ function buildDash(){
     <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head, or use a WordPress schema plugin.</p></div>
     <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
-      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — schema is managed automatically</span> — your WordPress plugin generates and installs your schema every month. You only need this tool if you want to manually review or edit the code.</div>
+      <div id="proSchemaNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — schema installs automatically</span> — your WordPress plugin generates and installs your schema on your site every month. You don't need to do anything. This tool is here if you want to review or edit the code manually.</div>
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
@@ -2866,7 +2892,7 @@ function buildDash(){
           <h3>FAQ Schema</h3>
           <div style="background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:14px 16px;margin-bottom:20px;font-size:14px;color:var(--t-body);line-height:1.7">
             <strong>Why FAQ schema matters:</strong> When someone asks an AI assistant a question your business can answer — "who does emergency plumbing in Wellingborough?" — FAQ schema gives AI the exact answer to cite. Without it, AI guesses or uses a competitor.<br><br>
-            <strong>What to do:</strong> Create 3–5 questions your customers actually ask. Write clear, direct answers. Add them below — we generate the schema code automatically. Install it on your website and AI can use your answers directly.
+            <strong>What to do:</strong> Create 3–5 questions your customers actually ask. Write clear, direct answers below — the schema code generates automatically. <strong>Two things you need to do:</strong> (1) Install the generated schema code on your website, and (2) Add an actual FAQ section to a page on your website with the same questions and answers — this reinforces the signal for both AI and human visitors.
           </div>
           <p style="font-size:16px;color:var(--t-support);margin-bottom:22px">AI engines extract FAQs directly from your pages. One of the highest-impact GEO changes you can make.</p>
           <div id="faqItems">
@@ -2901,7 +2927,7 @@ function buildDash(){
   <!-- LLMS -->
   <div class="dp" id="dp-llms">
     <div class="dh"><h2>llms.txt Generator</h2><p>The file AI systems look for when they visit your site. Without it they are guessing who you are. Generate it in seconds.</p></div>
-    <div id="proLlmsNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — llms.txt is managed automatically</span> — your WordPress plugin generates and publishes your llms.txt every month. You only need this tool to manually review or edit the file.</div>
+    <div id="proLlmsNote" style="display:none;background:#E6F7ED;border:1.5px solid #1A8A40;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px"><span style="font-weight:700;color:#1A8A40">✓ Pro plan — llms.txt publishes automatically</span> — your WordPress plugin generates and publishes your llms.txt on your site every month. This tool is here if you want to review or edit the file manually.</div>
     <div id="llmsGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">llms.txt Generator — Starter plan</strong><p>Download your llms.txt file with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="llmsContent">
       <div id="llmsProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
@@ -2927,7 +2953,10 @@ function buildDash(){
             <div class="codebl"><button class="copy-btn" onclick="cpEl('llmsOut',this)">Copy</button><pre id="llmsOut" style="font-size:13px;color:var(--t-white45)">Fill in your details to generate llms.txt</pre></div>
             <div style="text-align:center;margin-top:14px"><button class="btn btn-primary btn-sm" onclick="dlLlms()">Download llms.txt</button></div>
           </div>
-          <div class="alert al-info" style="margin-top:14px"><strong>How to install:</strong> Download the file. Upload via FTP or cPanel File Manager to your domain root. Test by visiting yourdomain.co.uk/llms.txt in a browser — you should see plain text.</div>
+          <div class="alert al-info" style="margin-top:14px">
+  <strong>Starter plan:</strong> Download the file. Upload via FTP or cPanel File Manager to your domain root. Test by visiting yourdomain.co.uk/llms.txt — you should see plain text.<br>
+  <strong>Pro plan:</strong> Your WordPress plugin publishes and updates this file automatically every month. Nothing to do.
+</div>
         </div>
       </div><!-- end d2col -->
     </div><!-- end llmsContent -->
@@ -3292,6 +3321,7 @@ function syncDash(){
   if(S.user.url){const u=S.user.url.replace(/^https?:\/\//,'');['dUrl','su','lu'].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=u;});}
   if(S.user.business){['sn','ln'].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=S.user.business;});}
   if(S.score)renderScoreOverview(S.score);
+  else loadLastScore();
   // Autopopulate all forms from profile
   const prof=getProfile();
   if(!prof.business&&S.user&&S.user.business)saveProfile({business:S.user.business});
