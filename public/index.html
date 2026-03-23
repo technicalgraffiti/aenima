@@ -3988,10 +3988,16 @@ initSupabase();
       }catch(ex){console.warn('PKCE confirm error:',ex);}
     }
   }
-  if(_up.get('upgraded')==='1'&&_up.get('plan')&&S.user){
-    S.plan=_up.get('plan');
-    S.user.plan=S.plan;
-    saveS();
+  if(_up.get('upgraded')==='1'&&S.user){
+    // Never trust the plan from the URL — always verify from Supabase
+    try{
+      const{data}=await SB.from('users').select('plan,stripe_subscription_id').eq('id',S.user.id).single();
+      if(data&&data.plan){
+        S.plan=data.plan;
+        S.user.plan=data.plan;
+        saveS();
+      }
+    }catch(e){console.warn('Plan verify failed:',e);}
     showPage('dashboard');
     setTimeout(()=>showDp('billing',null),500);
   } else if(S.user){
