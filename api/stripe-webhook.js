@@ -47,6 +47,7 @@ module.exports = async (req, res) => {
 
   switch (event.type) {
 
+    // ── New checkout completed (first-time purchase) ──────────────────────
     case 'checkout.session.completed': {
       const session = event.data.object;
       const email = session.customer_details?.email || session.customer_email;
@@ -62,48 +63,90 @@ module.exports = async (req, res) => {
       const plan = PLAN_MAP[priceId] || 'starter';
       console.log(`Price: ${priceId}, Plan: ${plan}`);
 
-      // Try update by email
-      const { data, error, count } = await SB
+      const { data, error } = await SB
         .from('users')
         .update({
           plan,
           stripe_customer_id: customerId,
           stripe_subscription_id: subId,
-          plan_updated_at: new Date().toISOString()
+          plan_updated_at: new Date().toISOString(),
+          payment_failed: false,
         })
         .eq('email', email)
         .select();
 
-      console.log(`Supabase update — rows affected: ${data?.length}, error: ${JSON.stringify(error)}`);
-
       if (error) console.error('Supabase update failed:', error);
-      else if (!data || data.length === 0) {
-        console.error(`No user found with email: ${email}`);
-      } else {
-        console.log(`Plan updated: ${email} → ${plan}`);
-      }
+      else if (!data || data.length === 0) console.error(`No user found with email: ${email}`);
+      else console.log(`Plan updated: ${email} → ${plan}`);
       break;
     }
 
+    // ── Subscription changed mid-cycle (upgrade / downgrade / proration) ──
+    case 'customer.subscription.updated': {
+      const sub = event.data.object;
+      const priceId = sub.items.data[0]?.price?.id;
+      const plan = PLAN_MAP[priceId] || 'starter';
+      const customerId = sub.customer;
+
+      console.log(`Subscription updated — customer: ${customerId}, price: ${priceId}, plan: ${plan}`);
+
+      const { error } = await SB
+        .from('users')
+        .update({
+          plan,
+          stripe_subscription_id: sub.id,
+          plan_updated_at: new Date().toISOString(),
+          payment_failed: false,
+        })
+        .eq('stripe_customer_id', customerId);
+
+      if (error) console.error('Subscription update failed:', error);
+      else console.log(`Plan updated via subscription change: ${customerId} → ${plan}`);
+      break;
+    }
+
+    // ── Subscription cancelled / expired ─────────────────────────────────
     case 'customer.subscription.deleted': {
       const sub = event.data.object;
       const customerId = sub.customer;
+
       const { error } = await SB
         .from('users')
-        .update({ plan: 'free', stripe_subscription_id: null })
+        .update({
+          plan: 'free',
+          stripe_subscription_id: null,
+          plan_updated_at: new Date().toISOString(),
+          payment_failed: false,
+        })
         .eq('stripe_customer_id', customerId);
+
       if (error) console.error('Supabase downgrade failed:', error);
       else console.log(`Plan reverted to free: customer ${customerId}`);
       break;
     }
 
+    // ── Payment failed — flag the user ────────────────────────────────────
     case 'invoice.payment_failed': {
       const invoice = event.data.object;
-      console.log(`Payment failed for customer: ${invoice.customer}`);
+      const customerId = invoice.customer;
+
+      console.log(`Payment failed for customer: ${customerId}`);
+
+      const { error } = await SB
+        .from('users')
+        .update({
+          payment_failed: true,
+          payment_failed_at: new Date().toISOString(),
+        })
+        .eq('stripe_customer_id', customerId);
+
+      if (error) console.error('Failed to flag payment failure:', error);
+      else console.log(`Payment failed flagged for: ${customerId}`);
       break;
     }
 
     default:
+      console.log(`Unhandled event type: ${event.type}`);
       break;
   }
 
