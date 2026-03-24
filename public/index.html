@@ -159,6 +159,8 @@ h1,h2,h3,h4{
 
 .btn-primary{background:var(--orange);color:#FFFFFF}
 .btn-primary:hover{background:var(--orange-dk)}
+.btn-nav-cta{background:var(--orange);color:#FFFFFF;border:2px solid var(--orange)}
+.btn-nav-cta:hover{background:transparent;color:#FFFFFF;border-color:#FFFFFF}
 .btn-secondary{background:var(--bg-navy);color:#FFFFFF}
 .btn-secondary:hover{background:var(--bg-navy2)}
 .btn-outline-white{background:transparent;border:2px solid rgba(255,255,255,0.3);color:#FFFFFF}
@@ -269,11 +271,11 @@ h1,h2,h3,h4{
    NAV
 ═══════════════════════════════════════ */
 nav{
-  position:sticky;top:0;z-index:200;
+  position:static;
   background:var(--bg-navy);
   border-bottom:1px solid var(--border-dk);
-  height:64px;
   display:flex;align-items:center;
+  height:64px;
 }
 .nav-inner{
   max-width:var(--max);
@@ -286,15 +288,14 @@ nav{
 }
 .nav-logo{
   font-family:'Work Sans',sans-serif;
-  font-weight:800;
+  font-weight:900;
   font-size:22px;
   color:#FFFFFF;
-  text-decoration:none;
+  letter-spacing:-0.03em;
   cursor:pointer;
-  letter-spacing:-0.02em;
 }
 .nav-logo span{color:var(--orange)}
-.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links{display:flex;gap:28px;align-items:center}
 .nav-links a,.nav-links button{
   font-size:15px;
   font-weight:500;
@@ -307,6 +308,26 @@ nav{
   transition:color 0.2s;
 }
 .nav-links a:hover,.nav-links button:hover{color:#FFFFFF}
+.nav-cta-float{
+  position:fixed;
+  top:12px;
+  right:28px;
+  z-index:500;
+  background:var(--orange);
+  color:#FFFFFF;
+  border:none;
+  padding:12px 24px;
+  border-radius:8px;
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:-0.01em;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(240,90,34,0.4);
+  transition:background 0.15s,transform 0.15s;
+}
+.nav-cta-float:hover{background:var(--orange-dk);transform:translateY(-2px)}
+@media(max-width:700px){.nav-cta-float{display:none}}
 
 /* ═══════════════════════════════════════
    HERO
@@ -831,7 +852,7 @@ nav{
   padding:28px 24px;
   display:flex;
   flex-direction:column;
-  text-align:left;
+  text-align:center;
 }
 .pc.feat{border-color:var(--orange);border-width:2px}
 .pc-tag{
@@ -842,7 +863,7 @@ nav{
   border-radius:20px;
   text-transform:uppercase;
   margin-bottom:16px;
-  align-self:flex-start;
+  align-self:center;
 }
 .tag-free{background:#F0F0F0;color:#888}
 .tag-start{background:var(--orange-lt);color:var(--orange)}
@@ -875,7 +896,7 @@ nav{
 .pc-billing{margin:10px 0 20px;display:flex;flex-direction:column;gap:5px}
 .pc-b-row{display:flex;justify-content:space-between;font-size:14px;color:var(--t-support)}
 .pc-save{color:var(--green);font-size:12px;font-weight:600}
-.pc-div{height:1px;background:var(--border-lt);margin-bottom:20px}
+.pc-div{height:1px;background:var(--border-lt);margin-top:16px;margin-bottom:20px}
 .pc-for{
   font-size:12px;font-weight:700;
   letter-spacing:1px;text-transform:uppercase;
@@ -898,6 +919,8 @@ nav{
 }
 .pc-feats li.no{color:#CCCCCC}
 .pc-feats li.no::before{content:'–';color:#CCCCCC}
+.pc-feats.no-icon li{padding-left:0;text-align:center}
+.pc-feats.no-icon li::before{display:none}
 .pc-note{font-size:13px;color:var(--t-support);font-style:italic;margin-bottom:14px;line-height:1.4}
 
 /* ═══════════════════════════════════════
@@ -917,7 +940,7 @@ nav{
 }
 .diff-left .section-h{color:var(--t-heading);font-size:clamp(28px,3.5vw,52px)!important;margin-bottom:8px}
 .diff-left .eyebrow{color:var(--orange)}
-.diff-left p{font-size:17px;color:var(--t-body);line-height:1.75;margin-bottom:20px}
+.diff-left p{font-size:17px;color:var(--t-body);line-height:1.75;margin-top:16px;margin-bottom:20px}
 .diff-left strong{color:var(--t-heading);font-weight:500}
 .diff-table{
   background:rgba(255,255,255,0.04);
@@ -1459,18 +1482,18 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 }
 .why-signal:last-child{border-bottom:none}
 .why-icon{font-size:18px;color:var(--orange);flex-shrink:0;margin-top:2px;width:24px;text-align:center}
-.why-h{font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:#FFFFFF;letter-spacing:-0.01em;margin-bottom:3px}
+.why-h{font-family:'Work Sans',sans-serif;font-weight:700;font-size:20px;color:#FFFFFF;letter-spacing:-0.01em;margin-bottom:3px}
 .why-d{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5}
 @media(max-width:900px){.why-grid{grid-template-columns:1fr}}
 .different-points{display:flex;flex-direction:column;gap:24px}
 .diff-point{display:flex;gap:20px;align-items:flex-start}
 .diff-num{font-family:'Work Sans',sans-serif;font-size:22px;font-weight:800;color:var(--orange);opacity:1;flex-shrink:0;line-height:1.2;min-width:36px}
-.diff-point strong{font-family:'Work Sans',sans-serif;font-weight:700;font-size:17px;color:var(--t-heading);display:block;margin-bottom:6px;letter-spacing:-0.01em}
+.diff-point strong{font-family:'Work Sans',sans-serif;font-weight:700;font-size:20px;color:var(--t-heading);display:block;margin-bottom:6px;letter-spacing:-0.01em}
 .diff-point p{font-size:15px;color:var(--t-body);line-height:1.6;margin:0}
 .faq{background:var(--bg-warm);padding:80px 5vw}
 .faq .section-inner{max-width:var(--max);margin:0 auto}
 .faq .section-label{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange);margin-bottom:16px}
-.faq h2{font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(32px,4vw,52px);letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:48px;line-height:1}
+.faq h2{font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(36px,5vw,64px);letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:48px;line-height:1;text-align:center}
 .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 64px}
 .faq-item{padding:24px 0;border-bottom:1px solid var(--border-lt)}
 .faq-item:nth-child(1),.faq-item:nth-child(2){border-top:1px solid var(--border-lt)}
@@ -1491,22 +1514,15 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   <div class="nav-inner">
     <span class="nav-logo" onclick="showPage('marketing')">Aenima<span>.</span></span>
     <div class="nav-links" id="navLinks">
-      <a onclick="gotoAnchor('how');closeMobileMenu()">How it works</a>
-      <a onclick="gotoAnchor('pricing');closeMobileMenu()">Pricing</a>
-      <button onclick="showPage('login');closeMobileMenu()">Log in</button>
-      <button class="btn btn-primary btn-sm" onclick="showPage('register');closeMobileMenu()">Get my free score →</button>
+      <a onclick="gotoAnchor('how')">Why?</a>
+      <a onclick="gotoAnchor('pricing')">Pricing</a>
+      <button onclick="showPage('login')">Log in</button>
     </div>
-    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-  <div class="mobile-menu" id="mobileMenu">
-    <a onclick="gotoAnchor('how');closeMobileMenu()">How it works</a>
-    <a onclick="gotoAnchor('pricing');closeMobileMenu()">Pricing</a>
-    <a onclick="showPage('login');closeMobileMenu()">Log in</a>
-    <button class="btn btn-primary btn-full" onclick="showPage('register');closeMobileMenu()">Get my free score →</button>
   </div>
 </nav>
+
+<!-- FLOATING ORANGE CTA — sticky, scrolls with page -->
+<button class="nav-cta-float" onclick="gotoAnchor('score')">Get my free score →</button>
 
 <!-- PAGE: MARKETING -->
 <div class="page active" id="page-marketing">
@@ -1563,7 +1579,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   </section>
 
   <!-- WHY AI IS MISSING YOU -->
-  <section class="why-section" style="background:var(--bg-warm)">
+  <section class="why-section" id="how" style="background:var(--bg-warm)">
     <div class="wrap why-grid">
       <div class="why-left">
         <span class="eyebrow">Under the Radar</span>
@@ -1734,8 +1750,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   </section>
 
   <!-- PRICING -->
-  <section class="pricing-section" id="pricing how">
-    <div id="how" style="position:absolute;margin-top:-80px"></div>
+  <section class="pricing-section" id="pricing">
     <div class="wrap">
       <span class="eyebrow">Pricing &amp; Plans</span>
       <h2 class="section-h">Simple. Honest. Affordable.</h2>
@@ -1748,15 +1763,16 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
     </div>
     <div class="pricing-grid">
 
-      <div class="pc">
+      <div class="pc" style="text-align:center">
         <span class="pc-tag tag-free">Free</span>
-        <div class="pc-name">Score Check</div>
-        <div class="pc-tagline">See where AI can't find you</div>
+        <div class="pc-name">The Score</div>
+        <div class="pc-tagline">See where AI can't find you.</div>
         <div class="pc-price"><sup></sup>£0</div>
-        <div class="pc-billing"><span class="pc-b-row">Forever free — no account</span></div>
+        <div class="pc-billing"><span class="pc-b-row"><span>Forever free</span><span>no account</span></span></div>
+        <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:12px 0 0">Get your Machine-Visibility Score in 60 seconds. See every issue listed in plain English — what's wrong and why. No sign-up. No email. No commitment. Always free.</p>
         <div class="pc-div"></div>
         <div class="pc-for">For everyone</div>
-        <ul class="pc-feats">
+        <ul class="pc-feats no-icon">
           <li>Score out of 100</li>
           <li>Category breakdown</li>
           <li>Issues in plain English</li>
@@ -1764,52 +1780,52 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li class="no">AI identity file</li>
           <li class="no">Monthly tracking</li>
         </ul>
-        <button class="btn btn-outline btn-full btn-sm" onclick="gotoAnchor('score')">Check my score</button>
+        <button class="btn btn-outline btn-full btn-sm" onclick="gotoAnchor('score')">Check my score for free →</button>
       </div>
 
-      <div class="pc feat">
+      <div class="pc feat" style="text-align:center">
         <span class="pc-tag tag-start">Starter</span>
-        <div class="pc-name">Do It Yourself</div>
+        <div class="pc-name">The Roadmap</div>
         <div class="pc-tagline">Get the code. Fix it yourself.</div>
         <div class="pc-price"><sup>£</sup><span id="starter-price">5.50</span></div>
         <div class="pc-billing">
           <span class="pc-b-row" id="starter-billing-label"><span>Monthly</span><span>£5.50/mo</span></span>
         </div>
+        <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:12px 0 0">We generate the visibility files your site needs. Download and install them yourself — works on any website. Every month your score is rechecked, files are regenerated if anything has changed, and a report lands in your inbox.</p>
         <div class="pc-div"></div>
-        <div class="pc-for">Tech-savvy users</div>
-        <ul class="pc-feats">
-          <li>Everything in Free</li>
-          <li>AI visibility files generated for your site</li>
-          <li>Citation gap report with fix links</li>
-          <li>Monthly re-score + priority action</li>
-          <li>Monthly re-score</li>
-          <li>Competitor snapshot</li>
-          <li>Monthly action item</li>
-          <li>Machine-Visibility Certificate PDF</li>
+        <ul class="pc-feats no-icon">
+          <li>Works on ANY website — not WordPress only</li>
+          <li>Download ready-to-use files</li>
+          <li>Monthly re-score + Machine-Visibility Certificate</li>
+          <li>Audit Master Logic</li>
+          <li>Performance Checklist</li>
+          <li>AI Identity File</li>
+          <li>Monthly Re-score &amp; PDF</li>
         </ul>
-        <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')" id="starter-cta">Start for £5.50/month →</button>
+        <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')" id="starter-cta">Get the Code →</button>
       </div>
 
-      <div class="pc">
+      <div class="pc" style="text-align:center">
         <span class="pc-tag tag-pro">Pro</span>
-        <div class="pc-name">Automated — WordPress Only</div>
-        <div class="pc-tagline">Install the plugin once. It updates your visibility files every month while you sleep.</div>
+        <div class="pc-name">The Auto-Pilot</div>
+        <div class="pc-tagline">Automatically updates everything.</div>
         <div class="pc-price"><sup>£</sup><span id="pro-price">7.50</span></div>
         <div class="pc-billing">
           <span class="pc-b-row" id="pro-billing-label"><span>Monthly</span><span>£7.50/mo</span></span>
         </div>
+        <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:12px 0 0">Our WordPress plugin installs everything automatically. Every month it checks your score, updates your visibility files if anything has changed and emails you a report. Activate once — it runs forever while you sleep.</p>
         <div class="pc-div"></div>
-        <div class="pc-for">WordPress users who want it automated</div>
-        <ul class="pc-feats">
+        <ul class="pc-feats no-icon">
+          <li>WordPress websites only</li>
+          <li>Non-WordPress? Choose Starter instead</li>
+          <li>Install once — runs automatically forever</li>
           <li>Everything in Starter</li>
-          <li>WordPress plugin — one-click activation</li>
-          <li>Visibility files auto-update every month</li>
-          <li>Updates itself automatically</li>
-          <li>Monthly report to your inbox</li>
-          <li>Break &amp; competitor alerts</li>
+          <li>WordPress Plugin</li>
+          <li>One-Click Activation</li>
+          <li>Auto-updates while you sleep</li>
         </ul>
-        <p class="pc-note">WordPress websites only. Not on WordPress? Choose Starter instead.</p>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')" id="pro-cta">Start for £7.50/month →</button>
+        <p class="pc-note">WordPress websites only. Not on WordPress? Choose The Roadmap instead.</p>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')" id="pro-cta">Go Pro &amp; Automate →</button>
       </div>
 
       <div class="pc">
@@ -1825,7 +1841,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         </div>
         <div class="pc-div"></div>
         <div class="pc-for">Digital agencies &amp; designers</div>
-        <ul class="pc-feats">
+        <ul class="pc-feats no-icon">
           <li>10 client sites</li>
           <li>White-label reports — your logo</li>
           <li>Reports auto-emailed to clients</li>
@@ -1887,10 +1903,10 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div style="font-size:13px;color:var(--t-white45);letter-spacing:0.3px">Full Starter plan · Self-declared · No questions asked</div>
       </button>
 
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;max-width:440px;margin:0 auto 20px;text-align:left">
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;max-width:440px;margin:0 auto 20px;text-align:center">
         <div style="font-size:12px;color:rgba(255,255,255,0.30);margin-bottom:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Also free, always</div>
-        <div style="font-size:14px;color:var(--t-white70);margin-bottom:6px">&#10003; <strong style="color:#FFFFFF">Free PDF score report</strong> — download and implement yourself</div>
-        <div style="font-size:14px;color:var(--t-white70)">&#10003; <strong style="color:#FFFFFF">Free score check</strong> — unlimited, no account needed</div>
+        <div style="font-size:14px;color:var(--t-white70);margin-bottom:6px"><strong style="color:#FFFFFF">Free PDF score report</strong> — download and implement yourself</div>
+        <div style="font-size:14px;color:var(--t-white70)"><strong style="color:#FFFFFF">Free score check</strong> — unlimited, no account needed</div>
       </div>
 
       <p style="font-size:13px;color:rgba(255,255,255,0.25);margin-bottom:8px">Or talk to Stewart directly:</p>
@@ -1965,13 +1981,13 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
             <li><a onclick="openPolicy('privacy')">Privacy Policy</a></li>
             <li><a onclick="openPolicy('terms')">Terms of Service</a></li>
             <li><a onclick="openPolicy('cookies')">Cookie &amp; Storage Policy</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#65040c251100060d0b0c06040902170403030c110c4b060a4b100e">Data requests</a></li>
+            <li><a onclick="openPolicy('data')">Data Requests</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bot">
-        <p>© 2026 Technical Graffiti Ltd · Company No. 07180346 · ICO No. C1894540 · Registered in England &amp; Wales · <a href="https://technicalgraffiti.co.uk/#contact" style="color:var(--t-white45);text-decoration:none">Contact us</a></p>
-        <p><a onclick="openPolicy('privacy')" style="color:var(--t-white45);text-decoration:none">Privacy Policy</a> &nbsp;·&nbsp; <a onclick="openPolicy('terms')" style="color:var(--t-white45);text-decoration:none">Terms of Service</a> &nbsp;·&nbsp; <a onclick="openPolicy('cookies')" style="color:var(--t-white45);text-decoration:none">Cookie Policy</a> &nbsp;·&nbsp; <span style="color:var(--t-white20)">UK GDPR compliant</span></p>
+        <p>© 2026 Technical Graffiti Ltd · Company No. 07180346 · ICO No. C1894540 · Registered in England &amp; Wales · <a href="https://technicalgraffiti.co.uk/#contact" target="_blank" rel="noopener" style="color:var(--t-white45);text-decoration:none">Contact us</a></p>
+        <p><a onclick="openPolicy('privacy')" style="color:var(--t-white45);text-decoration:none">Privacy Policy</a> &nbsp;·&nbsp; <a onclick="openPolicy('terms')" style="color:var(--t-white45);text-decoration:none">Terms of Service</a> &nbsp;·&nbsp; <a onclick="openPolicy('cookies')" style="color:var(--t-white45);text-decoration:none">Cookie Policy</a> &nbsp;·&nbsp; <a onclick="openPolicy('data')" style="color:var(--t-white45);text-decoration:none">Data Requests</a> &nbsp;·&nbsp; <span style="color:var(--t-white20)">UK GDPR compliant</span></p>
       </div>
     </div>
   </footer>
@@ -2306,10 +2322,13 @@ function showPage(n){
 }
 function syncNav(in_){
   const nl=document.getElementById('navLinks');
+  const cta=document.querySelector('.nav-cta-float');
   if(in_&&S.user){
-    nl.innerHTML=`<span style="font-size:15px;color:var(--t-white45)">${S.user.name||S.user.email}</span><span class="pb pb-${S.plan}">${S.plan}</span><button onclick="doLogout()" style="font-size:15px;color:var(--t-white45);background:none;border:none;cursor:pointer;font-family:inherit">Log out</button>`;
+    if(nl)nl.innerHTML=`<span style="font-size:15px;color:var(--t-white45)">${S.user.name||S.user.email}</span><span class="pb pb-${S.plan}">${S.plan}</span><button onclick="doLogout()" style="font-size:15px;color:var(--t-white45);background:none;border:none;cursor:pointer;font-family:inherit">Log out</button>`;
+    if(cta){cta.textContent='Dashboard →';cta.onclick=()=>showPage('dashboard');}
   }else{
-    nl.innerHTML=`<a onclick="gotoAnchor('how')">How it works</a><a onclick="gotoAnchor('pricing')">Pricing</a><button onclick="showPage('login')">Log in</button><button class="btn btn-primary btn-sm" onclick="showPage('register')">Get my free score →</button>`;
+    if(nl)nl.innerHTML=`<a onclick="gotoAnchor('how')">Why?</a><a onclick="gotoAnchor('pricing')">Pricing</a><button onclick="showPage('login')">Log in</button>`;
+    if(cta){cta.textContent='Get my free score →';cta.onclick=()=>gotoAnchor('score');}
   }
 }
 
@@ -4303,6 +4322,10 @@ function mkModal(html){
 /* ═══════════════════════════════════════
    HARDSHIP
 ═══════════════════════════════════════ */
+function slowOpen(url){
+  const w=window.open('about:blank','_blank','noopener,noreferrer');
+  setTimeout(()=>{if(w)w.location.href=url;},600);
+}
 function showHardship(id){
   const el=document.getElementById(id);if(!el)return;
   el.style.display='block';el.textContent='ai@technicalgraffiti.co.uk';
@@ -4561,6 +4584,7 @@ function closeMobileMenu(){
       <button class="policy-tab active" onclick="switchPolicy('privacy')">Privacy Policy</button>
       <button class="policy-tab" onclick="switchPolicy('terms')">Terms of Service</button>
       <button class="policy-tab" onclick="switchPolicy('cookies')">Cookie &amp; Storage Policy</button>
+      <button class="policy-tab" onclick="switchPolicy('data')">Data Requests</button>
     </div>
 
     <!-- PRIVACY POLICY -->
@@ -4570,7 +4594,7 @@ function closeMobileMenu(){
       <p>This policy explains what personal data Aenima (operated by Technical Graffiti Ltd, Northamptonshire, England) collects, why, how we store it, and your rights under UK GDPR and the Data (Use and Access) Act 2025.</p>
 
       <h2>1. Who we are</h2>
-      <p>Technical Graffiti Ltd is the data controller for all personal data collected through aenima.co.uk. Registered address: Northamptonshire, England. Company No. 07180346. Contact: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7a1b133a0e1f19121413191b161d081b1c1c130e13541915540f11">[email&#160;protected]</a></strong></p>
+      <p>Technical Graffiti Ltd is the data controller for all personal data collected through aenima.co.uk. Registered address: Northamptonshire, England. Company No. 07180346. Contact: <strong><button onclick="this.innerHTML='ai@technicalgraffiti.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong></p>
       <p>We are registered with the Information Commissioner&rsquo;s Office (ICO) as required under UK GDPR.</p>
 
       <h2>2. What data we collect and why</h2>
@@ -4633,7 +4657,7 @@ function closeMobileMenu(){
         <li><strong>Objection</strong> — object to processing based on legitimate interest</li>
         <li><strong>Withdraw consent</strong> — at any time, without affecting prior processing</li>
       </ul>
-      <p>To exercise any right, email <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3c5d557c48595f5452555f5d505b4e5d5a5a554855125f53124957">[email&#160;protected]</a></strong> with the subject &ldquo;Data Request&rdquo;. We will respond within 30 days.</p>
+      <p>To exercise any right, email <strong><button onclick="this.innerHTML='ai@technicalgraffiti.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong> with the subject &ldquo;Data Request&rdquo;. We will respond within 30 days.</p>
 
       <h2>6. Data security</h2>
       <p>Passwords are hashed before storage. Data is transmitted over HTTPS. Access to production data is restricted to authorised personnel only. We follow ICO guidance on appropriate technical and organisational measures.</p>
@@ -4717,7 +4741,7 @@ function closeMobileMenu(){
       <p>These Terms are governed by the laws of England and Wales. Disputes shall be subject to the exclusive jurisdiction of the English courts.</p>
 
       <h2>11. Contact</h2>
-      <p>Technical Graffiti Ltd &middot; Company No. 07180346 &middot; Northamptonshire, England &middot; <a href="https://technicalgraffiti.co.uk/#contact" style="color:var(--t-white45);text-decoration:none">Contact us</a></p>
+      <p>Technical Graffiti Ltd &middot; Company No. 07180346 &middot; Northamptonshire, England &middot; <a href="https://technicalgraffiti.co.uk/#contact" target="_blank" rel="noopener" style="color:var(--t-white45);text-decoration:none">Contact us</a></p>
     </div>
 
     <!-- COOKIE AND STORAGE POLICY -->
@@ -4746,4 +4770,38 @@ function closeMobileMenu(){
       </ul>
 
       <h2>5. How to clear your data</h2>
-      <p>To remove all Aenima data f
+      <p>To remove all Aenima data from your browser, clear your browser's localStorage. In Chrome: Settings → Privacy and Security → Clear browsing data → Cached images and files. This will log you out and remove your saved score.</p>
+
+      <h2>6. Changes to this policy</h2>
+      <p>We will notify registered users by email of any material changes. The date at the top of this page will always reflect the latest version.</p>
+    </div>
+
+    <!-- DATA REQUESTS -->
+    <div class="policy-content" id="pol-data">
+      <h1>Data Requests</h1>
+      <p><strong>Last updated:</strong> March 2026 &nbsp;|&nbsp; <strong>Controller:</strong> Technical Graffiti Ltd, Company No. 07180346</p>
+      <p>Under UK GDPR you have the right to request access to, correction of, or deletion of your personal data. This page explains how to exercise those rights.</p>
+
+      <h2>Your rights</h2>
+      <ul>
+        <li><strong>Access</strong> — request a copy of the personal data we hold about you</li>
+        <li><strong>Rectification</strong> — ask us to correct inaccurate or incomplete data</li>
+        <li><strong>Erasure</strong> — ask us to delete your data ("right to be forgotten")</li>
+        <li><strong>Portability</strong> — receive your data in a machine-readable format</li>
+        <li><strong>Restriction</strong> — ask us to pause processing your data</li>
+        <li><strong>Objection</strong> — object to processing based on legitimate interest</li>
+      </ul>
+
+      <h2>How to make a request</h2>
+      <p>Email <strong><button onclick="this.innerHTML='ai@technicalgraffiti.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong> with the subject line <strong>"Data Request"</strong> and tell us what you would like us to do. We will respond within <strong>30 days</strong>.</p>
+      <p>Please include the email address associated with your Aenima account so we can locate your data quickly.</p>
+
+      <h2>What we'll need from you</h2>
+      <ul>
+        <li>Your full name and email address</li>
+        <li>The nature of your request (access, deletion, correction etc.)</li>
+        <li>Any specific data you are concerned about</li>
+      </ul>
+
+      <h2>Complaints</h2>
+      <p>If you are unhappy with how we handle your request, you have the right to lodge a complaint with the Information Commissioner's Office (ICO) at <strong>ico.org.uk</strong> or by calling <stro
