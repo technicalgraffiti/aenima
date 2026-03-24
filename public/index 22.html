@@ -904,7 +904,7 @@ nav{
    DIFFERENCE — navy
 ═══════════════════════════════════════ */
 .diff-section{
-  background:#ffffff;
+  background:var(--bg-warm);
   padding:80px 5vw;
 }
 .diff-inner{
@@ -1675,7 +1675,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <p class="fp-sub">Choose the path that fits you. Cancel any time.</p>
         <div class="fix-opts-3col" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
 
-          <div class="fix-opt" onclick="handleUpgrade('starter')">
+          <div class="fix-opt" onclick="window.location.href='https://www.aenima.co.uk/#register'">
             <div class="fix-opt-hd">
               <span class="fix-opt-name">Do it yourself</span>
               <span class="fix-opt-price">&pound;5.50<span>/mo</span></span>
@@ -1690,7 +1690,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
             <button class="fix-btn">Start for &pound;5.50/month &rarr;</button>
           </div>
 
-          <div class="fix-opt hi" onclick="handleUpgrade('pro')">
+          <div class="fix-opt hi" onclick="window.location.href='https://www.aenima.co.uk/#register'">
             <div class="fix-opt-hd">
               <span class="fix-opt-name">We handle it</span>
               <span class="fix-opt-price">&pound;7.50<span>/mo</span></span>
@@ -1787,7 +1787,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li>Monthly action item</li>
           <li>Machine-Visibility Certificate PDF</li>
         </ul>
-        <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')" id="starter-cta">Start for £5.50/month →</button>
+        <button class="btn btn-primary btn-full btn-sm" onclick="window.location.href='https://www.aenima.co.uk/#register'" id="starter-cta">Start for £5.50/month →</button>
       </div>
 
       <div class="pc">
@@ -1809,7 +1809,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li>Break &amp; competitor alerts</li>
         </ul>
         <p class="pc-note">WordPress websites only. Not on WordPress? Choose Starter instead.</p>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')" id="pro-cta">Start for £7.50/month →</button>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="window.location.href='https://www.aenima.co.uk/#register'" id="pro-cta">Start for £7.50/month →</button>
       </div>
 
       <div class="pc">
@@ -4124,27 +4124,17 @@ function setGlobalBilling(period,btn){
 /* setBilling removed — setGlobalBilling handles all billing */
 function handleUpgrade(plan){
   if(CFG.STRIPE_KEY==='pk_live_YOUR_STRIPE_KEY'){showUpgradeModal(plan);return;}
+  // Must be logged in before payment — so webhook can match email to user
   if(!S.user){
-    // Slim email+password modal — no full registration form
+    // Save intended plan and redirect to register
     sessionStorage.setItem('pendingPlan',plan);
     sessionStorage.setItem('pendingBilling',S.billing||'mo');
-    const o=mkModal(`
-      <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">One quick step</h2>
-      <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">We need your email to create your account and send your monthly reports. That's it.</p>
-      <p style="font-size:13px;color:var(--t-support);margin-bottom:20px;padding:10px 14px;background:var(--bg-warm);border-radius:6px">🔒 For your security and so we can match your payment to your account.</p>
-      <div id="qpErr" style="display:none;background:#FFF0EE;border:1px solid #FFCCCC;border-radius:8px;padding:10px 14px;font-size:14px;color:var(--red);margin-bottom:14px"></div>
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Email address</label>
-        <input id="qpEmail" type="email" placeholder="you@yourbusiness.co.uk" autocomplete="email" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
-      </div>
-      <div style="margin-bottom:20px">
-        <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Choose a password <span style="font-weight:400;text-transform:none;letter-spacing:0">(min 8 characters)</span></label>
-        <input id="qpPass" type="password" placeholder="••••••••" autocomplete="new-password" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
-      </div>
-      <button id="qpBtn" class="btn btn-primary btn-full" onclick="doQuickPay()">Continue to payment →</button>
-      <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--t-support)">Already have an account? <a onclick="this.closest('.modal-ov').remove();showPage('login')" style="color:var(--orange);cursor:pointer">Log in</a></p>`);
-    // Focus email field
-    setTimeout(()=>{const f=document.getElementById('qpEmail');if(f)f.focus();},100);
+    showPage('register');
+    const err=document.getElementById('regErr');
+    if(err){
+      err.style.color='var(--orange)';
+      err.textContent='Create a free account first — then complete your upgrade.';
+    }
     return;
   }
   const billing=S.billing||'mo';
@@ -4157,6 +4147,7 @@ function handleUpgrade(plan){
     })
     .then(d=>{
       if(d.upgraded){
+        // Upgrade handled server-side via proration — no redirect needed
         S.plan=d.plan;
         syncNav(true);
         updBilling();
@@ -4174,109 +4165,9 @@ function handleUpgrade(plan){
       alert('Payment error: '+err.message+'. Please visit technicalgraffiti.co.uk to get in touch');
     });
 }
-
-async function doQuickPay(){
-  const e=(document.getElementById('qpEmail')?.value||'').trim();
-  const p=(document.getElementById('qpPass')?.value||'').trim();
-  const errEl=document.getElementById('qpErr');
-  const btn=document.getElementById('qpBtn');
-  const showQpErr=(msg)=>{if(errEl){errEl.textContent=msg;errEl.style.display='block';}};
-  if(!e||!e.includes('@')){showQpErr('Please enter a valid email address.');return;}
-  if(p.length<8){showQpErr('Password must be at least 8 characters.');return;}
-  if(btn){btn.disabled=true;btn.textContent='Creating account...';}
-  try{
-    if(SB){
-      const {data,error}=await SB.auth.signUp({email:e,password:p,options:{data:{name:'',business:''}}});
-      const alreadyExists=error?.message?.toLowerCase().includes('already registered')
-        ||error?.message?.toLowerCase().includes('already exists')
-        ||(data?.user&&data.user.identities&&data.user.identities.length===0);
-      if(error&&!alreadyExists){
-        if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
-        showQpErr(error.message);return;
-      }
-      if(alreadyExists){
-        // Account exists — sign them in instead
-        if(btn)btn.textContent='Signing in...';
-        const {data:sd,error:se}=await SB.auth.signInWithPassword({email:e,password:p});
-        if(se){
-          if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
-          showQpErr('An account with this email already exists. Password incorrect — try logging in instead.');
-          return;
-        }
-        if(sd.user)S.user={id:sd.user.id,email:e,name:sd.user.user_metadata?.name||'',business:sd.user.user_metadata?.business||'',plan:'free'};
-      } else {
-        if(data.user)S.user={id:data.user.id,email:e,name:'',business:'',plan:'free'};
-        // Insert bare user record
-        if(data.user&&SB){
-          await SB.from('users').upsert({id:data.user.id,email:e,name:'',business:'',plan:'free'}).catch(()=>{});
-        }
-      }
-    } else {
-      S.user={email:e,name:'',business:'',plan:'free'};
-    }
-    S.plan='free';saveS();
-    document.querySelector('.modal-ov')?.remove();
-    const plan=sessionStorage.getItem('pendingPlan')||'starter';
-    S.billing=sessionStorage.getItem('pendingBilling')||'mo';
-    sessionStorage.removeItem('pendingPlan');
-    sessionStorage.removeItem('pendingBilling');
-    // handleUpgrade checks S.user — now set — goes straight to Stripe
-    handleUpgrade(plan);
-  }catch(ex){
-    if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
-    showQpErr('Something went wrong. Please try again.');
-    console.error('Quick pay error:',ex);
-  }
-}
-
-function openHardshipPayment(){
-  if(!CFG.HARDSHIP_LINK||CFG.HARDSHIP_LINK==='YOUR_STRIPE_HARDSHIP_PAYMENT_LINK'){
-    mkModal(`
-      <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:32px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">Set up the hardship payment link</h2>
-      <p style="font-size:16px;color:var(--t-support);margin-bottom:20px">To activate the £3.50/mo hardship option, create a Payment Link in Stripe and add it to your CONFIG.</p>
-      <div style="background:var(--bg-warm);border-radius:10px;padding:18px;margin-bottom:20px;font-size:15px;color:var(--t-body);line-height:1.8">
-        <strong>In Stripe dashboard:</strong><br>
-        1. Products → Add product → "Aenima Starter Hardship" → £3.50/mo recurring<br>
-        2. Payment Links → Create link → select that product<br>
-        3. Copy the link (buy.stripe.com/...)<br>
-        4. Open index.html → find CFG → replace YOUR_STRIPE_HARDSHIP_PAYMENT_LINK
-      </div>
-      <button class="btn btn-primary btn-full" onclick="window.open('https://dashboard.stripe.com/payment-links','_blank');this.closest('.modal-ov').remove()">Open Stripe dashboard →</button>
-      <button class="btn btn-outline btn-full" style="margin-top:10px" onclick="this.closest('.modal-ov').remove()">Close</button>`);
-    return;
-  }
-  // Email capture before Stripe hardship link
-  mkModal(`
-    <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">One quick step</h2>
-    <p style="font-size:15px;color:var(--t-support);margin-bottom:20px">We need your email so we can set up your account and send your monthly reports.</p>
-    <div id="hpErr" style="display:none;background:#FFF0EE;border:1px solid #FFCCCC;border-radius:8px;padding:10px 14px;font-size:14px;color:var(--red);margin-bottom:14px"></div>
-    <div style="margin-bottom:20px">
-      <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Email address</label>
-      <input id="hpEmail" type="email" placeholder="you@yourbusiness.co.uk" autocomplete="email" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
-    </div>
-    <button id="hpBtn" class="btn btn-primary btn-full" style="background:var(--orange)" onclick="doHardshipPay()">Continue to payment — £3.50/mo →</button>
-    <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--t-support)">Full Starter plan · Self-declared · No questions asked</p>`);
-  setTimeout(()=>{const f=document.getElementById('hpEmail');if(f)f.focus();},100);
-}
-
-function doHardshipPay(){
-  const e=(document.getElementById('hpEmail')?.value||'').trim();
-  const errEl=document.getElementById('hpErr');
-  const btn=document.getElementById('hpBtn');
-  if(!e||!e.includes('@')){
-    if(errEl){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';}
-    return;
-  }
-  // Store email for post-payment use
-  sessionStorage.setItem('hardshipEmail',e);
-  document.querySelector('.modal-ov')?.remove();
-  // Append email as prefill to Stripe link if supported
-  const url=CFG.HARDSHIP_LINK+(CFG.HARDSHIP_LINK.includes('?')?'&':'?')+'prefilled_email='+encodeURIComponent(e);
-  window.open(url,'_blank');
-}
 function showUpgradeModal(plan){
   const prices={starter:'£5.50/month · £14/quarter · £49/year — works on any website',pro:'£7.50/month · £19.50/quarter · £79/year — WordPress only',agency:'£89/month'};
-  mkModal(`
+  const o=mkModal(`
     <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">Upgrade to ${plan.charAt(0).toUpperCase()+plan.slice(1)}</h2>
     <p style="font-size:17px;color:var(--t-support);margin-bottom:20px">Add your Stripe keys to CFG in index.html to activate payments. See DEPLOY.md.</p>
     <div style="background:var(--bg-warm);border-radius:10px;padding:18px;margin-bottom:20px;font-size:16px;color:var(--t-heading);font-family:'Work Sans',sans-serif;font-weight:600">${prices[plan]||''}</div>
@@ -4306,6 +4197,25 @@ function mkModal(html){
 function showHardship(id){
   const el=document.getElementById(id);if(!el)return;
   el.style.display='block';el.textContent='ai@technicalgraffiti.co.uk';
+}
+function openHardshipPayment(){
+  if(!CFG.HARDSHIP_LINK||CFG.HARDSHIP_LINK==='YOUR_STRIPE_HARDSHIP_PAYMENT_LINK'){
+    // Not yet configured — show instructions
+    mkModal(`
+      <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:32px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">Set up the hardship payment link</h2>
+      <p style="font-size:16px;color:var(--t-support);margin-bottom:20px">To activate the £3.50/mo hardship option, create a Payment Link in Stripe and add it to your CONFIG.</p>
+      <div style="background:var(--bg-warm);border-radius:10px;padding:18px;margin-bottom:20px;font-size:15px;color:var(--t-body);line-height:1.8">
+        <strong>In Stripe dashboard:</strong><br>
+        1. Products → Add product → "Aenima Starter Hardship" → £3.50/mo recurring<br>
+        2. Payment Links → Create link → select that product<br>
+        3. Copy the link (buy.stripe.com/...)<br>
+        4. Open index.html → find CFG → replace YOUR_STRIPE_HARDSHIP_PAYMENT_LINK
+      </div>
+      <button class="btn btn-primary btn-full" onclick="window.open('https://dashboard.stripe.com/payment-links','_blank');this.closest('.modal-ov').remove()">Open Stripe dashboard →</button>
+      <button class="btn btn-outline btn-full" style="margin-top:10px" onclick="this.closest('.modal-ov').remove()">Close</button>`);
+    return;
+  }
+  window.open(CFG.HARDSHIP_LINK,'_blank');
 }
 
 /* ═══════════════════════════════════════
