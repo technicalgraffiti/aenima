@@ -316,7 +316,7 @@ nav{
   padding:100px 5vw 110px;
   text-align:center;
 }
-.hero-inner{max-width:1040px;margin:0 auto}
+.hero-inner{max-width:840px;margin:0 auto}
 .hero-sub{
   font-size:19px;
   font-weight:400;
@@ -333,11 +333,10 @@ nav{
   letter-spacing:-0.02em;
   line-height:1.2;
   color:#ffffff73;
-  max-width:880px;
+  max-width:680px;
   margin:20px auto 0;
   text-align:center;
   background:none;
-  padding-top:30px;
 }
 .hero-statement .white{color:#FFFFFF;}
 .hero-statement br{display:block}
@@ -904,7 +903,7 @@ nav{
    DIFFERENCE — navy
 ═══════════════════════════════════════ */
 .diff-section{
-  background:var(--bg-warm);
+  background:var(--bg-navy);
   padding:80px 5vw;
 }
 .diff-inner{
@@ -915,10 +914,10 @@ nav{
   gap:64px;
   align-items:center;
 }
-.diff-left .section-h{color:var(--t-heading);font-size:clamp(28px,3.5vw,52px)!important;margin-bottom:8px}
+.diff-left .section-h{color:#FFFFFF;font-size:clamp(20px,2.5vw,32px)!important;margin-bottom:8px}
 .diff-left .eyebrow{color:var(--orange)}
-.diff-left p{font-size:17px;color:var(--t-body);line-height:1.75;margin-bottom:20px}
-.diff-left strong{color:var(--t-heading);font-weight:500}
+.diff-left p{font-size:17px;color:var(--t-white70);line-height:1.75;margin-bottom:20px}
+.diff-left strong{color:#FFFFFF;font-weight:500}
 .diff-table{
   background:rgba(255,255,255,0.04);
   border-radius:var(--radius-lg);
@@ -1389,94 +1388,6 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   .pdf-card{justify-content:flex-end!important}
   @media(max-width:700px){.result-section-inner{padding:0 12px!important;max-width:100%!important}}
   .pdf-card-content{flex-shrink:0}
-
-/* ═══════════════════════════════════════
-   PROBLEM SECTION
-═══════════════════════════════════════ */
-.problem-section{background:var(--bg-warm);padding:80px 5vw}
-.problem-left .section-h{color:var(--t-heading)}
-.problem-quote{
-  border-left:4px solid var(--orange);
-  padding:16px 20px;
-  margin-top:24px;
-  font-family:'Work Sans',sans-serif;
-  font-weight:700;
-  font-size:clamp(17px,1.8vw,22px);
-  color:var(--t-heading);
-  line-height:1.4;
-  letter-spacing:-0.01em;
-  background:var(--orange-lt);
-  border-radius:0 8px 8px 0;
-  max-width:600px;
-}
-.shift-section{background:var(--bg-navy);padding:80px 5vw}
-.shift-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.shift-stat{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.10);
-  border-radius:var(--radius);
-  padding:24px;
-  display:flex;
-  flex-direction:column;
-}
-.ssn{
-  font-family:'Work Sans',sans-serif;
-  font-weight:800;
-  font-size:40px;
-  color:#FFFFFF;
-  line-height:1;
-  letter-spacing:-0.03em;
-  margin-bottom:8px;
-}
-.ssl{
-  font-family:'Work Sans',sans-serif;
-  font-weight:700;
-  font-size:14px;
-  color:rgba(255,255,255,0.70);
-  margin-bottom:6px;
-}
-.ssd{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5}
-@media(max-width:700px){.shift-stats{grid-template-columns:1fr}}
-.why-section{padding:80px 5vw}
-.why-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:64px;
-  align-items:center;
-}
-.why-left .section-h{color:var(--t-heading)}
-.why-right{
-  background:var(--bg-navy);
-  border-radius:var(--radius-lg);
-  padding:8px;
-}
-.why-signal{
-  display:flex;
-  gap:16px;
-  align-items:flex-start;
-  padding:18px 20px;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-}
-.why-signal:last-child{border-bottom:none}
-.why-icon{font-size:18px;color:var(--orange);flex-shrink:0;margin-top:2px;width:24px;text-align:center}
-.why-h{font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:#FFFFFF;letter-spacing:-0.01em;margin-bottom:3px}
-.why-d{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5}
-@media(max-width:900px){.why-grid{grid-template-columns:1fr}}
-.different-points{display:flex;flex-direction:column;gap:24px}
-.diff-point{display:flex;gap:20px;align-items:flex-start}
-.diff-num{font-family:'Work Sans',sans-serif;font-size:22px;font-weight:800;color:var(--orange);opacity:1;flex-shrink:0;line-height:1.2;min-width:36px}
-.diff-point strong{font-family:'Work Sans',sans-serif;font-weight:700;font-size:17px;color:var(--t-heading);display:block;margin-bottom:6px;letter-spacing:-0.01em}
-.diff-point p{font-size:15px;color:var(--t-body);line-height:1.6;margin:0}
-.faq{background:var(--bg-warm);padding:80px 5vw}
-.faq .section-inner{max-width:var(--max);margin:0 auto}
-.faq .section-label{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange);margin-bottom:16px}
-.faq h2{font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(32px,4vw,52px);letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:48px;line-height:1}
-.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 64px}
-.faq-item{padding:24px 0;border-bottom:1px solid var(--border-lt)}
-.faq-item:nth-child(1),.faq-item:nth-child(2){border-top:1px solid var(--border-lt)}
-.faq-item h3{font-family:'Work Sans',sans-serif;font-weight:700;font-size:16px;color:var(--t-heading);letter-spacing:-0.01em;margin-bottom:8px}
-.faq-item p{font-size:15px;color:var(--t-body);line-height:1.65;margin:0}
-@media(max-width:700px){.faq-grid{grid-template-columns:1fr}.faq-item:nth-child(2){border-top:none}}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1515,70 +1426,24 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   <section class="hero">
     <div class="hero-inner">
       <span class="eyebrow">GEO &amp; AEO — AI Search Visibility</span>
-      <h1 class="display">Stop being ignored by<br><em>AI search engines.</em></h1>
-      <h2 class="hero-statement hero-sub-bold" style="margin-top:12px;color:#FFFFFF">If your business isn't in the AI's "Generated Answer," you don't exist to those customers.</h2>
+      <h1 class="display">Is your business<br><em>showing up in AI search?</em></h1>
+      <h2 class="hero-statement">Most local businesses don't.</h2>
+      <h2 class="hero-statement hero-sub-bold" style="margin-top:12px;color:#FFFFFF">We check your AI visibility in 60 seconds &mdash; and generate the files that fix it.</h2>
       <div class="hero-cta">
-        <button class="btn btn-primary btn-lg" onclick="gotoAnchor('score')">Get my free score →</button>
+        <button class="btn btn-primary btn-lg" onclick="gotoAnchor('score')">Check my score free →</button>
+        <button class="btn btn-outline-white btn-lg" onclick="gotoAnchor('how')">See how it works</button>
       </div>
-      <p class="standout">No account needed. Results in 60 seconds.</p>
-
-    </div>
-  </section>
-
-  <!-- THE PROBLEM -->
-  <section class="problem-section">
-    <div class="wrap">
-      <div class="problem-left">
-        <span class="eyebrow">The Problem</span>
-        <h2 class="section-h">Most local businesses<br>are invisible to AI.</h2>
-        <p style="font-size:17px;color:var(--t-body);line-height:1.7;margin-top:16px">It isn't because your business isn't good enough — it's because nobody told you the rules of search have changed. When a customer asks an AI assistant for a recommendation in your area, it doesn't provide a list of ten links.</p>
-        <blockquote class="problem-quote">"If your business isn't in that answer, you've been erased from the conversation."</blockquote>
+      <p class="standout">Free score check. No account needed. From £5.50/month to fix it.</p>
+      <div class="hero-bar">
+        <div class="hero-stat"><span class="n">5.7M</span><span class="l">UK SMEs invisible to AI</span></div>
+        <div class="hero-stat"><span class="n">40%</span><span class="l">of searches use AI answers</span></div>
+        <div class="hero-stat"><span class="n">1</span><span class="l">answer given — not ten links</span></div>
+        <div class="hero-stat"><span class="n">£0</span><span class="l">to check your score now</span></div>
       </div>
     </div>
   </section>
 
-  <!-- SHIFT SECTION -->
-  <section class="shift-section">
-    <div class="wrap">
-      <span class="eyebrow" style="color:var(--orange)">By The Numbers</span>
-      <h2 class="section-h" style="color:#FFFFFF;margin-bottom:48px">The shift is already happening.</h2>
-      <div class="shift-stats">
-        <div class="shift-stat">
-          <span class="ssn">1</span>
-          <span class="ssl">Answer Given</span>
-          <span class="ssd">Not a page of links. One trusted answer. Either it's you or it's someone else. Always.</span>
-        </div>
-        <div class="shift-stat">
-          <span class="ssn" style="color:var(--orange)">↑</span>
-          <span class="ssl">AI Search Growing Fast</span>
-          <span class="ssd">AI search is growing faster than any previous shift in how customers find local businesses.</span>
-        </div>
-        <div class="shift-stat">
-          <span class="ssn">£0</span>
-          <span class="ssl">To Check</span>
-          <span class="ssd">Find out if AI can find you right now. Free score — no account needed.</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY AI IS MISSING YOU -->
-  <section class="why-section" style="background:var(--bg-warm)">
-    <div class="wrap why-grid">
-      <div class="why-left">
-        <span class="eyebrow">Under the Radar</span>
-        <h2 class="section-h">Why AI is currently<br>missing you.</h2>
-        <p style="font-size:17px;color:var(--t-body);line-height:1.7;margin-top:16px">AI doesn't just need your website — it looks for structured signals it can trust. Our scoring system checks your site for the exact technical markers AI engines require. Without these, AI treats your site as an anonymous page with no verified identity.</p>
-      </div>
-      <div class="why-right">
-        <div class="why-signal"><span class="why-icon">◉</span><div><div class="why-h">Business Identity</div><div class="why-d">Schema markup — tells AI who you are and what you do</div></div></div>
-        <div class="why-signal"><span class="why-icon">◎</span><div><div class="why-h">Physical Presence</div><div class="why-d">Directory signals — confirms you're a real local business</div></div></div>
-        <div class="why-signal"><span class="why-icon">⬡</span><div><div class="why-h">AI Identity File</div><div class="why-d">llms.txt — confirms you exist in a format AI can actually read</div></div></div>
-        <div class="why-signal"><span class="why-icon">▤</span><div><div class="why-h">AI Crawler Access</div><div class="why-d">robots.txt — ensures AI actually crawls your site</div></div></div>
-      </div>
-    </div>
-  </section>
-
+  <!-- SCORE CHECK -->
   <section class="score-section" id="score">
     <div class="score-card">
       <span class="eyebrow">Free — no account needed</span>
@@ -1675,7 +1540,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <p class="fp-sub">Choose the path that fits you. Cancel any time.</p>
         <div class="fix-opts-3col" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
 
-          <div class="fix-opt" onclick="window.location.href='https://www.aenima.co.uk/#register'">
+          <div class="fix-opt" onclick="handleUpgrade('starter')">
             <div class="fix-opt-hd">
               <span class="fix-opt-name">Do it yourself</span>
               <span class="fix-opt-price">&pound;5.50<span>/mo</span></span>
@@ -1690,7 +1555,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
             <button class="fix-btn">Start for &pound;5.50/month &rarr;</button>
           </div>
 
-          <div class="fix-opt hi" onclick="window.location.href='https://www.aenima.co.uk/#register'">
+          <div class="fix-opt hi" onclick="handleUpgrade('pro')">
             <div class="fix-opt-hd">
               <span class="fix-opt-name">We handle it</span>
               <span class="fix-opt-price">&pound;7.50<span>/mo</span></span>
@@ -1733,13 +1598,106 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
     </div>
   </section>
 
-  <!-- PRICING -->
-  <section class="pricing-section" id="pricing how">
-    <div id="how" style="position:absolute;margin-top:-80px"></div>
+  <!-- THREE PATHS -->
+  <section class="paths-section" id="how">
+    <div class="wrap" style="text-align:center;margin-bottom:48px">
+      <span class="eyebrow">Three ways to get AI-visible</span>
+      <h2 class="section-h">Pick your path</h2>
+    </div>
+    <div class="paths-grid" style="padding:0 5vw">
+
+      <div class="path-card free">
+        <span class="path-num">01</span>
+        <span class="path-label">Always free — no account</span>
+        <h3 class="path-h">See what's missing <span style="color:var(--orange)">for FREE</span></h3>
+        <p class="path-desc">Get your Machine-Visibility Score in 60 seconds. See every issue listed in plain English — what's wrong and why. No sign-up. No email. No commitment. Always free.</p>
+        <div class="path-works">
+          <div class="pw-item">✓ Works on any website</div>
+          <div class="pw-item">✓ No account ever needed</div>
+          <div class="pw-item">✓ Results in under 60 seconds</div>
+        </div>
+        <span class="path-price">Free</span>
+        <button class="path-btn" onclick="gotoAnchor('score')">Check my score for free →</button>
+      </div>
+
+      <div class="path-card starter">
+        <span class="path-num">02</span>
+        <span class="path-label">Starter — £5.50/mo</span>
+        <h3 class="path-h">Get the code and <span style="color:#A8E063">fix it yourself</span></h3>
+        <p class="path-desc">We generate the visibility files your site needs. Download and install them yourself — works on any website. Every month your score is rechecked, files are regenerated if anything has changed, and a report lands in your inbox.</p>
+        <div class="path-works">
+          <div class="pw-item pw-ok">✓ Works on ANY website — not WordPress only</div>
+          <div class="pw-item pw-ok">✓ Download ready-to-use files</div>
+          <div class="pw-item pw-ok">✓ Monthly re-score + Machine-Visibility Certificate</div>
+        </div>
+        <span class="path-price">£5.50<small>/mo</small></span>
+        <button class="path-btn" onclick="handleUpgrade('starter')">Get the code — £5.50/month →</button>
+      </div>
+
+      <div class="path-card pro">
+        <span class="path-num">03</span>
+        <span class="path-label">Pro — £7.50/mo · WordPress only</span>
+        <h3 class="path-h">Want it automated? <span style="color:#FFFFFF;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px">We have a solution.</span></h3>
+        <p class="path-desc">Our WordPress plugin installs everything automatically. Every month it checks your score, updates your visibility files if anything has changed and emails you a report. Activate once — it runs forever while you sleep.</p>
+        <div class="path-works">
+          <div class="pw-item pw-warn">⚠ WordPress websites only</div>
+          <div class="pw-item pw-warn">⚠ Non-WordPress? Choose Starter instead</div>
+          <div class="pw-item pw-ok">✓ Install once — runs automatically forever</div>
+        </div>
+        <span class="path-price">£7.50<small>/mo</small></span>
+        <button class="path-btn" onclick="handleUpgrade('pro')">Get the plugin — £7.50/month →</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
     <div class="wrap">
-      <span class="eyebrow">Pricing &amp; Plans</span>
-      <h2 class="section-h">Simple. Honest. Affordable.</h2>
-      <p class="section-intro" style="max-width:540px;margin:16px auto 24px;font-size:18px;color:var(--t-support)">Priced so a plumber in Wellingborough or a solicitor in Bristol can afford it — not just big marketing firms.</p>
+      <span class="eyebrow">Under the bonnet</span>
+      <h2 class="section-h" style="color:#FFFFFF">Why most local businesses are invisible to AI<br><span style="color:var(--orange)">— and how to fix it</span></h2>
+      <p class="how-intro">When someone asks ChatGPT for a plumber in Northampton, an electrician in Leeds, a solicitor in Cardiff, a dentist in Birmingham, or a builder in Edinburgh, AI doesn't search Google. It looks for two specific technical files on your website — files that identify your business type, location and services in a format AI can read and trust.</p>
+    <p class="how-intro" style="margin-top:16px">There are 5.7 million SMEs in the UK. The vast majority don't have these files. They are invisible to AI search — not because their work isn't good, but because the technical signals simply aren't there.</p>
+    <p class="how-intro" style="margin-top:16px">Aenima checks whether your files exist, scores your AI visibility in 60 seconds, and generates the exact files that fix it. Without these files, nothing else matters. We generate them. You install them. You become visible.</p>
+    </div>
+    <div class="how-grid" style="padding:0 5vw">
+      <div class="how-card" style="border-top:3px solid var(--orange)">
+        <span class="how-n">01</span>
+        <div class="how-badge how-badge-free">FREE — no account</div>
+        <h3 class="how-h">Check your score</h3>
+        <p class="how-p">Enter your website address. We run real technical checks on your domain and give you a score out of 100 with every issue explained in plain English.</p>
+        <p class="how-p" style="margin-top:12px;color:var(--t-support)">Takes 60 seconds. Always free. No account needed.</p>
+        <button onclick="gotoAnchor('score')" style="margin-top:20px;background:var(--orange);color:#FFFFFF;border:none;border-radius:6px;padding:11px 20px;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='#D44510'" onmouseout="this.style.background='var(--orange)'">Check my score for free →</button>
+      </div>
+      <div class="how-card" style="border-top:3px solid var(--orange)">
+        <span class="how-n">02</span>
+        <div class="how-badge how-badge-paid">From £5.50/mo</div>
+        <h3 class="how-h">Get the files that fix it</h3>
+        <p class="how-p">We generate the specific visibility files your business needs — and keep them updated every month as your business changes.</p>
+        <ul class="how-p" style="margin-top:12px;color:var(--t-support);padding-left:20px;line-height:2">
+          <li><strong>Starter</strong> — download and install yourself. Works on any website.</li>
+          <li><strong>Pro</strong> — WordPress plugin installs and updates automatically. No code required.</li>
+          <li><strong>Both plans</strong> — monthly re-score, files regenerated if anything has changed, report to your inbox.</li>
+        </ul>
+        <button onclick="gotoAnchor('pricing')" style="margin-top:20px;background:var(--bg-navy);color:#FFFFFF;border:none;border-radius:6px;padding:11px 20px;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--bg-navy2)'" onmouseout="this.style.background='var(--bg-navy)'">See how it works →</button>
+      </div>
+      <div class="how-card" style="border-top:3px solid var(--orange)">
+        <span class="how-n">03</span>
+        <div class="how-badge how-badge-paid">Included in all paid plans</div>
+        <h3 class="how-h">Stay ahead — every month automatically</h3>
+        <p class="how-p">AI engines update constantly. Competitors gain ground. Your business changes. Every month your score is rechecked, your files are regenerated if anything has changed, and a report lands in your inbox. Pro users — the WordPress plugin handles all of this automatically while you sleep.</p>
+        <p class="how-p" style="margin-top:12px;color:var(--t-support)">This is why it is a monthly subscription — not a one-off fix. Starter from £5.50/mo. Pro from £7.50/mo.</p>
+        <button onclick="gotoAnchor('pricing')" style="margin-top:20px;background:var(--bg-navy);color:#FFFFFF;border:none;border-radius:6px;padding:11px 20px;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--bg-navy2)'" onmouseout="this.style.background='var(--bg-navy)'">See plans →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="wrap">
+      <span class="eyebrow">Pricing</span>
+      <h2 class="section-h">Simple. Fair. No surprises.</h2>
+      <p class="section-intro" style="max-width:540px;margin:16px auto 24px;font-size:18px;color:var(--t-support)">Start free. Pay only when you want the tools to fix it. Cancel anytime.</p>
       <div class="billing-toggle">
         <button class="bill-btn active" id="billMo" onclick="setGlobalBilling('mo',this)">Monthly</button>
         <button class="bill-btn" id="billQtr" onclick="setGlobalBilling('qtr',this)">Quarterly <span class="bill-save">Save £3</span></button>
@@ -1787,7 +1745,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li>Monthly action item</li>
           <li>Machine-Visibility Certificate PDF</li>
         </ul>
-        <button class="btn btn-primary btn-full btn-sm" onclick="window.location.href='https://www.aenima.co.uk/#register'" id="starter-cta">Start for £5.50/month →</button>
+        <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')" id="starter-cta">Start for £5.50/month →</button>
       </div>
 
       <div class="pc">
@@ -1809,7 +1767,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li>Break &amp; competitor alerts</li>
         </ul>
         <p class="pc-note">WordPress websites only. Not on WordPress? Choose Starter instead.</p>
-        <button class="btn btn-secondary btn-full btn-sm" onclick="window.location.href='https://www.aenima.co.uk/#register'" id="pro-cta">Start for £7.50/month →</button>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')" id="pro-cta">Start for £7.50/month →</button>
       </div>
 
       <div class="pc">
@@ -1845,82 +1803,55 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
     <div class="diff-inner">
       <div class="diff-left">
         <span class="eyebrow">Why we're different</span>
-        <h2 class="section-h" style="color:var(--t-heading);margin-bottom:8px">Every other tool shows you the problem.<span class="section-h" style="color:#F05A22;margin-bottom:24px"> We fix it.</span></h2>
-        <p>Other tools tell you if you appear in AI search, but they don't help you change the result. They often cost over £80 a month just for a dashboard.</p>
-        <p>Aenima generates the files that fix the gap. We provide the specific visibility files your business needs, ready to be put in place. We priced it so a plumber in Wellingborough or a solicitor in Bristol can afford it—not just big marketing firms.</p>
+        <h2 class="section-h" style="color:#FFFFFF;margin-bottom:8px">Every other tool shows you the problem.</h2>
+        <h2 class="section-h" style="color:#F05A22;margin-bottom:24px">We fix it.</h2>
+        <p><strong>Not one of them fixes it.</strong> Tools like Peec AI and SE Visible tell you whether you appear in AI search. They start at £85 a month. That's their product — a dashboard that shows you the problem, month after month.</p>
+        <p>We generate the files that fix it. Specific to your business, ready to install. We built the only WordPress plugin that installs and updates these files automatically, every month, while you sleep. And we priced it so a plumber in Wellingborough can afford it — not just an enterprise marketing team with a £500/month tools budget.</p>
       </div>
-      <div class="different-points">
-        <div class="diff-point">
-          <div class="diff-num">01</div>
-          <div>
-            <strong>We generate the files that close the gap</strong>
-            <p>Not a dashboard. Not a report. Actual working files your business needs — ready to put in place.</p>
-          </div>
-        </div>
-        <div class="diff-point">
-          <div class="diff-num">02</div>
-          <div>
-            <strong>Priced for real businesses</strong>
-            <p>£5.50 a month. Not £80. Not £200. Any local business can afford to be visible.</p>
-          </div>
-        </div>
-        <div class="diff-point">
-          <div class="diff-num">03</div>
-          <div>
-            <strong>Monthly. Automatic. Current.</strong>
-            <p>AI engines change constantly. We re-scan and regenerate your files every month so you stay visible.</p>
-          </div>
+      <div>
+        <div class="diff-table">
+          <div class="diff-row hd"><div>Factor</div><div>Every competitor</div><div>We</div></div>
+          <div class="diff-row"><div>What it does</div><div>Tells you you're invisible</div><div>We actually fix it</div></div>
+          <div class="diff-row"><div>Who it's for</div><div>Marketing directors</div><div>Plumbers, solicitors, trades</div></div>
+          <div class="diff-row"><div>Price</div><div>£99–£519/month</div><div>From £5.50/month</div></div>
+          <div class="diff-row"><div>WP plugin</div><div>None exist</div><div>Auto-installs everything</div></div>
+          <div class="diff-row"><div>Schema generator</div><div>None</div><div>Download ready</div></div>
+          <div class="diff-row"><div>AI identity file</div><div>None</div><div>Generated for you</div></div>
+          <div class="diff-row"><div>Free check</div><div>Sign-up required</div><div>No account ever</div></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- HARDSHIP + CONSULT -->
-  <section class="extra-section" style="background:var(--bg-navy);padding:100px 5vw;text-align:center">
-    <div style="max-width:640px;margin:0 auto">
-      <p style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--t-white45);margin-bottom:24px">The Safety Net</p>
-      <h3 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(36px,5vw,64px);letter-spacing:-0.03em;color:#FFFFFF;margin-bottom:24px;line-height:1.0">Genuine hardship?<br>We understand.</h3>
-      <p style="font-size:18px;color:var(--t-white70);line-height:1.7;margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto">Can't afford £5.50 right now? Pay £3.50 for 3 months — full Starter plan, no questions asked. This is self-declared. We want you to be visible, regardless of your budget.</p>
+  <section class="extra-section" style="padding-top:80px">
+    <div class="extra-grid">
+      <div class="extra-card hardship">
+        <p style="font-family:'Work Sans',sans-serif;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Genuine hardship</p>
+        <h3 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(28px,3vw,40px);letter-spacing:-0.025em;color:#FFFFFF;margin-bottom:16px;line-height:1.05">We understand.</h3>
+        <p style="font-size:16px;color:var(--t-white70);line-height:1.7;margin-bottom:18px">Can't afford £5.50? Pay £3.50 for 3 months — full Starter plan, no questions asked. Self-declared. Cancel any time.</p>
 
-      <button onclick="openHardshipPayment()" style="display:block;width:100%;max-width:440px;margin:0 auto 32px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:24px 32px;cursor:pointer;text-align:center;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.11)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
-        <div style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;color:var(--orange);letter-spacing:-0.02em;margin-bottom:8px">£3.50/mo for 3 months</div>
-        <div style="font-size:13px;color:var(--t-white45);letter-spacing:0.3px">Full Starter plan · Self-declared · No questions asked</div>
-      </button>
+        <button onclick="openHardshipPayment()" style="width:100%;background:var(--orange);color:#FFFFFF;border:none;border-radius:8px;padding:14px 20px;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;margin-bottom:12px;transition:background 0.15s" onmouseover="this.style.background='#D44510'" onmouseout="this.style.background='var(--orange)'">Pay £3.50/month for 3 months →</button>
 
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;max-width:440px;margin:0 auto 20px;text-align:left">
-        <div style="font-size:12px;color:rgba(255,255,255,0.30);margin-bottom:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Also free, always</div>
-        <div style="font-size:14px;color:var(--t-white70);margin-bottom:6px">&#10003; <strong style="color:#FFFFFF">Free PDF score report</strong> — download and implement yourself</div>
-        <div style="font-size:14px;color:var(--t-white70)">&#10003; <strong style="color:#FFFFFF">Free score check</strong> — unlimited, no account needed</div>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px 16px;margin-bottom:14px">
+          <div style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:8px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase">Also free, always</div>
+          <div style="font-size:15px;color:var(--t-white70);margin-bottom:6px">&#10003; <strong style="color:#FFFFFF">Free PDF score report</strong> — download and implement yourself</div>
+          <div style="font-size:15px;color:var(--t-white70)">&#10003; <strong style="color:#FFFFFF">Free score check</strong> — unlimited, no account needed</div>
+        </div>
+
+        <p style="font-size:14px;color:rgba(255,255,255,0.3);margin-bottom:8px">Or talk to Stewart directly:</p>
+        <button class="reveal-btn" onclick="showHardship('hFooter')" style="font-size:15px">Click to reveal contact email</button>
+        <div class="reveal-out" id="hFooter"></div>
       </div>
-
-      <p style="font-size:13px;color:rgba(255,255,255,0.25);margin-bottom:8px">Or talk to Stewart directly:</p>
-      <button class="reveal-btn" onclick="showHardship('hFooter')" style="font-size:14px">Click to reveal contact email</button>
-      <div class="reveal-out" id="hFooter"></div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq">
-    <div class="section-inner">
-      <div class="section-label">FAQ</div>
-      <h2>Common questions.</h2>
-      <div class="faq-grid">
-        <div class="faq-item">
-          <h3>Is this for tech experts?</h3>
-          <p>No. If you can copy and paste, you can use Starter. If you use WordPress, Pro does it all for you.</p>
-        </div>
-        <div class="faq-item">
-          <h3>How long does it take?</h3>
-          <p>The free score takes 60 seconds. Improving your visibility starts as soon as you use the files we generate.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Why a subscription?</h3>
-          <p>AI engines and your competitors change constantly. We re-scan your site every month and regenerate your files to ensure you stay visible.</p>
-        </div>
-        <div class="faq-item">
-          <h3>What if I can't afford it?</h3>
-          <p>Use the hardship rate — £3.50/mo for 3 months, full Starter plan, self-declared. No questions asked.</p>
-        </div>
+      <div class="extra-card consult">
+        <span class="eyebrow">Technical Graffiti Consultancy</span>
+        <h3 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(28px,3vw,40px);letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:16px;line-height:1.05">Want someone to do it for you?</h3>
+        <ul style="list-style:none;margin-bottom:20px;display:flex;flex-direction:column;gap:10px">
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:var(--t-body)"><span style="color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px">✓</span><span><strong>Telephone AI Visibility Consultation</strong> (30 mins) — £65</span></li>
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:var(--t-body)"><span style="color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px">✓</span><span><strong>AI Visibility Audit</strong> — £195</span></li>
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:var(--t-body)"><span style="color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px">✓</span><span><strong>Monthly Managed Presence</strong> — £49/mo</span></li>
+        </ul>
+        <a href="https://technicalgraffiti.co.uk" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Visit Technical Graffiti →</a>
       </div>
     </div>
   </section>
