@@ -186,7 +186,9 @@ async function sendMonthlyReport(user, score, previousScore) {
 module.exports = async (req, res) => {
   const authHeader = req.headers['authorization'];
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  const isVercelCron = req.headers["x-vercel-cron"] === "1";
+  const isManual = authHeader === `Bearer ${cronSecret}`;
+  if (cronSecret && !isVercelCron && !isManual) {
     return res.status(401).json({ error: 'Unauthorised' });
   }
 
