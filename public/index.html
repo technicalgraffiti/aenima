@@ -1504,7 +1504,142 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Aenima","description":"AI visibility scoring and file generation tool for UK local businesses. Checks five technical signals, scores AI visibility out of 100 and generates the files that fix any gaps.","url":"https://aenima.co.uk","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":[{"@type":"Offer","name":"Free Score Check","price":"0","priceCurrency":"GBP"},{"@type":"Offer","name":"Starter Plan","price":"5.50","priceCurrency":"GBP"},{"@type":"Offer","name":"Pro Plan","price":"7.50","priceCurrency":"GBP"}],"publisher":{"@type":"Organization","name":"Technical Graffiti Ltd","url":"https://technicalgraffiti.co.uk","email":"ai@aenima.co.uk","telephone":"+447726318601","address":{"@type":"PostalAddress","addressLocality":"Northamptonshire","postalCode":"NN29","addressCountry":"GB"}}}
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://aenima.co.uk/#software",
+      "name": "Aenima",
+      "alternateName": "Aenima AI Visibility Tool",
+      "description": "GEO and AEO AI visibility scoring and file generation tool for UK local businesses. Checks five technical signals — schema markup, llms.txt, robots.txt, directory citations, and Google Business Profile — scores AI visibility out of 100, and generates the files that fix any gaps.",
+      "url": "https://aenima.co.uk",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "en-GB",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free Score Check",
+          "description": "Free AI visibility score out of 100. No account needed. Results in 60 seconds.",
+          "price": "0",
+          "priceCurrency": "GBP",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Starter Plan — The Roadmap",
+          "description": "AI visibility files generated for your site. Download and install yourself. Works on any website. Monthly re-score and Machine-Visibility Certificate included.",
+          "price": "5.50",
+          "priceCurrency": "GBP",
+          "availability": "https://schema.org/InStock",
+          "billingIncrement": "P1M"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro Plan — The Auto-Pilot",
+          "description": "WordPress plugin installs and auto-updates visibility files every month. Includes everything in Starter. WordPress websites only.",
+          "price": "7.50",
+          "priceCurrency": "GBP",
+          "availability": "https://schema.org/InStock",
+          "billingIncrement": "P1M"
+        },
+        {
+          "@type": "Offer",
+          "name": "Agency Plan",
+          "description": "White-label reseller programme. 10 client sites, white-label reports, reseller dashboard. Coming soon.",
+          "price": "89.00",
+          "priceCurrency": "GBP",
+          "availability": "https://schema.org/PreOrder",
+          "billingIncrement": "P1M"
+        }
+      ],
+      "publisher": {
+        "@id": "https://aenima.co.uk/#organization"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://aenima.co.uk/#organization",
+      "name": "Technical Graffiti Ltd",
+      "legalName": "Technical Graffiti Ltd",
+      "url": "https://technicalgraffiti.co.uk",
+      "email": "ai@technicalgraffiti.co.uk",
+      "telephone": "+447726318601",
+      "vatID": "GB07180346",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Northamptonshire",
+        "postalCode": "NN29",
+        "addressCountry": "GB",
+        "addressRegion": "England"
+      },
+      "sameAs": [
+        "https://technicalgraffiti.co.uk",
+        "https://find-and-update.company-information.service.gov.uk/company/07180346",
+        "https://ico.org.uk/ESDWebPages/Entry/C1894540"
+      ],
+      "founder": {
+        "@type": "Person",
+        "name": "Stewart Graham",
+        "jobTitle": "Founder and GEO & AEO Specialist",
+        "telephone": "+447726318601",
+        "worksFor": {
+          "@id": "https://aenima.co.uk/#organization"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://aenima.co.uk/#website",
+      "url": "https://aenima.co.uk",
+      "name": "Aenima — Stop Being Invisible to AI",
+      "description": "GEO and AEO AI search visibility tool for UK local businesses.",
+      "publisher": {
+        "@id": "https://aenima.co.uk/#organization"
+      },
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://aenima.co.uk/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Aenima for tech experts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. If you can copy and paste, you can use Starter. If you use WordPress, Pro does it all for you — activate once and it runs automatically."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does it take to improve AI visibility?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The free score takes 60 seconds. Improving your visibility starts as soon as you use the files we generate — AI engines re-crawl sites regularly and results can appear within days to weeks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is Aenima a subscription rather than a one-off purchase?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AI engines and your competitors change constantly. We re-scan your site every month and regenerate your visibility files to ensure you stay visible as the landscape evolves. A one-off fix would be out of date within weeks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What if I cannot afford the subscription price?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use the hardship rate — £3.50 per month for 3 months, full Starter plan, self-declared. No questions asked. After 3 months the subscription moves to the standard Starter rate of £5.50 per month."
+          }
+        }
+      ]
+    }
+  ]
+}
 </script>
 </head>
 <body>
@@ -4199,50 +4334,57 @@ async function doQuickPay(){
   const p=(document.getElementById('qpPass')?.value||'').trim();
   const errEl=document.getElementById('qpErr');
   const btn=document.getElementById('qpBtn');
-  const showQpErr=(msg)=>{if(errEl){errEl.textContent=msg;errEl.style.display='block';}};
+  const showQpErr=(msg)=>{
+    if(errEl){errEl.textContent=msg;errEl.style.display='block';}
+    if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
+  };
   if(!e||!e.includes('@')){showQpErr('Please enter a valid email address.');return;}
-  if(p.length<8){showQpErr('Password must be at least 8 characters.');return;}
+  if(!p||p.length<8){showQpErr('Password must be at least 8 characters.');return;}
   if(btn){btn.disabled=true;btn.textContent='Creating account...';}
+  if(errEl){errEl.style.display='none';}
   try{
     if(SB){
+      // Try sign up first
       const {data,error}=await SB.auth.signUp({email:e,password:p,options:{data:{name:'',business:''}}});
       const alreadyExists=error?.message?.toLowerCase().includes('already registered')
         ||error?.message?.toLowerCase().includes('already exists')
         ||(data?.user&&data.user.identities&&data.user.identities.length===0);
       if(error&&!alreadyExists){
-        if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
-        showQpErr(error.message);return;
+        showQpErr(error.message||'Could not create account. Please try again.');return;
       }
       if(alreadyExists){
-        // Account exists — sign them in instead
-        if(btn)btn.textContent='Signing in...';
+        // Account exists — sign in instead
+        if(btn){btn.disabled=true;btn.textContent='Signing in...';}
         const {data:sd,error:se}=await SB.auth.signInWithPassword({email:e,password:p});
         if(se){
-          if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
-          showQpErr('An account with this email already exists. Password incorrect — try logging in instead.');
+          showQpErr('This email is already registered but the password is incorrect. Try logging in instead.');
           return;
         }
-        if(sd.user)S.user={id:sd.user.id,email:e,name:sd.user.user_metadata?.name||'',business:sd.user.user_metadata?.business||'',plan:'free'};
+        if(!sd?.user){showQpErr('Sign in failed. Please try logging in from the main login page.');return;}
+        // Load full profile
+        const {data:profile}=await SB.from('users').select('*').eq('id',sd.user.id).single().catch(()=>({data:null}));
+        S.user={id:sd.user.id,email:e,name:profile?.name||'',business:profile?.business||'',plan:profile?.plan||'free'};
+        S.plan=S.user.plan;
       } else {
-        if(data.user)S.user={id:data.user.id,email:e,name:'',business:'',plan:'free'};
-        // Insert bare user record
-        if(data.user&&SB){
-          await SB.from('users').upsert({id:data.user.id,email:e,name:'',business:'',plan:'free'}).catch(()=>{});
-        }
+        if(!data?.user){showQpErr('Account creation failed. Please try again.');return;}
+        S.user={id:data.user.id,email:e,name:'',business:'',plan:'free'};
+        // Write user record to DB
+        await SB.from('users').upsert({id:data.user.id,email:e,name:'',business:'',plan:'free'}).catch(()=>{});
       }
     } else {
       S.user={email:e,name:'',business:'',plan:'free'};
     }
-    S.plan='free';saveS();
-    document.querySelector('.modal-ov')?.remove();
+    S.plan='free';
+    saveS();
+    // Keep modal open — do not remove it yet — handleUpgrade will redirect to Stripe
     const plan=sessionStorage.getItem('pendingPlan')||'starter';
     S.billing=sessionStorage.getItem('pendingBilling')||'mo';
     sessionStorage.removeItem('pendingPlan');
     sessionStorage.removeItem('pendingBilling');
-    // handleUpgrade checks S.user — now set — goes straight to Stripe
+    // Close modal then go to Stripe
+    document.querySelector('.modal-ov')?.remove();
     handleUpgrade(plan);
   }catch(ex){
-    if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
     showQpErr('Something went wrong. Please try again.');
     console.error('Quick pay error:',ex);
   }
