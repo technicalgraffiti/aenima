@@ -4180,7 +4180,7 @@ function handleUpgrade(plan){
         syncNav(true);
         updBilling();
         showDp('billing',document.querySelector('.sb-item[onclick*="billing"]'));
-        showToast('Upgraded to '+d.plan+' — you were only charged the difference.');
+        toast('Upgraded to '+d.plan+' — you were only charged the difference.');
       } else if(d.url){
         window.location.href=d.url;
       } else {
