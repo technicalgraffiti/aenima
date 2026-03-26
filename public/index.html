@@ -2747,7 +2747,7 @@ async function openBillingPortal(){
     });
     const data=await resp.json();
     if(data.url){
-      window.location.href=data.url;
+      window.location.replace(data.url);
     } else {
       throw new Error(data.error||'Could not open billing portal');
     }
@@ -4337,7 +4337,7 @@ function handleUpgrade(plan){
         showDp('billing',document.querySelector('.sb-item[onclick*="billing"]'));
         toast('Upgraded to '+d.plan+' — you were only charged the difference.');
       } else if(d.url){
-        window.location.href=d.url;
+        window.location.replace(d.url);
       } else {
         throw new Error('No checkout URL returned');
       }
