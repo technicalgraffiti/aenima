@@ -4389,7 +4389,7 @@ async function doQuickPay(){
         if(!data?.user){showQpErr('Account creation failed. Please try again.');return;}
         S.user={id:data.user.id,email:e,name:'',business:'',plan:'free'};
         // Write user record to DB
-        await SB.from('users').upsert({id:data.user.id,email:e,name:'',business:'',plan:'free'}).catch(()=>{});
+        try{await SB.from('users').upsert({id:data.user.id,email:e,name:'',business:'',plan:'free'});}catch(_){}
       }
     } else {
       S.user={email:e,name:'',business:'',plan:'free'};
