@@ -4382,7 +4382,8 @@ async function doQuickPay(){
         }
         if(!sd?.user){showQpErr('Sign in failed. Please try logging in from the main login page.');return;}
         // Load full profile
-        const {data:profile}=await SB.from('users').select('*').eq('id',sd.user.id).single().catch(()=>({data:null}));
+        let profile=null;
+        try{const {data:pd}=await SB.from('users').select('*').eq('id',sd.user.id).single();profile=pd;}catch(_){}
         S.user={id:sd.user.id,email:e,name:profile?.name||'',business:profile?.business||'',plan:profile?.plan||'free'};
         S.plan=S.user.plan;
       } else {
