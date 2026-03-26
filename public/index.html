@@ -2526,6 +2526,24 @@ async function _runScore(){
     }
 
     const data=await resp.json();
+
+    // Domain not found — show clear error, do not run score display
+    if(data.error==='domain_not_found'){
+      btn.disabled=false;btn.textContent='Check free →';
+      if(prog)prog.style.display='none';
+      if(bar)bar.style.width='0%';
+      if(txt)txt.textContent='';
+      const errBox=document.getElementById('scoreErr')||document.createElement('p');
+      errBox.id='scoreErr';
+      errBox.style.cssText='color:var(--red);font-size:16px;font-weight:600;margin-top:16px;text-align:center';
+      errBox.textContent=data.errorMessage;
+      const inputWrap=document.querySelector('.url-input-wrap');
+      if(inputWrap&&inputWrap.parentNode&&!document.getElementById('scoreErr')){
+        inputWrap.parentNode.insertBefore(errBox,inputWrap.nextSibling);
+      }
+      return;
+    }
+
     // Build result object matching existing renderScore format
     const r={
       overall: data.overall,
@@ -2541,6 +2559,8 @@ async function _runScore(){
     btn.disabled=false;btn.textContent='Check free →';
     if(prog)prog.style.display='none';
     if(bar)bar.style.width='0%';
+    // Clear any previous domain error
+    const oldErr=document.getElementById('scoreErr');if(oldErr)oldErr.remove();
     renderScore(r);
     saveScoreToSupabase(r);
 
@@ -4385,7 +4405,7 @@ async function doQuickPay(){
     document.querySelector('.modal-ov')?.remove();
     handleUpgrade(plan);
   }catch(ex){
-    showQpErr('Something went wrong. Please try again.');
+    showQpErr('Something went wrong: '+ex.message);
     console.error('Quick pay error:',ex);
   }
 }
@@ -4457,7 +4477,7 @@ function mkModal(html){
   const o=document.createElement('div');o.className='modal-ov';
   o.style.cssText='position:fixed;inset:0;background:rgba(10,22,40,0.75);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px';
   o.innerHTML=`<div style="background:#FFFFFF;border-radius:var(--radius-lg);padding:48px;width:100%;max-width:520px;position:relative">${html}</div>`;
-  o.onclick=(e)=>{if(e.target===o)o.remove();};
+  o.onclick=(e)=>{if(e.target===o){sessionStorage.removeItem('pendingPlan');sessionStorage.removeItem('pendingBilling');o.remove();}};
   document.body.appendChild(o);return o;
 }
 
