@@ -43,8 +43,26 @@ module.exports = async (req, res) => {
   const baseUrl = `https://${raw}`;
   const results = {};
 
+  // ── PRE-CHECK: DOMAIN EXISTS ─────────────────────────────────────────────
+  const domainCheck = await fetchUrl(baseUrl, 8000);
+  if (domainCheck.status === 0) {
+    const httpFallback = await fetchUrl(`http://${raw}`, 8000);
+    if (httpFallback.status === 0) {
+      return res.status(200).json({
+        domain: raw,
+        overall: 0,
+        error: 'domain_not_found',
+        errorMessage: `The domain "${raw}" does not exist or is not reachable. Please check the URL and try again.`,
+        cats: {},
+        issues: [{ p: 'critical', t: `Domain not found — "${raw}" could not be reached. Check the URL is correct.`, cta: false }],
+        checks: {},
+        ts: new Date().toISOString(),
+      });
+    }
+  }
+
   // ── CHECK 1: HTTPS ───────────────────────────────────────────────────────
-  const httpsCheck = await fetchUrl(baseUrl);
+  const httpsCheck = domainCheck.status > 0 ? domainCheck : await fetchUrl(baseUrl);
   results.https = {
     pass: httpsCheck.status >= 200 && httpsCheck.status < 400,
     detail: httpsCheck.status > 0 ? `HTTP ${httpsCheck.status}` : `Not reachable (${httpsCheck.error || 'no response'})`,
