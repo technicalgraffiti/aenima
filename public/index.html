@@ -4397,11 +4397,15 @@ async function doQuickPay(){
     }
     S.plan='free';
     saveS();
-    // Keep modal open — do not remove it yet — handleUpgrade will redirect to Stripe
+    // Store user ID in sessionStorage so we can recover it after Stripe redirect
+    if(S.user?.id) sessionStorage.setItem('pendingUserId', S.user.id);
+    if(S.user?.email) sessionStorage.setItem('pendingUserEmail', S.user.email);
     const plan=sessionStorage.getItem('pendingPlan')||'starter';
     S.billing=sessionStorage.getItem('pendingBilling')||'mo';
     sessionStorage.removeItem('pendingPlan');
     sessionStorage.removeItem('pendingBilling');
+    // Update button to show progress before Stripe redirect
+    if(btn){btn.disabled=true;btn.textContent='Redirecting to payment...';}
     // Close modal then go to Stripe
     document.querySelector('.modal-ov')?.remove();
     handleUpgrade(plan);
@@ -4596,18 +4600,28 @@ initSupabase();
       }catch(ex){console.warn('PKCE confirm error:',ex);}
     }
   }
-  if(_up.get('upgraded')==='1'&&S.user){
-    // Never trust the plan from the URL — always verify from Supabase
-    try{
-      const{data}=await SB.from('users').select('plan,stripe_subscription_id').eq('id',S.user.id).single();
-      if(data&&data.plan){
-        S.plan=data.plan;
-        S.user.plan=data.plan;
-        saveS();
-      }
-    }catch(e){console.warn('Plan verify failed:',e);}
-    showPage('dashboard');
-    setTimeout(()=>showDp('billing',null),500);
+  if(_up.get('upgraded')==='1'){
+    // Recover user from session if S.user lost during Stripe redirect
+    if(!S.user){
+      const uid=sessionStorage.getItem('pendingUserId');
+      const uemail=sessionStorage.getItem('pendingUserEmail');
+      if(uid&&uemail) S.user={id:uid,email:uemail,name:'',business:'',plan:'free'};
+    }
+    sessionStorage.removeItem('pendingUserId');
+    sessionStorage.removeItem('pendingUserEmail');
+    if(S.user&&SB){
+      try{
+        const{data}=await SB.from('users').select('plan,stripe_subscription_id').eq('id',S.user.id).single();
+        if(data&&data.plan){S.plan=data.plan;S.user.plan=data.plan;saveS();}
+      }catch(e){console.warn('Plan verify failed:',e);}
+    }
+    if(S.user){
+      showPage('dashboard');
+      setTimeout(()=>showDp('billing',null),500);
+      toast('Account created and payment complete. Welcome to Aenima.');
+    } else {
+      showPage('login');
+    }
   } else if(S.user){
     showPage('dashboard');
   } else {
