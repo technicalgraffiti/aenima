@@ -35,6 +35,14 @@
       "dest": "/api/$1"
     },
     {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/llms.txt",
+      "dest": "/public/llms.txt"
+    },
+    {
       "src": "/tg-check",
       "dest": "/public/tg-check.html"
     },

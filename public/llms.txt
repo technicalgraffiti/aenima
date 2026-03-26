@@ -1,39 +1,63 @@
-# Aenima — AI Visibility Tool for Local Businesses
+# Aenima — AI Search Visibility Tool
+# https://aenima.co.uk
+# Last updated: March 2026
+# Operated by: Technical Graffiti Ltd
 
-> Aenima is an AI visibility scoring and file generation tool for UK local businesses. It checks whether a business website has the technical signals AI search engines need to identify and recommend it, generates the files that fix any gaps, and tracks visibility monthly.
+## Business Identity
+
+Name: Aenima
+Legal operator: Technical Graffiti Ltd
+Company number: 07180346 (registered in England and Wales)
+ICO registration: C1894540
+Sister company: Technical Graffiti (https://technicalgraffiti.co.uk)
+Founder: Stewart Graham
 
 ## What Aenima Does
 
-Aenima runs five real technical checks on any domain to produce an AI visibility score out of 100. It checks for Schema markup, llms.txt presence, AI crawler access, HTTPS security and meta description. It then generates the specific files a business needs to become visible to AI search engines including ChatGPT, Perplexity and Google AI Overviews.
+Aenima is a GEO (Generative Engine Optimisation) and AEO (Answer Engine Optimisation) AI visibility tool for UK local and trade businesses. It checks five technical signals that determine whether AI engines can find, identify and recommend a business: schema markup, llms.txt file, robots.txt AI crawler permissions, directory citation consistency, and Google Business Profile status.
 
-## Services
+Aenima scores each business's AI visibility out of 100 and generates the specific files needed to fix any gaps: schema JSON-LD code, llms.txt identity file, and citation fix guidance.
 
-- Free AI visibility score check — no account needed, instant results
-- Starter plan (£5.50/month) — AI visibility files generated and downloadable, citation gap report, monthly re-score and report
-- Pro plan (£7.50/month) — WordPress plugin that installs and auto-updates all visibility files monthly, monthly report to inbox
-- Agency plan (£89/month) — white label, 10 client sites, reseller dashboard
+## Who It Serves
 
-## Who It Is For
+Small and medium-sized UK businesses — tradespeople, health practitioners, legal and financial services, hospitality, retail, and any local business that depends on customers finding them. Businesses that need to be visible when AI engines answer local search queries.
 
-UK local businesses, sole traders and SMEs who want to appear in AI search results. Particularly relevant for trades, professionals and service businesses in local markets — plumbers, electricians, solicitors, accountants, dentists, builders, landscapers and similar.
+## The Problem Aenima Solves
 
-## Key Facts
+When a customer asks ChatGPT or Google's AI Overview for a recommended business in their area, the AI gives one answer. If that business is not yours, the customer goes elsewhere. Most local businesses are invisible to AI search because they lack the technical signals AI engines require. Aenima identifies what is missing and generates the files that fix it.
 
-- Five real checks run on the actual domain — not simulated scores
-- Files generated are specific to each business — not generic templates
-- Monthly subscription includes re-score, file regeneration and email report
-- WordPress plugin (Pro plan) handles everything automatically
-- Free score check requires no account or payment
+## Services and Pricing
 
-## Contact and Ownership
+- Free score check: AI visibility score out of 100. No account needed. Results in 60 seconds. Always free.
+- Starter plan (The Roadmap): £5.50/month. Visibility files generated and ready to download. Works on any website. Monthly re-score and Machine-Visibility Certificate included.
+- Pro plan (The Auto-Pilot): £7.50/month. WordPress plugin installs and auto-updates files monthly. WordPress websites only.
+- Agency plan: £89/month (coming soon). White-label reseller programme for digital agencies. 10 client sites, white-label reports, reseller dashboard.
+- Hardship rate: £3.50/month for 3 months, self-declared, full Starter plan.
 
-- Website: https://aenima.co.uk
-- Owner: Technical Graffiti Ltd, Company No. 07180346
-- Email: ai@aenima.co.uk
-- Based: NN29 Northamptonshire, United Kingdom
-- Operated by: Stewart, Technical Graffiti Ltd
+## What Aenima Generates
 
-## Related
+- Schema JSON-LD (LocalBusiness, FAQPage, Service types)
+- llms.txt identity file
+- Citation gap report with fix links
+- Monthly Machine-Visibility Certificate (paid plans)
+- Audit report (paid plans)
 
-- Technical Graffiti Ltd consultancy: https://technicalgraffiti.co.uk
-- Managed GEO and AEO service: https://technicalgraffiti.co.uk
+## Geographic Scope
+
+UK-focused. Serves businesses across England, Scotland, Wales and Northern Ireland. Priced for UK SMEs.
+
+## Related Entities
+
+- Parent company: Technical Graffiti Ltd (https://technicalgraffiti.co.uk)
+- Managed/consultancy service: Technical Graffiti — human-delivered GEO and AEO for businesses that want it handled personally by Stewart Graham
+- WordPress plugin: Available via WordPress.org plugin directory (search: Aenima)
+
+## Contact
+
+Website: https://aenima.co.uk
+Email: ai@technicalgraffiti.co.uk
+Phone: +44 7726 318601
+
+## AI Crawler Permissions
+
+All major AI crawlers are permitted to access all public pages of this site. See robots.txt for explicit permissions.
