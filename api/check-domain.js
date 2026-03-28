@@ -92,6 +92,15 @@ module.exports = async (req, res) => {
     max: 20,
   };
 
+  // ── ADVANCED SCHEMA SIGNALS (advisory — not scored, but flagged) ───────────
+  const hasKnowsAbout = homepageBody.includes('knowsAbout') || homepageBody.includes('DefinedTerm');
+  const hasPriceSpec = homepageBody.includes('PriceSpecification') || homepageBody.includes('minPrice');
+  const hasDateModified = homepageBody.includes('dateModified');
+  const hasSameAs = (homepageBody.match(/"sameAs"/g) || []).length >= 1;
+  const hasSameAsMultiple = (homepageBody.match(/"sameAs"/g) || []).length >= 2 ||
+    (homepageBody.match(/sameAs.*\[/g) || []).length >= 1;
+  const hasReviewNode = homepageBody.includes('"Review"') || homepageBody.includes('@type":"Review');
+
   // ── CHECK 3: LLMS.TXT ────────────────────────────────────────────────────
   const llmsCheck = await fetchUrl(`${baseUrl}/llms.txt`);
   const llmsExists = llmsCheck.status === 200 && llmsCheck.body.length > 10;
@@ -173,6 +182,19 @@ module.exports = async (req, res) => {
   if (results.robots.hasWildcardBlock) issues.push({ p: 'critical', t: 'All bots blocked by wildcard rule in robots.txt — no AI engine can access your site', cta: true });
   if (!results.meta.pass) issues.push({ p: 'high', t: 'No meta description — AI engines have no text summary of what your business does', cta: true });
 
+  // ── ADVISORY ISSUES (advanced signals — Gemini-level optimisation) ────────
+  const advisory = [];
+  if(results.schema.pass && !hasKnowsAbout)
+    advisory.push({ p: 'advisory', t: 'No knowsAbout/DefinedTerm in schema — AI engines cannot verify your topical authority. Add knowsAbout with DefinedTerm nodes for your key services.' });
+  if(results.schema.pass && !hasPriceSpec)
+    advisory.push({ p: 'advisory', t: 'No PriceSpecification in schema — AI comparison tools cannot extract your pricing. Add minPrice and maxPrice to each service offer.' });
+  if(results.schema.pass && !hasDateModified)
+    advisory.push({ p: 'advisory', t: 'No dateModified in schema — AI engines may deprioritise content without a freshness signal. Add dateModified to your schema.' });
+  if(results.schema.pass && !hasSameAsMultiple)
+    advisory.push({ p: 'advisory', t: 'Weak sameAs signals — AI engines verify identity by cross-referencing multiple sources. Add sameAs links to Google Business Profile, Companies House, and directory listings.' });
+  if(results.schema.pass && !hasReviewNode)
+    advisory.push({ p: 'advisory', t: 'No Review schema node — adding a verifiable review or testimonial as structured data increases AI recommendation confidence.' });
+
   // ── CATEGORIES for display ────────────────────────────────────────────────
   const cats = {
     'AI Identity File':    { score: results.llms.score,   max: 20, detail: results.llms.detail },
@@ -187,7 +209,15 @@ module.exports = async (req, res) => {
     overall,
     cats,
     issues,
+    advisory,
     checks: results,
+    advancedSignals: {
+      knowsAbout: hasKnowsAbout,
+      priceSpecification: hasPriceSpec,
+      dateModified: hasDateModified,
+      sameAsMultiple: hasSameAsMultiple,
+      reviewNode: hasReviewNode,
+    },
     ts: new Date().toISOString(),
   });
 };
