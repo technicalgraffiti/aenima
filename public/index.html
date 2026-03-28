@@ -3702,17 +3702,85 @@ function genSch(){
   const d=v('sd');const f=v('sf');const pr=v('sp')||'££';
   const svcs=v('ss').split('\n').map(x=>x.trim()).filter(Boolean);
   const areas=v('sa').split('\n').map(x=>x.trim()).filter(Boolean);
-  const schema={'@context':'https://schema.org','@type':t,'name':n};
-  if(u)schema.url='https://'+u.replace(/^https?:\/\//,'');
-  if(d)schema.description=d;if(ph)schema.telephone=ph;if(em)schema.email=em;
-  if(pr)schema.priceRange=pr;if(f)schema.foundingDate=f;
+  const today=new Date().toISOString().split('T')[0];
+  const baseUrl=u?'https://'+u.replace(/^https?:\/\//,'').replace(/\/$/,''):'';
+  const bizId=baseUrl?baseUrl+'/#business':'';
+
+  // Build @graph structure (Gemini-compliant)
+  const business={
+    '@type':t,
+    '@id':bizId||n,
+    'name':n,
+    'dateModified':today,
+  };
+  if(baseUrl)business.url=baseUrl;
+  if(d)business.description=d;
+  if(ph)business.telephone=ph;
+  if(em)business.email=em;
+  if(pr)business.priceRange=pr;
+  if(f)business.foundingDate=f;
+
   const addr={'@type':'PostalAddress','addressCountry':'GB'};
-  if(st)addr.streetAddress=st;if(tw)addr.addressLocality=tw;
-  if(co)addr.addressRegion=co;if(pc)addr.postalCode=pc;
-  schema.address=addr;
-  if(areas.length)schema.areaServed=areas.map(a=>({'@type':'City','name':a}));
-  if(svcs.length){schema.hasOfferCatalog={'@type':'OfferCatalog','name':'Services','itemListElement':svcs.map(s=>({'@type':'Offer','itemOffered':{'@type':'Service','name':s}}))};schema.knowsAbout=[...svcs,'GEO','AEO','Generative Engine Optimisation','Answer Engine Optimisation'];}
-  const el=document.getElementById('schOut');if(el)el.textContent=JSON.stringify(JSON.parse(JSON.stringify(schema)),null,2);
+  if(st)addr.streetAddress=st;
+  if(tw)addr.addressLocality=tw;
+  if(co)addr.addressRegion=co;
+  if(pc)addr.postalCode=pc;
+  business.address=addr;
+
+  if(areas.length)business.areaServed=areas.map(a=>({'@type':'City','name':a}));
+
+  // knowsAbout with DefinedTerm (Gemini signal 1)
+  const definedTerms=[
+    {'@type':'DefinedTerm','name':t,'description':'Local business providing '+svcs.slice(0,3).join(', ')+(svcs.length>3?' and more':'')},
+  ];
+  if(svcs.length){
+    business.knowsAbout=[...definedTerms,...svcs.map(s=>({'@type':'DefinedTerm','name':s}))];
+  } else {
+    business.knowsAbout=definedTerms;
+  }
+
+  // sameAs — GBP + directories (Gemini signal 4)
+  const sameas=[];
+  if(baseUrl)sameas.push(baseUrl);
+  if(tw){
+    sameas.push('https://www.google.com/maps/search/'+encodeURIComponent(n+' '+tw));
+  }
+  if(sameas.length)business.sameAs=sameas;
+
+  // Services with PriceSpecification (Gemini signal 2)
+  const graph=[business];
+  if(svcs.length){
+    business.hasOfferCatalog={
+      '@type':'OfferCatalog',
+      'name':'Services',
+      'itemListElement':svcs.map(s=>({
+        '@type':'Offer',
+        'itemOffered':{'@type':'Service','name':s},
+        'priceSpecification':{
+          '@type':'PriceSpecification',
+          'priceCurrency':'GBP',
+          'description':'Contact for pricing'
+        }
+      }))
+    };
+  }
+
+  // WebSite node
+  if(baseUrl){
+    graph.push({
+      '@type':'WebSite',
+      '@id':baseUrl+'/#website',
+      'url':baseUrl,
+      'name':n,
+      'publisher':{'@id':bizId},
+      'inLanguage':'en-GB',
+      'dateModified':today
+    });
+  }
+
+  const output={'@context':'https://schema.org','@graph':graph};
+  const el=document.getElementById('schOut');
+  if(el)el.textContent=JSON.stringify(output,null,2);
 }
 function genFaq(){
   const items=document.querySelectorAll('#faqItems .faq-i');
@@ -3759,15 +3827,62 @@ function genLlms(){
   const ph=v('lph');const em=v('lem');const u=v('lu');
   const svcs=v('ls').split('\n').map(x=>x.trim()).filter(Boolean);
   const cl=v('lc');const ar=v('la');const fcts=v('lf').split('\n').map(x=>x.trim()).filter(Boolean);
-  let txt=`# ${n}\n`;if(t)txt+=`\n> ${t}\n`;if(d)txt+=`\n${d}\n`;
-  if(svcs.length){txt+=`\n## Services\n\n`;svcs.forEach(s=>txt+=`- ${s}\n`);}
-  if(cl)txt+=`\n## Who we work with\n\n${cl}\n`;
-  if(ar)txt+=`\n## Service areas\n\n${ar}\n`;
-  if(fcts.length){txt+=`\n## Key facts\n\n`;fcts.forEach(f=>txt+=`- ${f}\n`);}
-  txt+=`\n## AI Search Visibility\n\nThis business is optimised for GEO (Generative Engine Optimisation) and AEO (Answer Engine Optimisation).\n`;
-  txt+=`\n## Contact\n\n`;
-  if(ph)txt+=`- Phone: ${ph}\n`;if(em)txt+=`- Email: ${em}\n`;
-  if(u)txt+=`- Website: https://${u.replace(/^https?:\/\//,'')}\n`;
+  const baseUrl=u?'https://'+u.replace(/^https?:\/\//,'').replace(/\/$/,''):'';
+  const today=new Date().toISOString().split('T')[0];
+
+  // GEMINI SIGNAL 5: Quick Summary front-loaded — name, service, location, contact in first paragraph
+  let txt=`# ${n}\n`;
+  txt+=`# ${baseUrl||n}\n`;
+  txt+=`# Last updated: ${today}\n\n`;
+
+  // Quick Summary MUST be first — AI reads first 100 tokens
+  txt+=`## Quick Summary\n\n`;
+  txt+=`${n} is a ${t||'local business'}`;
+  if(ar){const firstArea=ar.split('\n')[0].trim();if(firstArea)txt+=` based in ${firstArea}`;}
+  txt+=`.`;
+  if(svcs.length>0)txt+=` Services include: ${svcs.slice(0,3).join(', ')}${svcs.length>3?' and more':''}.`;
+  if(fcts.length>0){
+    // Look for price/turnaround facts
+    const priceFact=fcts.find(f=>/£|price|from|cost/i.test(f));
+    const speedFact=fcts.find(f=>/day|week|hour|fast|quick|turn/i.test(f));
+    if(priceFact)txt+=` ${priceFact}.`;
+    if(speedFact)txt+=` ${speedFact}.`;
+  }
+  if(ph)txt+=` Phone: ${ph}.`;
+  txt+=`\n\n`;
+
+  if(d)txt+=`${d}\n\n`;
+  if(t)txt+=`> ${t}\n\n`;
+
+  if(svcs.length){
+    txt+=`## Services\n\n`;
+    svcs.forEach(s=>txt+=`- ${s}\n`);
+    txt+=`\n`;
+  }
+  if(cl)txt+=`## Who we work with\n\n${cl}\n\n`;
+  if(ar)txt+=`## Service areas\n\n${ar}\n\n`;
+  if(fcts.length){
+    txt+=`## Key facts\n\n`;
+    fcts.forEach(f=>txt+=`- ${f}\n`);
+    txt+=`\n`;
+  }
+
+  txt+=`## AI Visibility\n\n`;
+  txt+=`This business is optimised for GEO (Generative Engine Optimisation) and AEO (Answer Engine Optimisation). `;
+  txt+=`Schema markup, llms.txt, and robots.txt AI crawler permissions are in place.\n\n`;
+
+  if(baseUrl){
+    txt+=`## Related entities\n\n`;
+    txt+=`- Website: ${baseUrl}\n`;
+    txt+=`- AI Visibility tool: https://aenima.co.uk\n`;
+    txt+=`- Parent consultancy: https://technicalgraffiti.co.uk\n\n`;
+  }
+
+  txt+=`## Contact\n\n`;
+  if(ph)txt+=`- Phone: ${ph}\n`;
+  if(em)txt+=`- Email: ${em}\n`;
+  if(baseUrl)txt+=`- Website: ${baseUrl}\n`;
+
   const el=document.getElementById('llmsOut');if(el)el.textContent=txt;
 }
 function dlLlms(){const c=document.getElementById('llmsOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('llms.txt',c,'text/plain');}

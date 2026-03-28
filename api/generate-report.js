@@ -54,6 +54,11 @@ If your current site is limiting what's possible, we build a five-page professio
 To discuss any option, contact Stewart direct: technicalgraffiti.co.uk`;
     }
 
+    const advisoryText = scoreData.advisory?.length
+      ? scoreData.advisory.map(a => a.t).join('; ')
+      : 'None identified';
+    const advSigs = scoreData.advancedSignals || {};
+
     const prompt = `You are a senior AI visibility consultant at Technical Graffiti, writing a professional audit report. The report must feel authoritative, specific and worth reading — no waffle, no filler, no generic advice that could apply to any business.
 
 BUSINESS DETAILS:
@@ -68,6 +73,14 @@ AUDIT RESULTS:
 - Issues found: ${scoreData.issues?.map(i => `${i.p.toUpperCase()}: ${i.t}`).join(', ') || 'None'}
 - Category breakdown: ${Object.entries(scoreData.cats || {}).map(([k,v]) => `${k}: ${v.score}/${v.max}`).join(', ')}
 
+ADVANCED SIGNAL STATUS (six Gemini-level signals — include in report):
+- knowsAbout/DefinedTerm (topical authority): ${advSigs.knowsAbout ? 'PRESENT' : 'MISSING — AI cannot verify topical authority'}
+- PriceSpecification (AI price comparison): ${advSigs.priceSpecification ? 'PRESENT' : 'MISSING — AI cannot extract pricing for comparison grids'}
+- dateModified (freshness signal): ${advSigs.dateModified ? 'PRESENT' : 'MISSING — content may be deprioritised as stale'}
+- sameAs multiple sources (entity verification): ${advSigs.sameAsMultiple ? 'PRESENT' : 'MISSING — insufficient cross-platform identity verification'}
+- Review schema node (verifiable evidence): ${advSigs.reviewNode ? 'PRESENT' : 'MISSING — no structured social proof for AI engines'}
+- Advisory items: ${advisoryText}
+
 Write the report in this exact structure:
 
 ## EXECUTIVE SUMMARY
@@ -78,6 +91,9 @@ Make it real and commercial. Describe the specific searches their customers are 
 
 ## WHAT THE AUDIT FOUND
 3-4 specific findings tied to their actual score data. Each finding should name the exact issue or strength, explain why it matters for AI visibility, and reference their specific business type and location.
+
+## ADVANCED SIGNAL GAPS
+If any of the six advanced signals are missing, include a concise section here. Name each missing signal, explain in one sentence what it does for AI visibility, and state the specific fix. Skip this section entirely if all six are present.
 
 ## PRIORITY ACTIONS
 Numbered list of 4-5 actions in strict order of impact. Each action must name the specific fix, explain what it does for AI visibility, and reference their actual business or location.

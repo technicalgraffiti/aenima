@@ -144,6 +144,22 @@ async function sendMonthlyReport(user, score, previousScore) {
     </table>`).join('') : '<p style="margin:0;font-size:15px;color:#1A8A40;font-weight:600">✓ No issues found this month</p>'}
   </td></tr>
 
+  <!-- ADVANCED SIGNALS ADVISORY -->
+  ${score.advisory?.length ? `
+  <tr><td style="background:#F8F4FF;border-left:4px solid #7B5EA7;border-right:1px solid #E8E8E8;padding:24px 40px">
+    <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7B5EA7">Advanced signal improvements</p>
+    <p style="margin:0 0 12px;font-size:14px;color:#555555;line-height:1.6">These are not scoring issues — your baseline is solid. These are the next-level signals that separate a visible business from a confidently recommended one:</p>
+    ${score.advisory.map(a => `
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px">
+      <tr>
+        <td valign="top" style="width:80px;padding-top:1px">
+          <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#EDE8F7;color:#7B5EA7">ADVISORY</span>
+        </td>
+        <td style="font-size:14px;color:#3D3D3D;line-height:1.5;padding-left:8px">${a.t}</td>
+      </tr>
+    </table>`).join('')}
+  </td></tr>` : ''}
+
   <!-- CTA -->
   <tr><td style="background:#FFFFFF;padding:32px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8;text-align:center">
     <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#0A1628;letter-spacing:-0.01em">Your updated visibility files are ready.</p>
