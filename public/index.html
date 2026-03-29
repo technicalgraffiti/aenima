@@ -3241,8 +3241,9 @@ function buildDash(){
       <div class="dcard">
         <h3>Your NAP — Name, Address, Phone</h3>
         <p style="font-size:16px;color:var(--t-support);margin-bottom:20px">These three must be identical across every directory listing. Any variation reduces AI trust signals.</p>
-        <div class="row2"><div class="fg"><label>Business name (exact)</label><input type="text" id="cn" placeholder="Smith Plumbing Ltd"></div><div class="fg"><label>Phone (exact format)</label><input type="tel" id="cp" placeholder="07700 000000"></div></div>
+        <div class="row2"><div class="fg"><label>Business name (exact)</label><input type="text" id="cn" placeholder="Smith Plumbing Ltd" oninput=""></div><div class="fg"><label>Phone (exact format)</label><input type="tel" id="cp" placeholder="07700 000000"></div></div>
         <div class="row2"><div class="fg"><label>Address</label><input type="text" id="ca" placeholder="123 High Street, Wellingborough"></div><div class="fg"><label>Postcode</label><input type="text" id="cpc" placeholder="NN8 1AA"></div></div>
+        <p style="font-size:13px;color:var(--t-support);margin-bottom:12px">Fields pre-fill from your profile. Edit if needed before generating.</p>
         <button class="btn btn-primary btn-sm" onclick="runCit()">Generate checklist →</button>
       </div>
       <div id="citResults" style="display:none">
@@ -3923,24 +3924,132 @@ const DIRS=[
   {n:'Cylex UK',u:'https://www.cylex.co.uk',p:'low',d:'European directory.'},
 ];
 function runCit(){
-  const nm=v('cn');if(!nm){alert('Please enter your business name.');return;}
+  const nm=v('cn');if(!nm){alert('Please enter your business name to generate the checklist.');return;}
   const ph=v('cp');const ad=v('ca');const pc=v('cpc');
+
+  // Pre-populate from profile if fields empty
+  const prof=getProfile();
+  if(!nm&&prof.business){document.getElementById('cn').value=prof.business;}
+  if(!ph&&prof.phone){document.getElementById('cp').value=prof.phone;}
+
+  const napDisplay=`${nm}${ph?' · '+ph:''}${ad?' · '+ad+(pc?', '+pc:''):''}`;
+
   document.getElementById('citResults').style.display='block';
   document.getElementById('citList').innerHTML=`
-  <div class="alert al-info" style="margin-bottom:20px"><strong>NAP to verify everywhere:</strong> <span style="font-family:'DM Mono',monospace;color:var(--orange);font-size:14px">${nm}${ph?' · '+ph:''}${ad?' · '+ad+(pc?', '+pc:''):''}</span></div>
-  ${DIRS.map(d=>`
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border:1.5px solid var(--border-lt);border-radius:var(--radius);margin-bottom:10px;background:var(--bg-white);flex-wrap:wrap;gap:12px">
-    <div><div style="font-family:'Work Sans',sans-serif;font-weight:600;font-size:16px;color:var(--t-heading);letter-spacing:-0.01em">${d.n} <span style="font-size:12px;color:var(--t-support);font-weight:400">${d.p==='critical'?'★ Critical':d.p==='high'?'● High':'○ Medium'}</span></div><div style="font-size:14px;color:var(--t-support);margin-top:3px">${d.d}</div></div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <a href="${d.u}" target="_blank" rel="noopener" style="font-size:15px;color:var(--orange);text-decoration:none;font-weight:600">Check →</a>
-      <select onchange="this.closest('div[style]').querySelector('div div:first-child').style.color=this.value==='listed'?'var(--green)':this.value==='wrong'?'var(--amber)':this.value==='missing'?'var(--red)':'var(--t-heading)'" style="font-size:14px;background:var(--bg-warm);border:1.5px solid var(--border-lt);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit">
-        <option value="">Not checked</option>
-        <option value="listed">✓ Listed — NAP correct</option>
-        <option value="wrong">⚠ Listed — NAP wrong</option>
-        <option value="missing">✗ Not listed</option>
-      </select>
-    </div>
-  </div>`).join('')}`;
+  <div class="alert al-info" style="margin-bottom:20px">
+    <strong>Your NAP to verify on every directory:</strong><br>
+    <span style="font-family:'DM Mono',monospace;color:var(--orange);font-size:14px;display:block;margin-top:6px">${napDisplay}</span>
+    <span style="font-size:13px;color:var(--t-support);display:block;margin-top:4px">This exact format must match everywhere. Any variation — even punctuation — reduces AI trust signals.</span>
+  </div>
+  <div style="margin-bottom:16px">
+    ${DIRS.map(d=>`
+    <div class="cit-row" data-dir="${d.n}" style="display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border:1.5px solid var(--border-lt);border-radius:var(--radius);margin-bottom:10px;background:var(--bg-white);flex-wrap:wrap;gap:12px">
+      <div style="flex:1;min-width:200px">
+        <div style="font-family:'Work Sans',sans-serif;font-weight:600;font-size:16px;color:var(--t-heading);letter-spacing:-0.01em">
+          ${d.n} <span style="font-size:12px;color:${d.p==='critical'?'var(--red)':d.p==='high'?'var(--amber)':'var(--t-support)'};font-weight:600">${d.p==='critical'?'★ Critical':d.p==='high'?'● High':'○ Medium'}</span>
+        </div>
+        <div style="font-size:13px;color:var(--t-support);margin-top:3px">${d.d}</div>
+        <div class="cit-nap-found" id="napfound-${d.n.replace(/\s/g,'')}" style="font-size:13px;margin-top:6px;display:none"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <a href="${d.u}/search?q=${encodeURIComponent(nm)}+${encodeURIComponent(pc||ad||'')}" target="_blank" rel="noopener"
+           style="font-size:14px;color:var(--orange);text-decoration:none;font-weight:600;white-space:nowrap;border:1.5px solid var(--orange);padding:6px 14px;border-radius:6px">
+          Search listing →
+        </a>
+        <select class="cit-status" data-dir="${d.n}" data-priority="${d.p}"
+          onchange="updateCitStatus(this)"
+          style="font-size:14px;background:var(--bg-warm);border:1.5px solid var(--border-lt);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit">
+          <option value="">Not checked</option>
+          <option value="correct">✓ Listed — NAP correct</option>
+          <option value="wrong">⚠ Listed — NAP wrong</option>
+          <option value="missing">✗ Not listed</option>
+        </select>
+      </div>
+    </div>`).join('')}
+  </div>
+  <div id="citSummary" style="display:none;margin-top:20px"></div>
+  <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn btn-primary btn-sm" onclick="generateCitReport('${nm.replace(/'/g,"\'")}','${napDisplay.replace(/'/g,"\'")}')">Generate fix report →</button>
+    <button class="btn btn-sm" style="background:var(--bg-warm);color:var(--t-support);border:1.5px solid var(--border-lt)" onclick="resetCit()">Start again</button>
+  </div>
+  `;}
+
+function updateCitStatus(sel){
+  // Update summary counts
+  const statuses=Array.from(document.querySelectorAll('.cit-status')).map(s=>s.value).filter(Boolean);
+  const correct=statuses.filter(s=>s==='correct').length;
+  const wrong=statuses.filter(s=>s==='wrong').length;
+  const missing=statuses.filter(s=>s==='missing').length;
+  const total=DIRS.length;
+  const checked=statuses.length;
+  if(checked===0)return;
+  const sumEl=document.getElementById('citSummary');
+  if(!sumEl)return;
+  sumEl.style.display='block';
+  sumEl.innerHTML=`
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:var(--bg-warm);border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:16px">
+    <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--t-heading)">${checked}/${total}</div><div style="font-size:12px;color:var(--t-support);text-transform:uppercase;letter-spacing:1px">Checked</div></div>
+    <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--green)">${correct}</div><div style="font-size:12px;color:var(--t-support);text-transform:uppercase;letter-spacing:1px">Correct</div></div>
+    <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--amber)">${wrong}</div><div style="font-size:12px;color:var(--t-support);text-transform:uppercase;letter-spacing:1px">NAP Wrong</div></div>
+    <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--red)">${missing}</div><div style="font-size:12px;color:var(--t-support);text-transform:uppercase;letter-spacing:1px">Not Listed</div></div>
+  </div>`;
+}
+
+function generateCitReport(bizName,nap){
+  const rows=Array.from(document.querySelectorAll('.cit-status'));
+  const results=rows.map(sel=>({dir:sel.dataset.dir,priority:sel.dataset.priority,status:sel.value})).filter(r=>r.status);
+  if(!results.length){alert('Check at least one directory before generating the report.');return;}
+
+  const correct=results.filter(r=>r.status==='correct');
+  const wrong=results.filter(r=>r.status==='wrong');
+  const missing=results.filter(r=>r.status==='missing');
+  const score=Math.round((correct.length/DIRS.length)*100);
+  const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="en-GB"><head>
+  <meta charset="UTF-8"><title>Citation Audit Report — ${bizName}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:740px;margin:40px auto;color:#222;line-height:1.6;padding:0 20px}
+    h1{font-size:26px;color:#0A1628;margin-bottom:4px}
+    .meta{font-size:14px;color:#777;margin-bottom:28px}
+    .score-block{background:#0A1628;color:#fff;border-radius:10px;padding:24px 28px;margin-bottom:28px;display:flex;align-items:center;gap:28px}
+    .score-num{font-size:56px;font-weight:700;color:${score>=70?'#44CC88':score>=40?'#FFAA44':'#FF6655'};line-height:1}
+    .score-label{font-size:16px;opacity:0.7}
+    .nap-box{background:#F8F4FF;border:2px solid #7B5EA7;border-radius:8px;padding:14px 18px;margin-bottom:24px;font-family:monospace;font-size:14px}
+    h2{font-size:16px;color:#0A1628;margin:24px 0 10px;border-bottom:2px solid #DD5827;padding-bottom:4px}
+    .row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+    .badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap;margin-top:2px}
+    .b-crit{background:#FFF0EE;color:#CC2200}
+    .b-high{background:#FFF8E6;color:#CC6600}
+    .b-med{background:#F0F0F0;color:#555}
+    .fix{font-size:14px;color:#333}
+    .fix a{color:#DD5827}
+    footer{margin-top:40px;font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:16px}
+  </style></head><body>
+  <h1>Citation Audit Report</h1>
+  <div class="meta">${bizName} · Generated ${date} · By Technical Graffiti</div>
+  <div class="score-block">
+    <div><div class="score-num">${score}</div><div class="score-label">/100 citation score</div></div>
+    <div><div style="font-size:18px;font-weight:600">${score>=70?'Good citation consistency':score>=40?'Moderate — fixes needed':'Critical — multiple gaps found'}</div>
+    <div style="font-size:14px;opacity:0.6;margin-top:4px">${correct.length} correct · ${wrong.length} wrong NAP · ${missing.length} not listed · ${DIRS.length-results.length} not checked</div></div>
+  </div>
+  <div class="nap-box"><strong>Correct NAP to use everywhere:</strong><br>${nap}</div>
+  ${wrong.length>0?`<h2>⚠ Wrong NAP — fix these first</h2>${wrong.map(r=>{const dir=DIRS.find(d=>d.n===r.dir)||{u:'#',p:'medium'};return`<div class="row"><span class="badge ${dir.p==='critical'?'b-crit':dir.p==='high'?'b-high':'b-med'}">${dir.p}</span><div class="fix"><strong>${r.dir}</strong> — NAP listed incorrectly. <a href="${dir.u}" target="_blank">Update listing →</a></div></div>`}).join('')}`:''}
+  ${missing.length>0?`<h2>✗ Not listed — add these</h2>${missing.map(r=>{const dir=DIRS.find(d=>d.n===r.dir)||{u:'#',p:'medium'};return`<div class="row"><span class="badge ${dir.p==='critical'?'b-crit':dir.p==='high'?'b-high':'b-med'}">${dir.p}</span><div class="fix"><strong>${r.dir}</strong> — Business not listed. <a href="${dir.u}" target="_blank">Add listing →</a></div></div>`}).join('')}`:''}
+  ${correct.length>0?`<h2>✓ Correct listings</h2>${correct.map(r=>`<div class="row"><span class="badge" style="background:#E6F7ED;color:#1A8A40">correct</span><div class="fix">${r.dir} — NAP correct ✓</div></div>`).join('')}`:''}
+  <h2>Next Steps</h2>
+  <p>Fix the wrong and missing listings above using the exact NAP shown. Once updated, re-run this checker in 2-4 weeks to confirm changes have propagated. For help implementing these fixes, contact <a href="https://technicalgraffiti.co.uk">Technical Graffiti</a>.</p>
+  <footer>Citation Audit by Technical Graffiti Ltd · technicalgraffiti.co.uk · Company No. 07180346<br>
+  Checked using Aenima · aenima.co.uk · ${date}</footer>
+  </body></html>`);
+  win.document.close();
+  win.print();
+}
+
+function resetCit(){
+  document.getElementById('citResults').style.display='none';
+  document.getElementById('citList').innerHTML='';
 }
 
 /* ═══════════════════════════════════════
