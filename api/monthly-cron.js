@@ -1,3 +1,8 @@
+// api/monthly-cron.js
+// Monthly cron — runs 1st of month at 8am UTC via vercel.json
+// Checks domain scores, sends branded email reports
+// AI Monitoring Phase 2 — checks if domain appears in OpenAI responses
+
 const { createClient } = require('@supabase/supabase-js');
 
 const SB = createClient(
@@ -6,9 +11,72 @@ const SB = createClient(
 );
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const APP_URL = process.env.NEXT_PUBLIC_URL || 'https://aenima.co.uk';
 const CHECK_URL = `${APP_URL}/api/check-domain`;
 
+// ── AI MONITORING — check if domain appears in ChatGPT response ────────────
+async function checkAIVisibility(domain, bizType, town) {
+  if (!OPENAI_API_KEY) return { checked: false, reason: 'No OpenAI key configured' };
+
+  try {
+    const query = bizType && town
+      ? `Who are the best ${bizType} businesses in ${town}? Give me specific recommendations.`
+      : `What businesses can you recommend at ${domain}?`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 500,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful local business advisor. Give specific, factual recommendations based on your training data.',
+          },
+          {
+            role: 'user',
+            content: query,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      console.error('OpenAI error:', err);
+      return { checked: false, reason: `OpenAI API error: ${err.error?.message || response.status}` };
+    }
+
+    const data = await response.json();
+    const answer = data.choices?.[0]?.message?.content || '';
+
+    // Check if the domain or its name appears in the response
+    const domainClean = domain.replace(/^www\./, '').toLowerCase();
+    const domainBase = domainClean.split('.')[0]; // e.g. "johnsmithplumbing" from "johnsmithplumbing.co.uk"
+
+    const appearsInResponse =
+      answer.toLowerCase().includes(domainClean) ||
+      answer.toLowerCase().includes(domainBase.replace(/-/g, ' '));
+
+    return {
+      checked: true,
+      appearsInChatGPT: appearsInResponse,
+      query,
+      snippet: answer.substring(0, 300),
+    };
+
+  } catch (e) {
+    console.error('AI monitoring check failed:', e.message);
+    return { checked: false, reason: e.message };
+  }
+}
+
+// ── SCORE CHECK ────────────────────────────────────────────────────────────
 async function runScoreCheck(domain) {
   try {
     const resp = await fetch(CHECK_URL, {
@@ -24,7 +92,8 @@ async function runScoreCheck(domain) {
   }
 }
 
-async function sendMonthlyReport(user, score, previousScore) {
+// ── EMAIL ──────────────────────────────────────────────────────────────────
+async function sendMonthlyReport(user, score, previousScore, aiMonitoring) {
   if (!RESEND_API_KEY || !user.email) return;
 
   const change = previousScore !== null ? score.overall - previousScore : null;
@@ -40,6 +109,27 @@ async function sendMonthlyReport(user, score, previousScore) {
   const scoreLabel = score.overall < 30 ? 'Not visible to AI search' : score.overall < 55 ? 'Limited AI visibility' : score.overall < 80 ? 'Moderate visibility' : 'Good visibility';
   const monthName = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
   const name = user.name || user.business || 'there';
+
+  // AI Monitoring badge
+  const aiMonitoringBadge = aiMonitoring?.checked
+    ? aiMonitoring.appearsInChatGPT
+      ? `<tr><td style="background:#E6F7ED;border-left:4px solid #1A8A40;border-right:1px solid #E8E8E8;padding:20px 40px">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td>
+              <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1A8A40">✓ ChatGPT Visibility</p>
+              <p style="margin:0;font-size:16px;font-weight:600;color:#1A1A1A">Your business was found in ChatGPT's responses this month.</p>
+            </td>
+          </tr></table>
+        </td></tr>`
+      : `<tr><td style="background:#FFF8F0;border-left:4px solid #CC6600;border-right:1px solid #E8E8E8;padding:20px 40px">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td>
+              <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#CC6600">ChatGPT Visibility</p>
+              <p style="margin:0;font-size:16px;font-weight:600;color:#1A1A1A">Your business was not found in ChatGPT responses this month. Improving your score will help.</p>
+            </td>
+          </tr></table>
+        </td></tr>`
+    : '';
 
   const catRows = score.cats ? Object.entries(score.cats).map(([catName, cat]) => {
     const pct = Math.round((cat.score / cat.max) * 100);
@@ -99,22 +189,15 @@ async function sendMonthlyReport(user, score, previousScore) {
     </table>
   </td></tr>
 
-  <!-- SCORE BAND -->
+  <!-- GREETING -->
   <tr><td style="background:#FFFFFF;padding:28px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td>
-          <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0A1628;letter-spacing:-0.02em">Hi ${name},</p>
-          <p style="margin:0;font-size:16px;color:#555555;line-height:1.6">Here's your AI visibility update for ${monthName}. Your domain scored <strong style="color:${scoreColour}">${score.overall}/100</strong> — ${scoreLabel.toLowerCase()}.</p>
-        </td>
-      </tr>
-      ${change !== null ? `<tr><td style="padding-top:16px">
-        <table cellpadding="0" cellspacing="0">
-          <tr><td style="background:${changeBg};color:${changeColour};font-size:14px;font-weight:700;padding:8px 18px;border-radius:20px">${changeText}</td></tr>
-        </table>
-      </td></tr>` : ''}
-    </table>
+    <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0A1628;letter-spacing:-0.02em">Hi ${name},</p>
+    <p style="margin:0;font-size:16px;color:#555555;line-height:1.6">Here's your AI visibility update for ${monthName}. Your domain scored <strong style="color:${scoreColour}">${score.overall}/100</strong> — ${scoreLabel.toLowerCase()}.</p>
+    ${change !== null ? `<table cellpadding="0" cellspacing="0" style="margin-top:16px"><tr><td style="background:${changeBg};color:${changeColour};font-size:14px;font-weight:700;padding:8px 18px;border-radius:20px">${changeText}</td></tr></table>` : ''}
   </td></tr>
+
+  <!-- AI MONITORING BADGE -->
+  ${aiMonitoringBadge}
 
   <!-- PRIORITY ACTION -->
   <tr><td style="background:${topIssue ? '#FFFBF0' : '#F0FBF4'};border-left:4px solid ${topIssue ? '#CC6600' : '#1A8A40'};border-right:1px solid #E8E8E8;padding:24px 40px">
@@ -125,9 +208,7 @@ async function sendMonthlyReport(user, score, previousScore) {
   <!-- CATEGORY BREAKDOWN -->
   <tr><td style="background:#FFFFFF;padding:28px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8">
     <p style="margin:0 0 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAAAAA">Category breakdown</p>
-    <table width="100%" cellpadding="0" cellspacing="0">
-      ${catRows}
-    </table>
+    <table width="100%" cellpadding="0" cellspacing="0">${catRows}</table>
   </td></tr>
 
   <!-- ISSUES -->
@@ -144,17 +225,14 @@ async function sendMonthlyReport(user, score, previousScore) {
     </table>`).join('') : '<p style="margin:0;font-size:15px;color:#1A8A40;font-weight:600">✓ No issues found this month</p>'}
   </td></tr>
 
-  <!-- ADVANCED SIGNALS ADVISORY -->
+  <!-- ADVANCED SIGNALS -->
   ${score.advisory?.length ? `
   <tr><td style="background:#F8F4FF;border-left:4px solid #7B5EA7;border-right:1px solid #E8E8E8;padding:24px 40px">
     <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7B5EA7">Advanced signal improvements</p>
-    <p style="margin:0 0 12px;font-size:14px;color:#555555;line-height:1.6">These are not scoring issues — your baseline is solid. These are the next-level signals that separate a visible business from a confidently recommended one:</p>
     ${score.advisory.map(a => `
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px">
       <tr>
-        <td valign="top" style="width:80px;padding-top:1px">
-          <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#EDE8F7;color:#7B5EA7">ADVISORY</span>
-        </td>
+        <td valign="top" style="width:80px;padding-top:1px"><span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#EDE8F7;color:#7B5EA7">ADVISORY</span></td>
         <td style="font-size:14px;color:#3D3D3D;line-height:1.5;padding-left:8px">${a.t}</td>
       </tr>
     </table>`).join('')}
@@ -199,12 +277,11 @@ async function sendMonthlyReport(user, score, previousScore) {
   }
 }
 
+// ── MAIN CRON HANDLER ──────────────────────────────────────────────────────
 module.exports = async (req, res) => {
-  const authHeader = req.headers['authorization'];
-  const cronSecret = process.env.CRON_SECRET;
-  const isVercelCron = req.headers["x-vercel-cron"] === "1";
-  const isManual = authHeader === `Bearer ${cronSecret}`;
-  if (cronSecret && !isVercelCron && !isManual) {
+  const isVercelCron = req.headers['x-vercel-cron'] === '1';
+  const isManual = req.headers['authorization'] === `Bearer ${process.env.CRON_SECRET}`;
+  if (!isVercelCron && !isManual) {
     return res.status(401).json({ error: 'Unauthorised' });
   }
 
@@ -212,7 +289,7 @@ module.exports = async (req, res) => {
 
   const { data: users, error } = await SB
     .from('users')
-    .select('id, email, name, business, website, plan')
+    .select('id, email, name, business, website, plan, biz_type, town')
     .in('plan', ['starter', 'pro', 'agency'])
     .not('website', 'is', null);
 
@@ -234,6 +311,7 @@ module.exports = async (req, res) => {
 
       if (!domain) continue;
 
+      // Previous score for comparison
       const { data: prevScores } = await SB
         .from('scores')
         .select('score')
@@ -243,19 +321,38 @@ module.exports = async (req, res) => {
 
       const previousScore = prevScores?.[1]?.score ?? null;
 
+      // Technical score check
       const score = await runScoreCheck(domain);
       if (!score) { console.warn(`Score check failed for ${domain}`); continue; }
 
+      // AI Monitoring — only for Pro and Agency plans
+      let aiMonitoring = { checked: false };
+      if (user.plan === 'pro' || user.plan === 'agency') {
+        console.log(`Running AI monitoring for ${domain}`);
+        aiMonitoring = await checkAIVisibility(domain, user.biz_type, user.town);
+      }
+
+      // Save score to Supabase
       await SB.from('scores').insert({
         user_id: user.id,
         url: domain,
         score: score.overall,
-        results: { cats: score.cats, issues: score.issues },
+        results: {
+          cats: score.cats,
+          issues: score.issues,
+          ai_monitoring: aiMonitoring,
+        },
         created_at: new Date().toISOString()
       });
 
-      await sendMonthlyReport(user, score, previousScore);
-      results.push({ email: user.email, domain, score: score.overall });
+      // Send email report
+      await sendMonthlyReport(user, score, previousScore, aiMonitoring);
+      results.push({
+        email: user.email,
+        domain,
+        score: score.overall,
+        ai_visible: aiMonitoring?.appearsInChatGPT ?? null,
+      });
 
     } catch(e) {
       console.error(`Error processing ${user.email}:`, e.message);
