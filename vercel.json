@@ -55,12 +55,11 @@
       "dest": "/public/tg-check.html"
     },
     {
-      "src": "/",
-      "dest": "/public/marketing.html",
-      "continue": false
+      "src": "/app",
+      "dest": "/public/app.html"
     },
     {
-      "src": "/(?!api)(?!robots)(?!llms)(?!tg-check)(.*)",
+      "src": "/(.*)",
       "dest": "/public/index.html"
     }
   ],
