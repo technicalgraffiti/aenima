@@ -2275,7 +2275,7 @@ function handleUpgrade(plan){
       alert('Payment error: '+err.message+'. Please visit technicalgraffiti.co.uk to get in touch');
     });
 }
-function downloadScorePDF(){
+async function downloadScorePDF(){
   if(!S.score)return;
   const r=S.score;
   const w=window.open('','_blank');
@@ -2432,7 +2432,7 @@ function mkModal(html){
   document.body.appendChild(o);return o;
 }
 
-function doQuickPay(){
+async function doQuickPay(){
   const e=(document.getElementById('qpEmail')?.value||'').trim();
   const p=(document.getElementById('qpPass')?.value||'').trim();
   const errEl=document.getElementById('qpErr');
@@ -2498,7 +2498,7 @@ function doQuickPay(){
   }
 }
 
-function updBilling(){
+async function updBilling(){
   const desc={free:'Score check only',starter:'AI visibility files + monthly tracking',pro:'WordPress plugin — everything automated',agency:'10 sites, white-label, support'};
   const bb=document.getElementById('bBadge');const bd=document.getElementById('bDesc');const ba=document.getElementById('bActions');
   const uc=document.getElementById('bUpgradeCards');const ut=document.getElementById('bUpgradeTitle');
@@ -2562,7 +2562,7 @@ function toast(msg){
   t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);
 }
 
-function downloadScorePDF(){
+async function downloadScorePDF(){
   if(!S.score)return;
   const r=S.score;
   const w=window.open('','_blank');
