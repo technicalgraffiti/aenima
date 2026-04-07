@@ -56,10 +56,11 @@
     },
     {
       "src": "/",
-      "dest": "/public/marketing.html"
+      "dest": "/public/marketing.html",
+      "continue": false
     },
     {
-      "src": "/(.*)",
+      "src": "/(?!api)(?!robots)(?!llms)(?!tg-check)(.*)",
       "dest": "/public/index.html"
     }
   ],
