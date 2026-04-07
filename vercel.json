@@ -55,10 +55,6 @@
       "dest": "/public/tg-check.html"
     },
     {
-      "src": "/app",
-      "dest": "/public/app.html"
-    },
-    {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
