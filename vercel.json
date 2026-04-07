@@ -55,12 +55,12 @@
       "dest": "/public/tg-check.html"
     },
     {
-      "src": "/app",
-      "dest": "/public/index.html"
+      "src": "/",
+      "dest": "/public/marketing.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/public/marketing.html"
+      "dest": "/public/index.html"
     }
   ],
   "crons": [
