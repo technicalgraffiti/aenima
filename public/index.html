@@ -2102,7 +2102,7 @@ function _runScore(){
   },600);
 
   try{
-    const resp=await fetch('/api/check-domain',{
+    const resp=await fetch('https://aenima.co.uk/api/check-domain',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({domain:raw})
@@ -2400,7 +2400,7 @@ function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 
 // Nav
 function showPage(p){
-  window.location.href='https://aenima.co.uk/#'+p;
+  window.location.href='https://aenima.co.uk/app#'+p;
 }
 function syncNav(){}
 function buildDash(){}
