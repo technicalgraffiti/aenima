@@ -2403,7 +2403,8 @@ function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 
 // Nav
 function showPage(p){
-  window.location.href='https://aenima.co.uk/app#'+p;
+  if(p==='marketing'){window.location.href='https://aenima.co.uk/';return;}
+  window.location.href='https://aenima.co.uk/#'+p;
 }
 function syncNav(){}
 function buildDash(){}
