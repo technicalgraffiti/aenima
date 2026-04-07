@@ -1,4 +1,4 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html lang="en-GB">
 <head>
 <meta charset="UTF-8">
@@ -2413,6 +2413,180 @@ window.addEventListener('DOMContentLoaded',function(){
     window.location.href='https://aenima.co.uk/'+hash;
   }
 });
+
+// Missing functions
+function mkModal(html){
+  const o=document.createElement('div');o.className='modal-ov';
+  o.style.cssText='position:fixed;inset:0;background:rgba(10,22,40,0.75);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px';
+  o.innerHTML=`<div style="background:#FFFFFF;border-radius:var(--radius-lg);padding:48px;width:100%;max-width:520px;position:relative">${html}</div>`;
+  o.onclick=(e)=>{if(e.target===o){sessionStorage.removeItem('pendingPlan');sessionStorage.removeItem('pendingBilling');o.remove();}};
+  document.body.appendChild(o);return o;
+}
+
+function doQuickPay(){
+  const e=(document.getElementById('qpEmail')?.value||'').trim();
+  const p=(document.getElementById('qpPass')?.value||'').trim();
+  const errEl=document.getElementById('qpErr');
+  const btn=document.getElementById('qpBtn');
+  const showQpErr=(msg)=>{
+    if(errEl){errEl.textContent=msg;errEl.style.display='block';}
+    if(btn){btn.disabled=false;btn.textContent='Continue to payment →';}
+  };
+  if(!e||!e.includes('@')){showQpErr('Please enter a valid email address.');return;}
+  if(!p||p.length<8){showQpErr('Password must be at least 8 characters.');return;}
+  if(btn){btn.disabled=true;btn.textContent='Creating account...';}
+  if(errEl){errEl.style.display='none';}
+  try{
+    if(SB){
+      // Try sign up first
+      const {data,error}=await SB.auth.signUp({email:e,password:p,options:{data:{name:'',business:''}}});
+      const alreadyExists=error?.message?.toLowerCase().includes('already registered')
+        ||error?.message?.toLowerCase().includes('already exists')
+        ||(data?.user&&data.user.identities&&data.user.identities.length===0);
+      if(error&&!alreadyExists){
+        showQpErr(error.message||'Could not create account. Please try again.');return;
+      }
+      if(alreadyExists){
+        // Account exists — sign in instead
+        if(btn){btn.disabled=true;btn.textContent='Signing in...';}
+        const {data:sd,error:se}=await SB.auth.signInWithPassword({email:e,password:p});
+        if(se){
+          showQpErr('This email is already registered but the password is incorrect. Try logging in instead.');
+          return;
+        }
+        if(!sd?.user){showQpErr('Sign in failed. Please try logging in from the main login page.');return;}
+        // Load full profile
+        let profile=null;
+        try{const {data:pd}=await SB.from('users').select('*').eq('id',sd.user.id).single();profile=pd;}catch(_){}
+        S.user={id:sd.user.id,email:e,name:profile?.name||'',business:profile?.business||'',plan:profile?.plan||'free'};
+        S.plan=S.user.plan;
+      } else {
+        if(!data?.user){showQpErr('Account creation failed. Please try again.');return;}
+        S.user={id:data.user.id,email:e,name:'',business:'',plan:'free'};
+        // Write user record to DB
+        try{await SB.from('users').upsert({id:data.user.id,email:e,name:'',business:'',plan:'free'});}catch(_){}
+      }
+    } else {
+      S.user={email:e,name:'',business:'',plan:'free'};
+    }
+    S.plan='free';
+    saveS();
+    // Store user ID in sessionStorage so we can recover it after Stripe redirect
+    if(S.user?.id) sessionStorage.setItem('pendingUserId', S.user.id);
+    if(S.user?.email) sessionStorage.setItem('pendingUserEmail', S.user.email);
+    const plan=sessionStorage.getItem('pendingPlan')||'starter';
+    S.billing=sessionStorage.getItem('pendingBilling')||'mo';
+    sessionStorage.removeItem('pendingPlan');
+    sessionStorage.removeItem('pendingBilling');
+    // Update button to show progress before Stripe redirect
+    if(btn){btn.disabled=true;btn.textContent='Redirecting to payment...';}
+    // Close modal then go to Stripe
+    document.querySelector('.modal-ov')?.remove();
+    handleUpgrade(plan);
+  }catch(ex){
+    showQpErr('Something went wrong: '+ex.message);
+    console.error('Quick pay error:',ex);
+  }
+}
+
+function updBilling(){
+  const desc={free:'Score check only',starter:'AI visibility files + monthly tracking',pro:'WordPress plugin — everything automated',agency:'10 sites, white-label, support'};
+  const bb=document.getElementById('bBadge');const bd=document.getElementById('bDesc');const ba=document.getElementById('bActions');
+  const uc=document.getElementById('bUpgradeCards');const ut=document.getElementById('bUpgradeTitle');
+  if(bb){bb.className=`pb pb-${S.plan}`;bb.textContent=S.plan.charAt(0).toUpperCase()+S.plan.slice(1);}
+  if(bd)bd.textContent=desc[S.plan]||'';
+  if(ba&&S.plan!=='free')ba.innerHTML=`<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" id="cancelBtn" onclick="openBillingPortal()">Manage / Cancel subscription →</button>`;
+
+  if(!uc)return;
+  const plan=S.plan||'free';
+
+  // Free — show both Starter and Pro
+  if(plan==='free'){
+    if(ut)ut.textContent='Upgrade';
+    uc.innerHTML=`
+      <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-start">Starter</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£5.50/mo</span></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">AI visibility files generated for your site. Download and install yourself. Monthly re-score and report.</p>
+        <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')">Upgrade to Starter →</button>
+      </div>
+      <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£7.50/mo</span></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin installs and updates everything automatically. Nothing to do.</p>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Upgrade to Pro →</button>
+      </div>`;
+  }
+
+  // Starter — show Pro upgrade as £2.50/mo top-up
+  else if(plan==='starter'){
+    if(ut)ut.textContent='Upgrade to Pro';
+    uc.innerHTML=`
+      <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><div style="text-align:right"><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em;color:var(--orange)">+£2.50/mo</span><br><span style="font-size:13px;color:var(--t-support)">£7.50/mo total — you already pay £5.50</span></div></div>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:8px;line-height:1.6">WordPress plugin installs and updates everything automatically. You only pay the difference — <strong>£2.50/mo extra</strong>, not £7.50. Your current billing date stays the same.</p>
+        <p style="font-size:13px;color:var(--t-support);margin-bottom:14px">No cancellation needed. No refunds on partial periods. Upgrade takes effect immediately.</p>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Upgrade to Pro — add £2.50/mo →</button>
+      </div>`;
+  }
+
+  // Pro or Agency — no upgrade options, just confirmation
+  else if(plan==='pro'||plan==='agency'){
+    if(ut)ut.textContent='Your plan';
+    uc.innerHTML=`<div style="background:#F0FBF4;border:1.5px solid var(--green);border-radius:var(--radius);padding:20px;text-align:center">
+      <p style="font-weight:700;color:var(--green);font-size:16px;margin-bottom:6px">✓ You are on the ${plan.charAt(0).toUpperCase()+plan.slice(1)} plan</p>
+      <p style="font-size:15px;color:var(--t-support)">To make changes to your subscription use the button above.</p>
+    </div>`;
+  }
+}
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function dlFile(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
+
+function cpEl(id,btn){
+  const txt=document.getElementById(id)?.textContent;if(!txt)return;
+  navigator.clipboard.writeText(txt).then(()=>{const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,1500);});
+}
+
+function toast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;top:76px;right:24px;z-index:999;background:var(--green);color:#FFFFFF;padding:14px 22px;border-radius:10px;font-family:"Work Sans",sans-serif;font-size:16px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.15);letter-spacing:-0.01em';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+
+function downloadScorePDF(){
+  if(!S.score)return;
+  const r=S.score;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<meta name="google-site-verification" content="smsqj64VWRJFp66mXwqet770wWYwDf2UkHHtFBt1Hbo" /><title>Machine-Visibility Report — ${r.domain}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}
+    .hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}
+    .hdr h1{font-size:26px;margin:0 0 6px;letter-spacing:-0.02em}
+    .hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}
+    .score{font-size:88px;font-weight:800;color:#E8500A;line-height:1;letter-spacing:-0.04em;margin:0 0 4px}
+    .grade{font-size:20px;color:#777;margin-bottom:36px}
+    h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:28px 0 12px;border-bottom:1px solid #EEE;padding-bottom:10px}
+    .issue{display:flex;gap:12px;margin-bottom:10px;font-size:16px;color:#3D3D3D;align-items:flex-start}
+    .bdg{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+    .crit{background:#FFF0EE;color:#CC2200}.high{background:#FFF8E6;color:#CC6600}
+    .foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}
+    @media print{body{margin:20px}}
+  </style>
+
+</head><body>
+  <div class="hdr"><h1>Machine-Visibility Report</h1><p>${r.domain} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Issued by Technical Graffiti</p></div>
+  <div class="score">${r.overall}</div>
+  <div class="grade">${r.overall<30?'Not visible to AI search engines.':r.overall<55?'Limited AI visibility.':'Reasonable visibility — improvements available.'}</div>
+  <h3>Issues found</h3>
+  ${r.issues.map(i=>`<div class="issue"><span class="bdg ${i.p==='critical'?'crit':'high'}">${i.p.toUpperCase()}</span>${i.t}</div>`).join('')}
+  <h3>Recommended actions</h3>
+  <p style="font-size:16px;color:#3D3D3D;line-height:1.7">1. Log in to your Aenima dashboard to generate and download your AI visibility files.<br>2. Install your visibility files on your website or activate the WordPress plugin.<br>3. Check and fix your directory listings using the Citation Checker.</p>
+  <div class="foot"><span>Technical Graffiti Ltd · Company No. 07180346</span><span>technicalgraffiti.co.uk</span></div>
+  
+</body></html>`);
+  w.document.close();setTimeout(()=>{w.focus();w.print();},400);
+}
 </script>
 </body>
 </html>
