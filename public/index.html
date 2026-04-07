@@ -2035,6 +2035,9 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
 
+function gotoAnchor(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
+function toggleMobileMenu(){const m=document.getElementById('mobileMenu');if(m)m.style.display=m.style.display==='flex'?'none':'flex';}
+function closeMobileMenu(){const m=document.getElementById('mobileMenu');if(m)m.style.display='none';}
 let SB=null;
 const S={user:null,plan:'free',score:null,billing:'mo'};
 function saveS(){}
@@ -2070,7 +2073,7 @@ try{
 
 // Core functions
 function runScore(){_runScore().catch(e=>console.error(e));}
-function _runScore(){
+async function _runScore(){
   let raw=document.getElementById('pubUrl').value.trim();
   if(!raw){alert('Please enter your website address.');return;}
   raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
