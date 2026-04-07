@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aenima — AI Search Visibility for UK Local Businesses | Free Score Check</title>
+<meta name="description" content="We generate the files that get your business found by AI. Free score check — no account needed. Schema markup, llms.txt and AI crawler permissions ready to install. From £5.50. No contract.">
+<link rel="canonical" href="https://aenima.co.uk/">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aenima.co.uk/">
+<meta property="og:title" content="Aenima — AI Search Visibility for UK Local Businesses">
+<meta property="og:description" content="Free AI visibility score check. No account needed. We generate the files that fix it. From £5.50/month.">
+<meta name="google-site-verification" content="smsqj64VWRJFp66mXwqet770wWYwDf2UkHHtFBt1Hbo">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Aenima",
+  "url": "https://aenima.co.uk",
+  "description": "AI search visibility tool for UK local businesses. Free score check in 60 seconds. Generates Schema markup and llms.txt files to fix AI visibility. From £5.50/month, no contract.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": [
+    {"@type":"Offer","name":"Free Score Check","price":"0","priceCurrency":"GBP"},
+    {"@type":"Offer","name":"Starter — Do It Yourself","price":"5.50","priceCurrency":"GBP","description":"We generate your AI visibility files monthly. Download and install yourself."},
+    {"@type":"Offer","name":"Pro — We Handle It","price":"7.50","priceCurrency":"GBP","description":"WordPress plugin installs and updates your visibility files automatically every month."}
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "Technical Graffiti Ltd",
+    "url": "https://technicalgraffiti.co.uk",
+    "telephone": "+447726318601",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Northamptonshire",
+      "postalCode": "NN29",
+      "addressCountry": "GB"
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  /* Backgrounds */
+  --bg-warm:    #F8F7F5;
+  --bg-white:   #FFFFFF;
+  --bg-navy:    #0A1628;
+  --bg-navy2:   #0D1E38;
+
+  /* Text on light backgrounds */
+  --t-heading:  #0A1628;
+  --t-body:     #3D3D3D;
+  --t-support:  #777777;
+
+  /* Text on dark backgrounds */
+  --t-white:    #FFFFFF;
+  --t-white70:  rgba(255,255,255,0.70);
+  --t-white45:  rgba(255,255,255,0.45);
+  --t-white20:  rgba(255,255,255,0.20);
+
+  /* Brand */
+  --orange:     #F05A22;
+  --orange-dk:  #D44510;
+  --orange-lt:  #FEF0EB;
+
+  /* Borders */
+  --border-lt:  #E5E5E5;
+  --border-dk:  rgba(255,255,255,0.10);
+
+  /* Status */
+  --green:      #1A8A40;
+  --green-lt:   #E6F7ED;
+  --red:        #CC2200;
+  --amber:      #CC6600;
+
+  /* Layout */
+  --max:        1160px;
+  --radius:     10px;
+  --radius-lg:  16px;
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg-warm);
+  color:var(--t-body);
+  font-size:17px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 5vw}
+.hidden{display:none!important}
+.mono{font-family:'DM Mono',monospace}
+
+/* ═══════════════════════════════════════
+   TYPOGRAPHY
+═══════════════════════════════════════ */
+h1,h2,h3,h4{
+  font-family:'Work Sans',sans-serif;
+  color:var(--t-heading);
+  line-height:1.05;
+  letter-spacing:-0.02em;
+}
+.display{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:clamp(52px,7.5vw,100px);
+  line-height:0.95;
+  letter-spacing:-0.03em;
+  color:#FFFFFF;
+}
+.display em{font-style:normal;color:var(--orange)}
+
+
+
+.section-h{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:clamp(36px,4.5vw,64px);
+  letter-spacing:-0.025em;
+  line-height:1;
+}
+.sub-h{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:clamp(22px,2.5vw,32px);
+  letter-spacing:-0.02em;
+  line-height:1.1;
+}
+.eyebrow{
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--orange);
+  display:block;
+  margin-bottom:16px;
+}
+.standout{
+  font-family:'DM Mono',monospace;
+  font-size:20px;
+  font-weight:400;
+  color:var(--t-white70);
+  line-height:1.5;
+  margin:28px 0 0;
+}
+.hero-sub-bold{
+  color:#FFFFFF;
+  font-weight:600;
+  margin-top:12px;
+}
+.label-sm{
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:-0.01em;
+  padding:14px 32px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  text-decoration:none;
+  transition:transform 0.12s,background 0.15s,opacity 0.15s;
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+
+.btn-primary{background:var(--orange);color:#FFFFFF}
+.btn-primary:hover{background:var(--orange-dk)}
+.btn-nav-cta{background:var(--orange);color:#FFFFFF;border:2px solid var(--orange)}
+.btn-nav-cta:hover{background:transparent;color:#FFFFFF;border-color:#FFFFFF}
+.btn-secondary{background:var(--bg-navy);color:#FFFFFF}
+.btn-secondary:hover{background:var(--bg-navy2)}
+.btn-outline-white{background:transparent;border:2px solid rgba(255,255,255,0.3);color:#FFFFFF}
+.btn-outline-white:hover{border-color:#FFFFFF;background:rgba(255,255,255,0.08)}
+.btn-outline{background:transparent;border:2px solid var(--border-lt);color:var(--t-body)}
+.btn-outline:hover{border-color:var(--t-heading);color:var(--t-heading)}
+.btn-sm{font-size:14px;padding:10px 22px}
+.btn-lg{font-size:18px;padding:16px 40px}
+.btn-full{width:100%;justify-content:center}
+
+/* ═══════════════════════════════════════
+   FORMS
+═══════════════════════════════════════ */
+.fg{margin-bottom:20px}
+.fg label{
+  display:block;
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--t-support);
+  margin-bottom:8px;
+}
+.fg input,.fg select,.fg textarea{
+  width:100%;
+  background:var(--bg-white);
+  border:1.5px solid var(--border-lt);
+  border-radius:8px;
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  color:var(--t-heading);
+  padding:12px 16px;
+  outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px rgba(232,80,10,0.12);
+}
+.fg textarea{resize:vertical;min-height:90px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ═══════════════════════════════════════
+   URL INPUT — large, prominent
+═══════════════════════════════════════ */
+.url-input-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  background:var(--bg-white);
+  border:2px solid var(--border-lt);
+  border-radius:10px;
+  overflow:hidden;
+  max-width:620px;
+  margin:0 auto;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.url-input-wrap:focus-within{
+  border-color:var(--orange);
+  box-shadow:0 0 0 4px rgba(232,80,10,0.12);
+}
+.url-prefix{
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  background:var(--bg-warm);
+  border-right:1.5px solid var(--border-lt);
+  font-family:'DM Mono',monospace;
+  font-size:15px;
+  color:var(--t-support);
+  white-space:nowrap;
+  user-select:none;
+}
+.url-input-wrap input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  font-family:'DM Sans',sans-serif;
+  font-size:17px;
+  color:var(--t-heading);
+  padding:16px 18px;
+}
+.url-input-wrap input::placeholder{color:#BBBBBB}
+.url-input-wrap button{
+  background:var(--orange);
+  color:#FFFFFF;
+  border:none;
+  font-family:'Work Sans',sans-serif;
+  font-size:16px;
+  font-weight:700;
+  padding:16px 28px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:background 0.15s;
+  min-width:160px;
+}
+.url-input-wrap button:hover{background:var(--orange-dk)}
+
+/* ═══════════════════════════════════════
+   PAGES
+═══════════════════════════════════════ */
+.page{display:none;min-height:calc(100vh - 64px)}
+.page.active{display:block}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+nav{
+  position:static;
+  background:var(--bg-navy);
+  border-bottom:1px solid var(--border-dk);
+  display:flex;align-items:center;
+  height:64px;
+}
+.nav-inner{
+  max-width:var(--max);
+  margin:0 auto;
+  padding:0 5vw;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.nav-logo{
+  font-family:'Work Sans',sans-serif;
+  font-weight:900;
+  font-size:22px;
+  color:#FFFFFF;
+  letter-spacing:-0.03em;
+  cursor:pointer;
+}
+.nav-logo span{color:var(--orange)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a,.nav-links button{
+  font-size:15px;
+  font-weight:500;
+  color:var(--t-white45);
+  text-decoration:none;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+  transition:color 0.2s;
+}
+.nav-links a:hover,.nav-links button:hover{color:#FFFFFF}
+.nav-cta-float{
+  position:fixed;
+  top:12px;
+  right:28px;
+  z-index:500;
+  background:var(--orange);
+  color:#FFFFFF;
+  border:none;
+  padding:12px 24px;
+  border-radius:8px;
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:-0.01em;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(240,90,34,0.4);
+  transition:background 0.15s,transform 0.15s;
+}
+.nav-cta-float:hover{background:var(--orange-dk);transform:translateY(-2px)}
+@media(max-width:700px){.nav-cta-float{display:none}}
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero{
+  background:var(--bg-navy);
+  padding:100px 5vw 110px;
+  text-align:center;
+}
+.hero-inner{max-width:1040px;margin:0 auto}
+.hero-sub{
+  font-size:19px;
+  font-weight:400;
+  color:var(--t-white70);
+  max-width:580px;
+  margin:16px auto 0;
+  line-height:1.65;
+}
+.hero-sub strong{color:#FFFFFF;font-weight:500}
+.hero-statement{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:clamp(22px,2.8vw,34px);
+  letter-spacing:-0.02em;
+  line-height:1.2;
+  color:#ffffff73;
+  max-width:880px;
+  margin:20px auto 0;
+  text-align:center;
+  background:none;
+  padding-top:30px;
+}
+.hero-statement .white{color:#FFFFFF;}
+.hero-statement br{display:block}
+.hero-cta{
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:36px;
+}
+.hero-bar{
+  display:flex;
+  justify-content:center;
+  gap:48px;
+  margin-top:64px;
+  padding-top:48px;
+  border-top:1px solid var(--border-dk);
+  flex-wrap:wrap;
+}
+.hero-stat{}
+.hero-stat .n{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:44px;
+  color:var(--orange);
+  display:block;
+  line-height:1;
+  letter-spacing:-0.03em;
+}
+.hero-stat .l{
+  font-size:14px;
+  color:var(--t-white45);
+  margin-top:6px;
+}
+
+/* ═══════════════════════════════════════
+   SCORE SECTION — white bg
+═══════════════════════════════════════ */
+.score-section{
+  background:var(--bg-white);
+  padding:80px 5vw;
+}
+.score-card{
+  max-width:680px;
+  margin:0 auto;
+  text-align:center;
+}
+.score-card .section-h{color:var(--t-heading);margin-bottom:12px}
+.score-card p{
+  font-size:18px;
+  color:var(--t-support);
+  margin-bottom:32px;
+}
+.score-note{
+  font-size:16px;
+  font-weight:600;
+  color:var(--t-body);
+  margin-top:16px;
+  letter-spacing:-0.01em;
+}
+.prog-wrap{
+  background:var(--border-lt);
+  border-radius:4px;
+  height:5px;
+  overflow:hidden;
+  max-width:500px;
+  margin:10px auto 0;
+}
+.prog-bar{
+  height:100%;
+  background:var(--orange);
+  border-radius:4px;
+  transition:width 0.4s ease;
+}
+.prog-text{
+  font-size:15px;
+  color:var(--t-support);
+  margin-top:8px;
+}
+
+/* ═══════════════════════════════════════
+   SCORE RESULT — full width grid
+═══════════════════════════════════════ */
+.result-section{
+  background:var(--bg-warm);
+  padding:48px 5vw 80px;
+}
+.result-section .result-grid{padding:0}
+.result-section .result-actions-wrap{padding:0}
+/* result-grid replaced by inline styles */
+/* Score panel */
+.result-left-col{display:flex;flex-direction:column;gap:0;width:100%}
+.score-panel{
+  background:var(--bg-white);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  border:1.5px solid var(--border-lt);
+  border-bottom:none;
+  padding:32px;
+  text-align:center;
+}
+.score-ring{
+  width:160px;height:160px;
+  border-radius:50%;
+  border:8px solid var(--border-lt);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  transition:border-color 0.4s;
+}
+.score-ring.low{border-color:var(--red)}
+.score-ring.mid{border-color:var(--amber)}
+.score-ring.good{border-color:var(--green)}
+.score-big{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:72px;
+  line-height:1;
+  letter-spacing:-0.04em;
+}
+.score-ring.low .score-big{color:var(--red)}
+.score-ring.mid .score-big{color:var(--amber)}
+.score-ring.good .score-big{color:var(--green)}
+.score-denom{font-size:16px;color:var(--t-support)}
+.score-grade{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  color:var(--t-heading);
+  letter-spacing:-0.01em;
+}
+/* Categories panel */
+.cats-panel{
+  background:var(--bg-white);
+  border-radius:0;
+  border:1.5px solid var(--border-lt);
+  border-top:none;
+  border-bottom:none;
+  padding:28px 32px;
+}
+.cats-panel h3{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  letter-spacing:-0.01em;
+  color:var(--t-heading);
+  margin-bottom:24px;
+}
+.cat-row{margin-bottom:18px}
+.cat-row:last-child{margin-bottom:0}
+.cat-hd{display:flex;justify-content:space-between;margin-bottom:6px}
+.cat-name{font-size:15px;font-weight:500;color:var(--t-heading)}
+.cat-score{font-size:15px;font-weight:700}
+.cat-track{height:8px;background:var(--border-lt);border-radius:4px;overflow:hidden}
+.cat-fill{height:100%;border-radius:4px;transition:width 0.8s ease}
+.cat-low{background:var(--red)}
+.cat-mid{background:var(--amber)}
+.cat-ok{background:var(--green)}
+/* Pricing panel */
+.fix-panel{
+  background:var(--bg-navy);
+  border-radius:var(--radius-lg);
+  padding:28px;
+  position:sticky;
+  top:80px;
+}
+.fix-panel h3{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:22px;
+  color:#FFFFFF;
+  letter-spacing:-0.02em;
+  margin-bottom:6px;
+}
+.fix-panel .fp-sub{
+  font-size:14px;
+  color:var(--t-white45);
+  margin-bottom:24px;
+  line-height:1.5;
+}
+.fix-opt{
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border-dk);
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:12px;
+  cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+}
+.fix-opt:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.08)}
+.fix-opt.hi{border-color:var(--orange);background:rgba(232,80,10,0.10)}
+.fix-opt-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.fix-opt-name{font-family:'Work Sans',sans-serif;font-weight:700;font-size:15px;color:#FFFFFF;letter-spacing:-0.01em}
+.fix-opt-price{font-family:'Work Sans',sans-serif;font-weight:700;font-size:24px;color:var(--orange);letter-spacing:-0.02em}
+.fix-opt-price span{font-size:13px;font-weight:400;color:var(--t-white45)}
+.fix-opt-desc{font-size:13px;color:var(--t-white45);line-height:1.5;margin-bottom:10px}
+.fix-opt-list{list-style:none;margin-bottom:12px}
+.fix-opt-list li{font-size:13px;color:var(--t-white70);padding:3px 0 3px 18px;position:relative;line-height:1.4}
+.fix-opt-list li::before{content:'✓';position:absolute;left:0;color:var(--orange);font-size:11px;top:5px}
+.fix-btn{
+  width:100%;
+  background:var(--orange);
+  color:#FFFFFF;
+  border:none;
+  border-radius:7px;
+  padding:12px;
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:-0.01em;
+  transition:background 0.15s;
+}
+.fix-btn:hover{background:var(--orange-dk)}
+.fix-btn.ghost{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)}
+.fix-btn.ghost:hover{background:rgba(255,255,255,0.14)}
+.fix-hardship{font-size:13px;color:rgba(255,255,255,0.5);text-align:center;margin-top:16px;line-height:1.6}
+.fix-hardship button{background:none;border:none;color:rgba(255,255,255,0.65);font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline}
+.fix-hardship button:hover{color:#FFFFFF}
+
+/* Issues panel */
+.issues-panel{
+  background:var(--bg-white);
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  border:1.5px solid var(--border-lt);
+  border-top:none;
+  padding:28px;
+}
+.issues-panel h3{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  letter-spacing:-0.01em;
+  color:var(--t-heading);
+  margin-bottom:20px;
+}
+.issue-row{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-lt)}
+.issue-row:last-child{border-bottom:none;padding-bottom:0}
+.issue-badge{
+  font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:20px;
+  white-space:nowrap;letter-spacing:0.5px;
+  flex-shrink:0;margin-top:1px;
+}
+.badge-crit{background:#FFF0EE;color:var(--red)}
+.badge-high{background:#FFF8E6;color:var(--amber)}
+.issue-text{font-size:16px;color:var(--t-body);line-height:1.5}
+
+/* Result actions */
+.result-actions-wrap{
+  max-width:100%;
+  margin:16px 0 0;
+}
+.result-actions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+.action-card{display:flex;flex-direction:column;justify-content:space-between;
+  background:var(--bg-white);
+  border:1.5px solid var(--border-lt);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  cursor:pointer;
+  transition:border-color 0.2s;
+  text-align:left;
+  min-width:0;
+  overflow:hidden;
+}
+.action-card:hover{border-color:var(--orange);transform:translateY(-2px)}
+.action-card .ac-icon{font-size:24px;margin-bottom:12px;display:block}
+.action-card .ac-title{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:15px;
+  color:var(--t-heading);
+  letter-spacing:-0.01em;
+  margin-bottom:6px;
+}
+.action-card .ac-desc{font-size:13px;color:var(--t-support);line-height:1.5}
+.action-card .ac-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:nowrap;
+  margin-top:auto;
+  padding-top:16px;
+  font-family:'Work Sans',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  color:var(--orange);
+  letter-spacing:-0.01em;
+  white-space:nowrap;
+}
+.ac-cost{
+  font-size:11px;
+  font-weight:600;
+  color:var(--orange);
+  background:var(--orange-lt);
+  padding:2px 8px;
+  border-radius:10px;
+  margin-left:4px;
+  letter-spacing:0;
+}
+
+/* ═══════════════════════════════════════
+   THREE PATHS
+═══════════════════════════════════════ */
+.paths-section{
+  background:var(--bg-white);
+  padding:80px 5vw;
+  text-align:center;
+}
+.paths-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+  max-width:var(--max);
+  margin:48px auto 0;
+}
+.path-card{
+  border-radius:var(--radius-lg);
+  padding:40px 32px;
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+}
+.path-card.free{background:var(--bg-warm);border:1.5px solid var(--border-lt)}
+.path-card.starter{background:var(--bg-navy);border:1.5px solid transparent}
+.path-card.pro{background:var(--orange);border:1.5px solid transparent}
+.path-num{
+  font-family:'DM Mono',monospace;
+  font-size:48px;
+  font-weight:400;
+  line-height:1;
+  margin-bottom:24px;
+  display:block;
+  opacity:0.12;
+  position:absolute;
+  top:24px;right:24px;
+}
+.path-card.free .path-num{color:var(--t-heading)}
+.path-card.starter .path-num{color:#FFFFFF}
+.path-card.pro .path-num{color:#FFFFFF}
+.path-label{
+  font-family:'DM Mono',monospace;
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  display:block;
+}
+.path-card.free .path-label{color:var(--t-support)}
+.path-card.starter .path-label{color:rgba(255,255,255,0.5)}
+.path-card.pro .path-label{color:rgba(255,255,255,0.7)}
+.path-h{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:28px;
+  letter-spacing:-0.025em;
+  line-height:1.05;
+  margin-bottom:16px;
+}
+.path-card.free .path-h{color:var(--t-heading)}
+.path-card.starter .path-h{color:#FFFFFF}
+.path-card.pro .path-h{color:#FFFFFF}
+.path-desc{
+  font-size:16px;
+  line-height:1.65;
+  margin-bottom:28px;
+}
+.path-card.free .path-desc{color:var(--t-body)}
+.path-card.starter .path-desc{color:var(--t-white70)}
+.path-card.pro .path-desc{color:rgba(255,255,255,0.85)}
+.path-price{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:36px;
+  letter-spacing:-0.03em;
+  margin-bottom:20px;
+  display:block;
+}
+.path-price small{font-size:18px;font-weight:500;letter-spacing:-0.01em;opacity:0.7}
+.path-works{display:flex;flex-direction:column;gap:8px;margin:20px 0 24px;padding:16px;border-radius:8px;background:rgba(0,0,0,0.15)}
+.path-card.free .path-works{background:rgba(10,22,40,0.06)}
+.path-card.pro .path-works{background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.15)}
+.pw-item{font-size:14px;font-weight:500;line-height:1.4}
+.path-card.free .pw-item{color:var(--t-body)}
+.path-card.starter .pw-item{color:var(--t-white70)}
+.path-card.pro .pw-item{color:rgba(255,255,255,0.85)}
+.pw-ok{color:#44CC88!important}
+.path-card.pro .pw-ok{color:rgba(255,255,255,0.95)!important}
+.path-card.pro .pw-warn{color:rgba(255,255,255,0.70)!important}
+.pw-warn{color:#FFAA44!important}
+.path-card.free .path-price{color:var(--t-heading)}
+.path-card.starter .path-price{color:var(--orange)}
+.path-card.pro .path-price{color:#FFFFFF}
+.path-card.pro .path-btn{background:#FFFFFF;color:var(--orange)}
+.path-card.pro .path-btn:hover{background:rgba(255,255,255,0.9)}
+.path-card.starter .path-btn{background:var(--orange);color:#FFFFFF}
+.path-card.starter .path-btn:hover{background:var(--orange-dk)}
+.path-card.free .path-btn{background:var(--bg-navy);color:#FFFFFF}
+.path-card.free .path-btn:hover{background:var(--bg-navy2)}
+.path-btn{
+  display:inline-flex;align-items:center;
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;font-size:15px;
+  letter-spacing:-0.01em;
+  padding:13px 24px;
+  border-radius:8px;
+  border:none;cursor:pointer;
+  transition:background 0.15s,transform 0.12s;
+  text-decoration:none;
+}
+.path-btn:hover{transform:translateY(-2px)}
+
+/* ═══════════════════════════════════════
+   HOW IT WORKS — navy bg
+═══════════════════════════════════════ */
+.how-section{
+  background:var(--bg-navy);
+  padding:80px 5vw;
+  text-align:center;
+}
+.how-section .section-h{color:#FFFFFF}
+.how-section .eyebrow{color:var(--orange)}
+.how-intro{
+  font-size:18px;
+  color:var(--t-white70);
+  max-width:560px;
+  margin:16px auto 56px;
+  line-height:1.6;
+}
+.how-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  max-width:var(--max);
+  margin:0 auto;
+}
+.how-card{
+  background:rgba(255,255,255,0.97);
+  border-radius:var(--radius-lg);
+  padding:36px 28px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  min-height:420px;
+}
+.how-card .how-p:last-of-type{flex:1}
+.how-card:first-child{border-top:3px solid var(--orange)}
+.how-n{
+  font-family:'DM Mono',monospace;
+  font-size:64px;
+  color:rgba(10,22,40,0.08);
+  line-height:1;
+  margin-bottom:16px;
+  display:block;
+}
+.how-h{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  letter-spacing:-0.015em;
+  color:var(--t-heading);
+  margin-bottom:12px;
+}
+.how-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:14px}
+.how-badge-free{background:var(--green-lt);color:var(--green);border:1px solid rgba(10,110,46,0.2)}
+.how-badge-paid{background:var(--orange-lt);color:var(--orange);border:1px solid rgba(232,80,10,0.2)}
+.how-p{font-size:15px;color:var(--t-body);line-height:1.65}
+
+/* ═══════════════════════════════════════
+   PRICING — off-white bg
+═══════════════════════════════════════ */
+.pricing-section{
+  background:var(--bg-warm);
+  padding:80px 5vw;
+  text-align:center;
+}
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+  max-width:var(--max);
+  margin:48px auto 0;
+}
+.pc{
+  background:var(--bg-white);
+  border:1.5px solid var(--border-lt);
+  border-radius:var(--radius-lg);
+  padding:28px 24px;
+  display:flex;
+  flex-direction:column;
+  text-align:center;
+}
+.pc.feat{border-color:var(--orange);border-width:2px}
+.pc-tag{
+  display:inline-block;
+  font-size:11px;font-weight:700;
+  letter-spacing:1.5px;
+  padding:4px 12px;
+  border-radius:20px;
+  text-transform:uppercase;
+  margin-bottom:16px;
+  align-self:center;
+}
+.tag-free{background:#F0F0F0;color:#888}
+.tag-start{background:var(--orange-lt);color:var(--orange)}
+.tag-pro{background:var(--bg-navy);color:#FFFFFF}
+.tag-agency{background:var(--t-body);color:#FFFFFF}
+.pc-name{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  letter-spacing:-0.015em;
+  color:var(--t-heading);
+  margin-bottom:4px;
+}
+.pc-tagline{
+  font-family:'DM Mono',monospace;
+  font-size:13px;
+  color:var(--t-support);
+  margin-bottom:18px;
+  line-height:1.4;
+}
+.pc-price{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:52px;
+  letter-spacing:-0.04em;
+  color:var(--t-heading);
+  line-height:1;
+}
+.pc-price sup{font-size:22px;vertical-align:top;margin-top:10px;display:inline-block;font-weight:600}
+.pc-billing{margin:10px 0 20px;display:flex;flex-direction:column;gap:5px}
+.pc-b-row{display:flex;justify-content:space-between;font-size:14px;color:var(--t-support)}
+.pc-save{color:var(--green);font-size:12px;font-weight:600}
+.pc-div{height:1px;background:var(--border-lt);margin-top:16px;margin-bottom:20px}
+.pc-for{
+  font-size:12px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--orange);margin-bottom:12px;
+}
+.pc-feats{list-style:none;margin-bottom:24px;flex:1}
+.pc-feats li{
+  font-size:15px;
+  color:var(--t-body);
+  padding:6px 0 6px 22px;
+  position:relative;
+  line-height:1.4;
+  border-bottom:1px solid var(--border-lt);
+}
+.pc-feats li:last-child{border-bottom:none}
+.pc-feats li::before{
+  content:'✓';
+  position:absolute;left:0;top:7px;
+  color:var(--green);font-size:13px;font-weight:700;
+}
+.pc-feats li.no{color:#CCCCCC}
+.pc-feats li.no::before{content:'–';color:#CCCCCC}
+.pc-feats.no-icon li{padding-left:0;text-align:center}
+.pc-feats.no-icon li::before{display:none}
+.pc-note{font-size:13px;color:var(--t-support);font-style:italic;margin-bottom:14px;line-height:1.4}
+
+/* ═══════════════════════════════════════
+   DIFFERENCE — navy
+═══════════════════════════════════════ */
+.diff-section{
+  background:#ffffff;
+  padding:80px 5vw;
+}
+.diff-inner{
+  max-width:var(--max);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:64px;
+  align-items:center;
+}
+.diff-left .section-h{color:var(--t-heading);font-size:clamp(28px,3.5vw,52px)!important;margin-bottom:8px}
+.diff-left .eyebrow{color:var(--orange)}
+.diff-left p{font-size:17px;color:var(--t-body);line-height:1.75;margin-top:16px;margin-bottom:20px}
+.diff-left strong{color:var(--t-heading);font-weight:500}
+.diff-table{
+  background:rgba(255,255,255,0.04);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  border:1px solid var(--border-dk);
+}
+.diff-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid rgba(255,255,255,0.05)}
+.diff-row:last-child{border-bottom:none}
+.diff-row div{padding:14px 18px;font-size:15px}
+.diff-row.hd div{
+  font-size:12px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.03);
+}
+.diff-row div:nth-child(1){color:rgba(255,255,255,0.70)}
+.diff-row div:nth-child(2){color:rgba(255,255,255,0.30);border-left:1px solid rgba(255,255,255,0.05)}
+.diff-row div:nth-child(3){color:var(--orange);border-left:1px solid rgba(255,255,255,0.05);font-weight:500}
+
+/* ═══════════════════════════════════════
+   HARDSHIP + CONSULTANCY
+═══════════════════════════════════════ */
+.extra-section{
+  background:var(--bg-warm);
+  padding:0 5vw 80px;
+}
+.extra-grid{
+  max-width:var(--max);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.extra-card{border-radius:var(--radius-lg);padding:32px}
+.extra-card.hardship{background:var(--bg-navy);border-left:4px solid var(--orange)}
+.extra-card.consult{background:var(--bg-white);border:1.5px solid var(--border-lt)}
+.extra-card .eyebrow{}
+.extra-card.hardship .eyebrow{color:var(--orange)}
+.extra-card.consult .eyebrow{color:var(--orange)}
+.extra-card h3{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:28px;
+  letter-spacing:-0.025em;
+  margin-bottom:12px;
+}
+.extra-card.hardship h3{color:#FFFFFF}
+.extra-card.consult h3{color:var(--t-heading)}
+.extra-card p{font-size:16px;line-height:1.7;margin-bottom:20px}
+.extra-card.hardship p{color:var(--t-white70)}
+.extra-card.consult p{color:var(--t-body)}
+.reveal-btn{
+  background:none;border:none;
+  color:var(--orange);font-size:16px;
+  cursor:pointer;font-family:inherit;
+  font-weight:600;text-decoration:underline;
+}
+.reveal-out{
+  font-family:'DM Mono',monospace;
+  font-size:16px;color:var(--orange);
+  margin-top:10px;display:none;font-weight:500;
+}
+
+/* ═══════════════════════════════════════
+   AUTH
+═══════════════════════════════════════ */
+.auth-wrap{
+  min-height:calc(100vh - 64px);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg-warm);padding:40px 20px;
+}
+.auth-card{
+  background:var(--bg-white);
+  border:1.5px solid var(--border-lt);
+  border-radius:var(--radius-lg);
+  padding:48px;width:100%;max-width:640px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.06);
+}
+.auth-card h2{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;font-size:36px;
+  letter-spacing:-0.025em;
+  color:var(--t-heading);margin-bottom:8px;
+}
+.auth-card p{font-size:17px;color:var(--t-support);margin-bottom:32px}
+.auth-switch{text-align:center;margin-top:24px;font-size:16px;color:var(--t-support)}
+.auth-switch a{color:var(--orange);text-decoration:none;font-weight:600;cursor:pointer}
+.auth-err{background:#FFF0EE;border:1px solid #FFCCCC;border-radius:8px;padding:12px 16px;font-size:15px;color:var(--red);margin-bottom:18px;display:none}
+.auth-err.show{display:block}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+.dashboard{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 64px)}
+.sidebar{background:var(--bg-navy);padding:24px 0}
+.sb-acct{padding:20px 24px 22px;border-bottom:1px solid var(--border-dk);margin-bottom:10px}
+.sb-acct-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t-white20);margin-bottom:4px}
+.sb-acct-name{font-size:15px;color:var(--t-white70)}
+.sb-sect{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t-white20);padding:10px 24px 4px}
+.sb-item{
+  display:block;width:100%;text-align:left;
+  padding:11px 24px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  color:var(--t-white45);
+  background:none;border:none;cursor:pointer;
+  font-family:inherit;
+  transition:background 0.15s,color 0.15s;
+  border-left:3px solid transparent;
+}
+.sb-item:hover{background:rgba(255,255,255,0.05);color:#FFFFFF}
+.sb-item.on{
+  background:rgba(232,80,10,0.12);
+  color:#FFFFFF;
+  border-left-color:var(--orange);
+}
+.sb-div{height:1px;background:var(--border-dk);margin:8px 0}
+.main{background:var(--bg-warm);padding:40px;overflow-y:auto}
+.dp{display:none}
+.dp.on{display:block}
+.dh{margin-bottom:32px}
+.dh h2{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;font-size:44px;
+  letter-spacing:-0.03em;
+  color:var(--t-heading);margin-bottom:6px;
+}
+.dh p{font-size:17px;color:var(--t-support)}
+
+/* Metric row */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.mc{background:var(--bg-white);border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px}
+.mc .ml{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:10px}
+.mc .mv{font-family:'Work Sans',sans-serif;font-weight:800;font-size:44px;letter-spacing:-0.04em;color:var(--t-heading);line-height:1}
+.mc .ms{font-size:14px;color:var(--t-support);margin-top:4px}
+.mc.hi .mv{color:var(--green)}
+
+/* Quick actions row */
+.qa-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.qa-btn{
+  background:var(--bg-white);
+  border:1.5px solid var(--border-lt);
+  border-radius:var(--radius);
+  padding:20px;
+  cursor:pointer;
+  text-align:left;
+  transition:border-color 0.2s,transform 0.15s;
+  font-family:inherit;
+}
+.qa-btn:hover{border-color:var(--orange);transform:translateY(-2px)}
+.qa-btn .qa-icon{font-size:22px;margin-bottom:10px;display:block}
+.qa-btn .qa-label{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;font-size:15px;
+  letter-spacing:-0.01em;
+  color:var(--t-heading);
+  display:block;margin-bottom:4px;
+}
+.qa-btn .qa-sub{font-size:13px;color:var(--t-support);line-height:1.4}
+
+/* Dashboard card */
+.dcard{background:var(--bg-white);border:1.5px solid var(--border-lt);border-radius:var(--radius-lg);padding:28px;margin-bottom:24px}
+.dcard h3{font-family:'Work Sans',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.02em;color:var(--t-heading);margin-bottom:20px}
+.d2col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+
+/* Code block */
+.codebl{background:var(--bg-navy);border-radius:10px;padding:22px;margin:14px 0;position:relative}
+.codebl pre{font-family:'DM Mono',monospace;font-size:13px;color:var(--t-white45);line-height:1.6;white-space:pre-wrap;word-break:break-all}
+.copy-btn{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.08);border:1px solid var(--border-dk);color:var(--t-white45);font-size:12px;padding:5px 12px;border-radius:5px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.copy-btn:hover{color:var(--orange);border-color:var(--orange)}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:2px solid var(--border-lt);margin-bottom:28px}
+.tab{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;color:var(--t-support);padding:11px 22px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color 0.2s,border-color 0.2s}
+.tab.on{color:var(--t-heading);border-bottom-color:var(--orange)}
+.tabp{display:none}.tabp.on{display:block}
+
+/* Alerts */
+.alert{padding:14px 18px;border-radius:8px;font-size:16px;margin-bottom:18px;line-height:1.5}
+.al-ok{background:var(--green-lt);color:var(--green);border:1px solid #9FE1CB}
+.al-info{background:#E6F1FB;color:#1A5FA5;border:1px solid #9FC4F0}
+.al-warn{background:#FFF8E6;color:var(--amber);border:1px solid #FAC775}
+
+/* Report */
+.report-out{background:var(--bg-navy);border-radius:var(--radius-lg);padding:32px;margin-top:24px;color:rgba(255,255,255,0.85)}
+.report-out h4{font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--orange);margin-bottom:20px}
+.report-out h2,.report-out h3{color:var(--orange)}
+.report-out p,.report-out li,.report-out span{color:rgba(255,255,255,0.85)}
+.report-out strong{color:#fff}
+.report-out hr{border-color:rgba(255,255,255,0.15)}
+/* Inline version (dashboard quick analysis on white card) */
+#dReport h4{font-size:20px;color:var(--t-heading);margin-bottom:14px}
+#dReport .rs{border-bottom:1px solid var(--border-lt)}
+#dReport .rs h5{color:var(--t-support)}
+#dReport .rs p,#dReport .rs li{color:var(--t-body);font-size:15px}
+#dReport .hl{color:var(--orange)}
+#dReport .rw{color:var(--amber)}
+#dReport .rok{color:var(--green)}
+.rs{margin-bottom:24px;border-bottom:1px solid var(--border-dk);padding-bottom:24px}
+.rs:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.rs h5{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t-white20);margin-bottom:12px}
+.rs p,.rs li{font-size:16px;color:var(--t-white70);line-height:1.7}
+.rs ul{padding-left:20px}
+.rs li{margin-bottom:8px}
+.hl{color:var(--orange);font-weight:500}
+.rw{color:#FF9944}
+.rok{color:#44CC88}
+
+/* Plan badges */
+.pb{display:inline-block;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 12px;border-radius:20px;text-transform:uppercase}
+.pb-free{background:#F0F0F0;color:#888}
+.pb-start{background:var(--orange-lt);color:var(--orange)}
+.pb-pro{background:var(--bg-navy);color:#FFFFFF}
+.pb-agency{background:var(--t-body);color:#FFFFFF}
+
+/* Upgrade gate */
+.ugate{text-align:center;padding:48px 24px;border:2px dashed var(--border-lt);border-radius:var(--radius-lg);background:var(--bg-white);margin-bottom:24px}
+.ugate p{font-size:17px;color:var(--t-support);margin-bottom:20px;line-height:1.6}
+
+/* Score ring in dashboard */
+.d-ring{width:160px;height:160px;border-radius:50%;border:8px solid var(--border-lt);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px}
+.d-ring.low{border-color:var(--red)}.d-ring.mid{border-color:var(--amber)}.d-ring.good{border-color:var(--green)}
+.d-ring .dn{font-family:'Work Sans',sans-serif;font-weight:800;font-size:64px;letter-spacing:-0.04em;line-height:1}
+.d-ring.low .dn{color:var(--red)}.d-ring.mid .dn{color:var(--amber)}.d-ring.good .dn{color:var(--green)}
+.d-ring .dd{font-size:15px;color:var(--t-support)}
+
+/* Spinner */
+.spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#FFFFFF;border-radius:50%;animation:rot 0.7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* Progress */
+.pw{background:var(--border-lt);border-radius:4px;height:5px;overflow:hidden;margin:8px 0}
+.pb2{height:100%;background:var(--orange);border-radius:4px;transition:width 0.4s ease}
+
+/* Footer */
+footer{background:var(--bg-navy);padding:56px 5vw 40px}
+.footer-inner{max-width:var(--max);margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:32px;margin-bottom:48px}
+.fb-logo{font-family:'Work Sans',sans-serif;font-weight:800;font-size:24px;color:#FFFFFF;letter-spacing:-0.025em;margin-bottom:12px;display:block}
+.fb-logo span{color:var(--orange)}
+.fb-desc{font-size:15px;color:var(--t-white45);line-height:1.7;margin-bottom:12px}
+.fb-tagline{font-family:'DM Mono',monospace;font-size:13px;color:var(--t-white20)}
+.fc h4{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t-white20);margin-bottom:16px}
+.fc ul{list-style:none}
+.fc li{margin-bottom:10px}
+.fc a,.fc button{font-size:15px;color:var(--t-white45);text-decoration:none;background:none;border:none;cursor:pointer;font-family:inherit;padding:0;transition:color 0.2s}
+.fc a:hover,.fc button:hover{color:#FFFFFF}
+.footer-bot{border-top:1px solid var(--border-dk);padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-bot p{font-size:14px;color:var(--t-white20)}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:1100px){
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:960px){
+  .result-grid{max-width:95%}
+  .result-actions-wrap{max-width:100%}
+  .fix-opts-grid{grid-template-columns:1fr}
+  .fix-opts-3col{grid-template-columns:1fr!important}
+  .result-fix-row{grid-template-columns:1fr!important}
+  .result-actions{grid-template-columns:1fr 1fr}
+  .paths-grid,.how-grid,.pricing-grid,.diff-inner,.footer-grid{grid-template-columns:1fr 1fr}
+  .fix-panel{position:static}
+}
+@media(max-width:700px){
+  .dashboard{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .pricing-grid,.paths-grid,.how-grid,.diff-inner,.extra-grid,.footer-grid{grid-template-columns:1fr}
+  .metrics,.qa-row,.result-actions{grid-template-columns:1fr 1fr}
+  .d2col,.row2{grid-template-columns:1fr}
+  .fix-opts-grid{grid-template-columns:1fr!important}
+  .hero{padding:60px 5vw 70px}
+  .display{font-size:clamp(38px,10vw,60px)}
+  .section-h{font-size:clamp(24px,6vw,40px)}
+  nav{padding:0 16px}
+}
+
+@media(max-width:540px){
+  /* Billing toggle */
+  .billing-toggle{flex-direction:column;width:calc(100% - 32px);margin-left:16px;margin-right:16px;margin-top:16px}
+  .bill-btn{width:100%;text-align:center;padding:12px 16px}
+  .fix-opts-3col{grid-template-columns:1fr!important}
+  .result-fix-row{grid-template-columns:1fr!important}
+  /* URL input — stack vertically */
+  .url-input-wrap{flex-direction:column;border-radius:10px}
+  .url-prefix{border-right:none;border-bottom:1.5px solid var(--border-lt);padding:12px 16px;justify-content:center}
+  .url-input-wrap input{padding:12px 16px;text-align:center}
+  .url-input-wrap button{width:100%;border-radius:0 0 8px 8px;padding:14px;flex-shrink:0}
+  /* Pricing grid */
+  .pricing-grid{grid-template-columns:1fr}
+  /* Path cards */
+  .paths-grid{grid-template-columns:1fr}
+  .path-card{min-height:auto}
+  /* Result actions */
+  .result-actions{grid-template-columns:1fr 1fr}
+  /* Fix panel */
+  .fix-opts-grid{grid-template-columns:1fr!important}
+  .fix-opt{margin-bottom:0}
+  /* How grid */
+  .how-grid{gap:12px}
+  .how-card{padding:24px 20px;min-height:auto}
+  /* Hero stats */
+  .hero-bar{grid-template-columns:1fr}
+  /* Sections padding */
+  .hero{padding:48px 16px 60px}
+  .score-section,.paths-section,.how-section,.pricing-section,.diff-section,.extras-section{padding:48px 16px}
+  /* Nav */
+  .nav-links a:not(.nav-cta){display:none}
+  .nav-logo{font-size:16px}
+  /* Buttons */
+  .btn-lg{padding:12px 20px;font-size:14px}
+  .path-btn,.fix-btn{width:100%;text-align:center;justify-content:center}
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column;gap:16px;text-align:center}
+  /* Score result */
+  .result-grid{max-width:100%}
+  .result-actions-wrap{max-width:100%}
+  .result-actions{grid-template-columns:1fr}
+  /* Action cards */
+    /* Diff section */
+  .diff-inner{grid-template-columns:1fr;gap:32px}
+  /* Extra cards */
+  .extra-grid{grid-template-columns:1fr}
+}
+
+/* ── HAMBURGER / MOBILE NAV ── */
+.hamburger{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:8px;
+  margin-left:auto;
+}
+.hamburger span{
+  display:block;
+  width:24px;
+  height:2px;
+  background:#FFFFFF;
+  border-radius:2px;
+  transition:all 0.2s;
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{
+  display:none;
+  flex-direction:column;
+  gap:0;
+  background:var(--bg-navy);
+  border-top:1px solid var(--border-dk);
+  padding:16px 20px;
+  position:absolute;
+  top:64px;left:0;right:0;
+  z-index:199;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a,.mobile-menu button{
+  font-size:16px;
+  font-weight:500;
+  color:rgba(255,255,255,0.8);
+  text-decoration:none;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+  padding:14px 0;
+  border-bottom:1px solid var(--border-dk);
+  text-align:left;
+}
+.mobile-menu a:last-of-type{border-bottom:none}
+.mobile-menu .btn{margin-top:12px;justify-content:center;text-align:center}
+@media(max-width:700px){
+  .hamburger{display:flex}
+  .nav-links{display:none}
+}
+
+/* ── CONSENT BANNER ── */
+#consentBanner{
+  position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:var(--bg-navy);
+  border-top:2px solid var(--orange);
+  padding:20px 24px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:16px;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.3);
+}
+#consentBanner p{
+  flex:1;min-width:260px;
+  font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6;margin:0;
+}
+#consentBanner a{color:var(--orange);text-decoration:underline;cursor:pointer}
+.consent-btns{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.consent-btns button{
+  padding:10px 20px;border-radius:6px;font-size:14px;font-weight:700;
+  cursor:pointer;border:none;font-family:inherit;
+}
+#consentAccept{background:var(--orange);color:#FFFFFF}
+#consentReject{background:transparent;color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.3)!important}
+#consentAccept:hover{background:#D44510}
+#consentReject:hover{color:#FFFFFF;border-color:rgba(255,255,255,0.6)!important}
+
+/* ── POLICY MODAL ── */
+#policyModal{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,0.7);overflow-y:auto;padding:40px 20px;
+}
+#policyModal.open{display:block}
+.policy-box{
+  background:var(--bg-white);border-radius:var(--radius-lg);
+  max-width:780px;margin:0 auto;padding:48px;position:relative;
+}
+.policy-box h1{font-size:clamp(24px,3vw,36px);margin-bottom:8px}
+.policy-box h2{font-size:18px;margin-top:32px;margin-bottom:10px;color:var(--t-heading)}
+.policy-box h3{font-size:16px;margin-top:24px;margin-bottom:8px;color:var(--t-heading)}
+.policy-box p,.policy-box li{font-size:15px;color:var(--t-body);line-height:1.75}
+.policy-box ul{padding-left:20px;margin-bottom:16px}
+.policy-box li{margin-bottom:6px}
+.policy-close{
+  position:absolute;top:20px;right:20px;
+  background:none;border:none;font-size:24px;cursor:pointer;
+  color:var(--t-support);line-height:1;
+}
+.policy-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid var(--border-lt)}
+.policy-tab{
+  padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;
+  background:none;border:none;font-family:inherit;color:var(--t-support);
+  border-bottom:2px solid transparent;margin-bottom:-2px;
+}
+.policy-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.policy-content{display:none}
+.policy-content.active{display:block}
+/* old bill-btn removed */
+.pc-billing-hidden{display:none}
+
+/* ── BILLING TOGGLE ── */
+..billing-toggle{
+  display:inline-flex;gap:4px;background:#FFFFFF;border:2px solid var(--border-lt);border-radius:10px;
+  padding:4px;margin:32px auto 40px;width:fit-content;
+}
+.bill-btn{
+  padding:10px 24px;border-radius:8px;border:2px solid transparent;
+  font-family:'Work Sans',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;color:var(--bg-navy);transition:all 0.2s;white-space:nowrap;
+  background:transparent;
+}
+.bill-btn:hover{color:var(--bg-navy);background:rgba(10,22,40,0.08)}
+.bill-btn.active{
+  background:var(--orange);color:#FFFFFF;border-color:var(--orange);
+  box-shadow:0 2px 12px rgba(240,90,34,0.3);
+}
+.bill-save{
+  font-size:11px;font-weight:600;color:var(--green);
+  margin-left:4px;vertical-align:middle;
+}
+
+
+@media(max-width:540px){
+  .result-fix-row{grid-template-columns:1fr!important}
+  .fix-options-grid{grid-template-columns:1fr!important}
+}
+  html,body{overflow-x:hidden;max-width:100vw}
+  .pdf-card{justify-content:flex-end!important}
+  @media(max-width:700px){.result-section-inner{padding:0 12px!important;max-width:100%!important}}
+  .pdf-card-content{flex-shrink:0}
+
+/* ═══════════════════════════════════════
+   PROBLEM SECTION
+═══════════════════════════════════════ */
+.problem-section{background:var(--bg-warm);padding:80px 5vw}
+.problem-left .section-h{color:var(--t-heading)}
+.problem-quote{
+  border-left:4px solid var(--orange);
+  padding:16px 20px;
+  margin-top:24px;
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:clamp(17px,1.8vw,22px);
+  color:var(--t-heading);
+  line-height:1.4;
+  letter-spacing:-0.01em;
+  background:var(--orange-lt);
+  border-radius:0 8px 8px 0;
+  max-width:600px;
+}
+.shift-section{background:var(--bg-navy);padding:80px 5vw}
+.shift-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.shift-stat{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:var(--radius);
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+}
+.ssn{
+  font-family:'Work Sans',sans-serif;
+  font-weight:800;
+  font-size:40px;
+  color:#FFFFFF;
+  line-height:1;
+  letter-spacing:-0.03em;
+  margin-bottom:8px;
+}
+.ssl{
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:rgba(255,255,255,0.70);
+  margin-bottom:6px;
+}
+.ssd{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5}
+@media(max-width:700px){.shift-stats{grid-template-columns:1fr}}
+.why-section{padding:80px 5vw}
+.why-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:64px;
+  align-items:center;
+}
+.why-left .section-h{color:var(--t-heading)}
+.why-right{
+  background:var(--bg-navy);
+  border-radius:var(--radius-lg);
+  padding:8px;
+}
+.why-signal{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  padding:18px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.why-signal:last-child{border-bottom:none}
+.why-icon{font-size:18px;color:var(--orange);flex-shrink:0;margin-top:2px;width:24px;text-align:center}
+.why-h{font-family:'Work Sans',sans-serif;font-weight:700;font-size:20px;color:#FFFFFF;letter-spacing:-0.01em;margin-bottom:3px}
+.why-d{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5}
+@media(max-width:900px){.why-grid{grid-template-columns:1fr}}
+.different-points{display:flex;flex-direction:column;gap:24px}
+.diff-point{display:flex;gap:20px;align-items:flex-start}
+.diff-num{font-family:'Work Sans',sans-serif;font-size:22px;font-weight:800;color:var(--orange);opacity:1;flex-shrink:0;line-height:1.2;min-width:36px}
+.diff-point strong{font-family:'Work Sans',sans-serif;font-weight:700;font-size:20px;color:var(--t-heading);display:block;margin-bottom:6px;letter-spacing:-0.01em}
+.diff-point p{font-size:15px;color:var(--t-body);line-height:1.6;margin:0}
+.faq{background:var(--bg-warm);padding:80px 5vw}
+.faq .section-inner{max-width:var(--max);margin:0 auto}
+.faq .section-label{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange);margin-bottom:16px}
+.faq h2{font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(36px,5vw,64px);letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:48px;line-height:1;text-align:center}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 64px}
+.faq-item{padding:24px 0;border-bottom:1px solid var(--border-lt)}
+.faq-item:nth-child(1),.faq-item:nth-child(2){border-top:1px solid var(--border-lt)}
+.faq-item h3{font-family:'Work Sans',sans-serif;font-weight:700;font-size:16px;color:var(--t-heading);letter-spacing:-0.01em;margin-bottom:8px}
+.faq-item p{font-size:15px;color:var(--t-body);line-height:1.65;margin:0}
+@media(max-width:700px){.faq-grid{grid-template-columns:1fr}.faq-item:nth-child(2){border-top:none}}
+</style>
+<style>
+.page{display:block!important;visibility:visible!important}
+#page-marketing{display:block!important}
+</style>
+</head>
+<body>
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-logo" onclick="showPage('marketing')">Aenima<span>.</span></span>
+    <div class="nav-links" id="navLinks">
+      <a onclick="gotoAnchor('how')">Why?</a>
+      <a onclick="gotoAnchor('pricing')">Pricing</a>
+      <button onclick="showPage('login')">Log in</button>
+    </div>
+  </div>
+</nav>
+<div class="page active" id="page-marketing">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">GEO, AEO &amp; AIO · AI Search Visibility</span>
+      <h1 class="display">Stop being ignored by<br><em>AI search engines.</em></h1>
+      <h2 class="hero-statement hero-sub-bold" style="margin-top:12px;color:#FFFFFF">If your business isn't in the AI's "Generated Answer," you don't exist to those customers.</h2>
+      <p class="hero-statement" style="margin-top:16px;color:var(--orange);font-weight:700;font-size:clamp(16px,2vw,20px);max-width:680px;margin-left:auto;margin-right:auto">We generate the files that get your business found by AI. From £5.50. No contract.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg" onclick="gotoAnchor('score')">Get my free score →</button>
+      </div>
+      <p class="standout">No account needed. Results in 60 seconds.</p>
+
+    </div>
+  </section>
+
+  <!-- THE PROBLEM -->
+  <section class="problem-section">
+    <div class="wrap">
+      <div class="problem-left">
+        <span class="eyebrow">The Problem</span>
+        <h2 class="section-h">Most local businesses<br>are invisible to AI.</h2>
+        <p style="font-size:17px;color:var(--t-body);line-height:1.7;margin-top:16px">It isn't because your business isn't good enough — it's because nobody told you the rules of search have changed. When a customer asks an AI assistant for a recommendation in your area, it doesn't provide a list of ten links.</p>
+        <blockquote class="problem-quote">"If your business isn't in that answer, you've been erased from the conversation."</blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHIFT SECTION -->
+  <section class="shift-section">
+    <div class="wrap">
+      <span class="eyebrow" style="color:var(--orange)">By The Numbers</span>
+      <h2 class="section-h" style="color:#FFFFFF;margin-bottom:48px">The shift is already happening.</h2>
+      <div class="shift-stats">
+        <div class="shift-stat">
+          <span class="ssn">1</span>
+          <span class="ssl">Answer Given</span>
+          <span class="ssd">Not a page of links. One trusted answer. Either it's you or it's someone else. Always.</span>
+        </div>
+        <div class="shift-stat">
+          <span class="ssn" style="color:var(--orange)">↑</span>
+          <span class="ssl">AI Search Growing Fast</span>
+          <span class="ssd">AI search is growing faster than any previous shift in how customers find local businesses.</span>
+        </div>
+        <div class="shift-stat">
+          <span class="ssn">£0</span>
+          <span class="ssl">To Check</span>
+          <span class="ssd">Find out if AI can find you right now. Free score — no account needed.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY AI IS MISSING YOU -->
+  <section class="why-section" id="how" style="background:var(--bg-warm)">
+    <div class="wrap why-grid">
+      <div class="why-left">
+        <span class="eyebrow">Under the Radar</span>
+        <h2 class="section-h">Why AI is currently<br>missing you.</h2>
+        <p style="font-size:17px;color:var(--t-body);line-height:1.7;margin-top:16px">AI doesn't just need your website — it looks for structured signals it can trust. Our scoring system checks your site for the exact technical markers AI engines require. Without these, AI treats your site as an anonymous page with no verified identity.</p>
+      </div>
+      <div class="why-right">
+        <div class="why-signal"><span class="why-icon">◉</span><div><div class="why-h">Business Identity</div><div class="why-d">Schema markup — tells AI who you are and what you do</div></div></div>
+        <div class="why-signal"><span class="why-icon">◎</span><div><div class="why-h">Physical Presence</div><div class="why-d">Directory signals — confirms you're a real local business</div></div></div>
+        <div class="why-signal"><span class="why-icon">⬡</span><div><div class="why-h">AI Identity File</div><div class="why-d">llms.txt — confirms you exist in a format AI can actually read</div></div></div>
+        <div class="why-signal"><span class="why-icon">▤</span><div><div class="why-h">AI Crawler Access</div><div class="why-d">robots.txt — ensures AI actually crawls your site</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="score-section" id="score">
+    <div class="score-card">
+      <span class="eyebrow">Free — no account needed</span>
+      <h2 class="section-h">Find out if AI can find your business</h2>
+      <p>Enter your website address. See your score and exactly what's wrong — in under 60 seconds.</p>
+      <div class="url-input-wrap">
+        <div class="url-prefix">yoursite</div>
+        <input type="text" id="pubUrl" placeholder=".co.uk" autocomplete="off" onkeydown="if(event.key==='Enter')runScore()">
+        <button onclick="runScore()" id="scoreBtn">Check free →</button>
+      </div>
+      <p class="score-note">We run five real checks on your domain. Your score is based on what's actually there — not a guess.</p>
+      <div id="scoreProgWrap" style="display:none;margin-top:16px">
+        <p class="prog-text" id="scoreProgText">Checking your site...</p>
+        <div class="prog-wrap"><div class="prog-bar" id="scoreProgBar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCORE RESULT -->
+  <section class="result-section" id="resultSection" style="display:none">
+    <div class="result-section-inner" style="max-width:min(75%,100%);margin:48px auto 0;padding:0 16px;box-sizing:border-box">
+
+      <!-- ROW 1: Score ring + Category breakdown + Issues found — stacked -->
+      <div class="result-left-col">
+        <div class="score-panel">
+          <div class="score-ring" id="scoreRing">
+            <span class="score-big" id="scoreNum">0</span>
+            <span class="score-denom">/100</span>
+          </div>
+          <p class="score-grade" id="scoreGrade">—</p>
+        </div>
+        <div id="scoreFixMsg" style="display:none;background:var(--bg-navy);border-radius:10px;padding:20px 24px;margin-top:16px;border-left:4px solid var(--orange)">
+          <p style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:18px;color:#FFFFFF;margin:0 0 8px;line-height:1.3">Your score shows exactly why AI isn't finding you. We generate the files that fix it.</p>
+          <p style="font-size:15px;color:var(--t-white70);margin:0;line-height:1.7">Most tools stop here. Aenima generates the Schema markup, llms.txt and AI crawler permissions your site needs — ready to install. <strong style="color:#FFFFFF">From £5.50. No contract.</strong></p>
+        </div>
+        <div class="cats-panel">
+          <h3>Category breakdown</h3>
+          <div id="catBars"></div>
+        </div>
+        <div class="issues-panel">
+          <h3 id="issuesTitle">Issues found</h3>
+          <div id="issuesList"></div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Action row — fix button + PDF -->
+      <div class="result-actions-wrap" style="margin-top:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;min-width:0" class="result-fix-row">
+
+          <!-- Fix panel — designed value card -->
+          <div class="action-card fix-value-card" onclick="S.user?showDp('billing',null):gotoAnchor('pricing')" style="cursor:pointer">
+            <div style="margin-bottom:20px">
+              <div class="ac-title" style="font-size:22px;margin-bottom:8px">Fix what's missing</div>
+              <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:0">Three fixes. One subscription. From £5.50/month.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0;margin-top:2px">&#11041;</span>
+                <div>
+                  <div style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:var(--t-heading);margin-bottom:3px">AI visibility signals</div>
+                  <p style="font-size:13px;color:var(--t-body);line-height:1.6;margin:0">Structured information that tells AI engines your business name, type, location, and services. Without it, AI treats your site as an anonymous page with no identity.</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0;margin-top:2px">&#9636;</span>
+                <div>
+                  <div style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:var(--t-heading);margin-bottom:3px">Your AI identity file</div>
+                  <p style="font-size:13px;color:var(--t-body);line-height:1.6;margin:0">A machine-readable summary of your business that AI systems look for when they visit your site. Without it, they're guessing who you are.</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <span style="font-size:20px;flex-shrink:0;margin-top:2px">&#9678;</span>
+                <div>
+                  <div style="font-family:'Work Sans',sans-serif;font-weight:700;font-size:14px;color:var(--t-heading);margin-bottom:3px">Directory trust signals</div>
+                  <p style="font-size:13px;color:var(--t-body);line-height:1.6;margin:0">AI cross-references your business across the web. Gaps and inconsistencies reduce your score and your chances of being recommended. We show you exactly what needs fixing — so AI can recommend you.</p>
+                </div>
+              </div>
+            </div>
+            <span class="ac-btn">Fix it now &rarr; <span class="ac-cost">Starter &pound;5.50/mo &mdash; all three included</span></span>
+          </div>
+
+          <!-- PDF — 1/4 width -->
+          <div class="action-card pdf-card" onclick="downloadScorePDF()">
+            <div class="pdf-card-content">
+              <span class="ac-icon">&#8595;</span>
+              <div class="ac-title" style="font-size:22px">Download PDF report — <span style="color:var(--green)">Free</span></div>
+              <p class="ac-desc">Your Machine-Visibility Score as a professional PDF report. Print it, share it or keep it on file.</p>
+              <span class="ac-btn">Download PDF &rarr; <span class="ac-cost" style="color:var(--green)">FREE</span></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ROW 3: Fix it now — 3 columns side by side -->
+      <div class="fix-panel" style="margin-top:20px;border-radius:var(--radius-lg)">
+        <h3>Fix it now</h3>
+        <p class="fp-sub">Choose the path that fits you. Cancel any time.</p>
+        <div class="fix-opts-3col" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+
+          <div class="fix-opt" onclick="handleUpgrade('starter')">
+            <div class="fix-opt-hd">
+              <span class="fix-opt-name">Do it yourself</span>
+              <span class="fix-opt-price">&pound;5.50<span>/mo</span></span>
+            </div>
+            <p class="fix-opt-desc">We generate the visibility files your site needs. Download and install yourself. Works on any website.</p>
+            <ul class="fix-opt-list">
+              <li>AI visibility files generated for your site</li>
+              <li>Citation gap report with fix links</li>
+              <li>Monthly re-score + priority action</li>
+              <li>Machine-Visibility Certificate</li>
+            </ul>
+            <button class="fix-btn">Start for &pound;5.50/month &rarr;</button>
+          </div>
+
+          <div class="fix-opt hi" onclick="handleUpgrade('pro')">
+            <div class="fix-opt-hd">
+              <span class="fix-opt-name">We handle it</span>
+              <span class="fix-opt-price">&pound;7.50<span>/mo</span></span>
+            </div>
+            <p class="fix-opt-desc">Automatically updates everything while you sleep. Install the WordPress plugin once &mdash; it runs forever.</p>
+            <div style="background:rgba(255,170,68,0.18);border:1.5px solid #FFAA44;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:12px;font-weight:700;color:#FFAA44">&#9729; WORDPRESS ONLY &mdash; auto-installs &amp; updates</div>
+            <ul class="fix-opt-list">
+              <li>WordPress plugin — one-click activation</li>
+              <li>Visibility files auto-update every month</li>
+              <li>Monthly report straight to your inbox</li>
+              <li>Nothing to do — runs while you sleep</li>
+            </ul>
+            <button class="fix-btn">Start for &pound;7.50/month &rarr;</button>
+          </div>
+
+          <div class="fix-opt" onclick="showContact()">
+            <div class="fix-opt-hd">
+              <span class="fix-opt-name">Let us do the hard work</span>
+              <span class="fix-opt-price" style="font-size:18px">POA</span>
+            </div>
+            <p class="fix-opt-desc">Fully managed by Technical Graffiti. We handle your entire AI visibility setup and keep it maintained. You do nothing.</p>
+            <ul class="fix-opt-list">
+              <li>Full GEO, AEO &amp; AIO setup included</li>
+              <li>Monthly maintenance and updates</li>
+              <li>Monthly report and recommendations</li>
+              <li>Direct access to Stewart</li>
+            </ul>
+            <button class="fix-btn ghost">Talk to Stewart &rarr;</button>
+          </div>
+
+        </div>
+
+        <div class="fix-hardship">
+          Can&rsquo;t afford any paid tier right now? 
+          <button onclick="showHardship('hResult')">Email Stewart &mdash; no judgment</button>
+          <div id="hResult" style="display:none;color:rgba(255,255,255,0.6);margin-top:6px;font-family:'DM Mono',monospace;font-size:13px"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section style="background:var(--bg-navy);padding:60px 5vw;text-align:center">
+    <div style="max-width:800px;margin:0 auto">
+      <p style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(22px,3vw,36px);color:#FFFFFF;line-height:1.25;margin:0 0 16px;letter-spacing:-0.02em">Every other tool only shows you the gap.<br><em style="color:var(--orange);font-style:normal">We generate the files that close it.</em></p>
+      <p style="font-size:17px;color:var(--t-white70);line-height:1.8;margin:0">Schema markup. llms.txt. Built for your business, as a one-off or updated every month.<br>Install yourself for <strong style="color:#FFFFFF">£5.50</strong> or let the WordPress plugin do it automatically for <strong style="color:#FFFFFF">£7.50</strong>.</p>
+    </div>
+  </section>
+  <section class="pricing-section" id="pricing">
+    <div class="wrap">
+      <span class="eyebrow">Pricing &amp; Plans</span>
+      <h2 class="section-h">Simple. Honest. Affordable.</h2>
+      <p class="section-intro" style="max-width:540px;margin:16px auto 24px;font-size:18px;color:var(--t-support)">Priced so a plumber in Wellingborough or a solicitor in Bristol can afford it — not just big marketing firms.</p>
+      <div class="billing-toggle">
+        <button class="bill-btn active" id="billMo" onclick="setGlobalBilling('mo',this)">Monthly</button>
+        <button class="bill-btn" id="billQtr" onclick="setGlobalBilling('qtr',this)">Quarterly <span class="bill-save">Save £3</span></button>
+        <button class="bill-btn" id="billYr" onclick="setGlobalBilling('yr',this)">Annual <span class="bill-save">Save £11</span></button>
+      </div>
+    </div>
+    <div class="pricing-grid">
+
+      <div class="pc" style="text-align:center">
+        <span class="pc-tag tag-free">Free</span>
+        <div class="pc-name">The Score</div>
+        <div class="pc-tagline">See where AI can't find you.</div>
+        <div class="pc-price"><sup></sup>£0</div>
+        <div class="pc-billing"><span class="pc-b-row"><span>Forever free</span><span>no account</span></span></div>
+        <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:12px 0 0">Find out your AI visibility score in 60 seconds. See exactly what is wrong and why — in plain English. No sign-up. No email. No commitment. Always free.</p>
+        <div class="pc-div"></div>
+        <div class="pc-for">For everyone</div>
+        <ul class="pc-feats no-icon">
+          <li>Score out of 100</li>
+          <li>Category breakdown</li>
+          <li>Every issue listed in plain English</li>
+          <li>PDF report to download</li>
+          <li class="no">Schema markup file</li>
+          <li class="no">llms.txt identity file</li>
+          <li class="no">Monthly tracking</li>
+        </ul>
+        <p style="font-size:13px;color:var(--t-support);line-height:1.6;margin:16px 0 0;padding:12px;background:rgba(255,255,255,0.04);border-radius:6px;border-left:3px solid var(--orange)"><strong style="color:var(--t-heading)">What you do not get:</strong> the files that fix it. You can see the problem clearly. To get the solution, you need Starter.</p>
+        <button class="btn btn-outline btn-full btn-sm" style="margin-top:16px" onclick="gotoAnchor('score')">Check my score for free →</button>
+      </div>
+
+      <div class="pc feat" style="text-align:center">
+        <span class="pc-tag tag-start">Starter</span>
+        <div class="pc-name">The Roadmap</div>
+        <div class="pc-tagline">Get the code. Fix it yourself.</div>
+        <div class="pc-price"><sup>£</sup><span id="starter-price">5.50</span></div>
+        <div class="pc-billing">
+          <span class="pc-b-row" id="starter-billing-label"><span>Monthly</span><span>£5.50/mo</span></span>
+        </div>
+        <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:12px 0 0">We generate the exact visibility files your site needs — schema markup, llms.txt, robots.txt. Download and install yourself. Works on any website, any platform. Every month we rescore, regenerate your files if anything has changed, and send you a report.</p>
+        <div class="pc-div"></div>
+        <ul class="pc-feats no-icon">
+          <li>Schema markup file — generated for your business</li>
+          <li>llms.txt identity file — written for your business</li>
+          <li>robots.txt AI crawler permissions — checked and corrected</li>
+          <li>Citation gap report with fix links</li>
+          <li>Monthly re-score + Machine-Visibility Certificate</li>
+          <li>Works on ANY website — not WordPress only</li>
+        </ul>
+        <p style="font-size:13px;color:var(--t-support);line-height:1.6;margin:16px 0 0;padding:12px;background:rgba(255,255,255,0.04);border-radius:6px;border-left:3px solid var(--orange)"><strong style="color:var(--t-heading)">The difference from Free:</strong> Free shows you the problem. Starter gives you everything you need to fix it.</p>
+        <button class="btn btn-primary btn-full btn-sm" style="margin-top:16px" onclick="handleUpgrade('starter')" id="starter-cta">Get the Code →</button>
+      </div>
+
+      <div class="pc" style="text-align:center">
+        <span class="pc-tag tag-pro">Pro</span>
+        <div class="pc-name">The Auto-Pilot</div>
+        <div class="pc-tagline">Automatically updates everything.</div>
+        <div class="pc-price"><sup>£</sup><span id="pro-price">7.50</span></div>
+        <div class="pc-billing">
+          <span class="pc-b-row" id="pro-billing-label"><span>Monthly</span><span>£7.50/mo</span></span>
+        </div>
+        <p style="font-size:14px;color:var(--t-support);line-height:1.6;margin:12px 0 0">Everything in Starter, plus the Aenima WordPress plugin installs and updates your visibility files automatically every month. Activate once — it runs forever while you sleep. Nothing to download, nothing to upload, ever again.</p>
+        <div class="pc-div"></div>
+        <ul class="pc-feats no-icon">
+          <li>Everything in Starter</li>
+          <li>WordPress plugin — one-click activation</li>
+          <li>Visibility files auto-update every month</li>
+          <li>Monthly report straight to your inbox</li>
+          <li>Nothing to do after setup — completely automated</li>
+        </ul>
+        <p style="font-size:13px;color:var(--t-support);line-height:1.6;margin:16px 0 0;padding:12px;background:rgba(255,255,255,0.04);border-radius:6px;border-left:3px solid var(--orange)"><strong style="color:var(--t-heading)">The difference from Starter:</strong> Starter requires you to download and install files yourself each month. Pro does it all automatically via the WordPress plugin.</p>
+        <p class="pc-note">WordPress websites only. Not on WordPress? Choose The Roadmap instead.</p>
+        <button class="btn btn-secondary btn-full btn-sm" style="margin-top:16px" onclick="handleUpgrade('pro')" id="pro-cta">Go Pro &amp; Automate →</button>
+      </div>
+
+      <div class="pc">
+        <span class="pc-tag tag-agency">Agency</span>
+        <div class="pc-name">Agency</div>
+        <div style="display:inline-block;background:var(--orange);color:#FFFFFF;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 12px;border-radius:4px;margin-bottom:10px">COMING SOON</div>
+        <div class="pc-tagline">White-label reseller programme. Register your interest below and we&rsquo;ll be in touch when it launches.</div>
+        <div class="pc-price"><sup>£</sup>89</div>
+        <div class="pc-billing">
+          <span class="pc-b-row"><span>Monthly</span><span>£89/mo</span></span>
+          <span class="pc-b-row"><span>Extra sites</span><span>£8/site/mo</span></span>
+          <span class="pc-b-row"><span>White-label consultancy</span><span>POA</span></span>
+        </div>
+        <div class="pc-div"></div>
+        <div class="pc-for">Digital agencies &amp; designers</div>
+        <ul class="pc-feats no-icon">
+          <li>10 client sites</li>
+          <li>White-label reports — your logo</li>
+          <li>Reports auto-emailed to clients</li>
+          <li>Reseller dashboard</li>
+          <li>Onboarding call</li>
+          <li>Email support — 1 business day</li>
+          <li>All Aenima branding removed</li>
+        </ul>
+        <button class="btn btn-secondary btn-full btn-sm" onclick="showContact()">Get in touch →</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DIFFERENCE -->
+  <section class="diff-section">
+    <div class="diff-inner">
+      <div class="diff-left">
+        <span class="eyebrow">Why we're different</span>
+        <h2 class="section-h" style="color:var(--t-heading);margin-bottom:8px">Every other tool shows you the problem.<span class="section-h" style="color:#F05A22;margin-bottom:24px"> We fix it.</span></h2>
+        <p>Other tools tell you if you appear in AI search, but they don't help you change the result. They often cost over £80 a month just for a dashboard.</p>
+        <p>Aenima generates the files that fix the gap. We provide the specific visibility files your business needs, ready to be put in place. We priced it so a plumber in Wellingborough or a solicitor in Bristol can afford it—not just big marketing firms.</p>
+      </div>
+      <div class="different-points">
+        <div class="diff-point">
+          <div class="diff-num">01</div>
+          <div>
+            <strong>We generate the files that close the gap</strong>
+            <p>Not a dashboard. Not a report. Actual working files your business needs — ready to put in place.</p>
+          </div>
+        </div>
+        <div class="diff-point">
+          <div class="diff-num">02</div>
+          <div>
+            <strong>Priced for real businesses</strong>
+            <p>£5.50 a month. Not £80. Not £200. Any local business can afford to be visible.</p>
+          </div>
+        </div>
+        <div class="diff-point">
+          <div class="diff-num">03</div>
+          <div>
+            <strong>Monthly. Automatic. Current.</strong>
+            <p>AI engines change constantly. We re-scan and regenerate your files every month so you stay visible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HARDSHIP + CONSULT -->
+  <section class="extra-section" style="background:var(--bg-navy);padding:100px 5vw;text-align:center">
+    <div style="max-width:640px;margin:0 auto">
+      <p style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--t-white45);margin-bottom:24px">The Safety Net</p>
+      <h3 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(36px,5vw,64px);letter-spacing:-0.03em;color:#FFFFFF;margin-bottom:24px;line-height:1.0">Genuine hardship?<br>We understand.</h3>
+      <p style="font-size:18px;color:var(--t-white70);line-height:1.7;margin-bottom:40px;max-width:520px;margin-left:auto;margin-right:auto">Can't afford £5.50 right now? Pay £3.50 for 3 months — full Starter plan, no questions asked. This is self-declared. We want you to be visible, regardless of your budget.</p>
+
+      <button onclick="openHardshipPayment()" style="display:block;width:100%;max-width:440px;margin:0 auto 32px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:24px 32px;cursor:pointer;text-align:center;transition:background 0.15s" onmouseover="this.style.background='rgba(255,255,255,0.11)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+        <div style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;color:var(--orange);letter-spacing:-0.02em;margin-bottom:8px">£3.50/mo for 3 months</div>
+        <div style="font-size:13px;color:var(--t-white45);letter-spacing:0.3px">Full Starter plan · Self-declared · No questions asked</div>
+      </button>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;max-width:440px;margin:0 auto 20px;text-align:center">
+        <div style="font-size:12px;color:rgba(255,255,255,0.30);margin-bottom:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Also free, always</div>
+        <div style="font-size:14px;color:var(--t-white70);margin-bottom:6px"><strong style="color:#FFFFFF">Free PDF score report</strong> — download and implement yourself</div>
+        <div style="font-size:14px;color:var(--t-white70)"><strong style="color:#FFFFFF">Free score check</strong> — unlimited, no account needed</div>
+      </div>
+
+      <p style="font-size:13px;color:rgba(255,255,255,0.25);margin-bottom:8px">Or talk to Stewart directly:</p>
+      <button class="reveal-btn" onclick="showHardship('hFooter')" style="font-size:14px">Click to reveal contact email</button>
+      <div class="reveal-out" id="hFooter"></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="section-inner">
+      <div class="section-label">FAQ</div>
+      <h2>Common questions.</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Is this for tech experts?</h3>
+          <p>No. If you can copy and paste, you can use Starter. If you use WordPress, Pro does it all for you.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How long does it take?</h3>
+          <p>The free score takes 60 seconds. Improving your visibility starts as soon as you use the files we generate.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Why a subscription?</h3>
+          <p>AI engines and your competitors change constantly. We re-scan your site every month and regenerate your files to ensure you stay visible.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What if I can't afford it?</h3>
+          <p>Use the hardship rate — £3.50/mo for 3 months, full Starter plan, self-declared. No questions asked.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <span class="fb-logo">Aenima<span>.</span></span>
+          <p class="fb-desc">GEO, AEO &amp; AIO · AI Search Visibility for local and trade businesses. Stop being invisible to AI. Fixed price. No contract. No agency.</p>
+          <p class="fb-tagline">"Stop being invisible to AI."</p>
+        </div>
+        <div class="fc">
+          <h4>Product</h4>
+          <ul>
+            <li><a onclick="gotoAnchor('score')">Free score check</a></li>
+            <li><a onclick="gotoAnchor('how')">How it works</a></li>
+            <li><a onclick="gotoAnchor('pricing')">Pricing</a></li>
+            <li><a onclick="showPage('register')">Create account</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>For agencies</h4>
+          <ul>
+            <li><a onclick="gotoAnchor('pricing')">Agency plan — £89/mo</a></li>
+            <li><a onclick="showContact()">White-label reports</a></li>
+            <li><a onclick="showContact()">Reseller dashboard</a></li>
+            <li><a onclick="showContact()">Onboarding call</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>Contact</h4>
+          <ul>
+            <li><button onclick="showContact()">Get in touch</button></li>
+            <li><a href="https://technicalgraffiti.co.uk" target="_blank" rel="noopener">Technical Graffiti</a></li>
+          </ul>
+        </div>
+        <div class="fc">
+          <h4>Legal</h4>
+          <ul>
+            <li><a onclick="openPolicy('privacy')">Privacy Policy</a></li>
+            <li><a onclick="openPolicy('terms')">Terms of Service</a></li>
+            <li><a onclick="openPolicy('cookies')">Cookie &amp; Storage Policy</a></li>
+            <li><a onclick="openPolicy('data')">Data Requests</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bot">
+        <p>© 2026 Technical Graffiti Ltd · Company No. 07180346 · ICO No. C1894540 · Registered in England &amp; Wales · <a href="https://technicalgraffiti.co.uk/#contact" target="_blank" rel="noopener" style="color:var(--t-white45);text-decoration:none">Contact us</a></p>
+        <p><a onclick="openPolicy('privacy')" style="color:var(--t-white45);text-decoration:none">Privacy Policy</a> &nbsp;·&nbsp; <a onclick="openPolicy('terms')" style="color:var(--t-white45);text-decoration:none">Terms of Service</a> &nbsp;·&nbsp; <a onclick="openPolicy('cookies')" style="color:var(--t-white45);text-decoration:none">Cookie Policy</a> &nbsp;·&nbsp; <a onclick="openPolicy('data')" style="color:var(--t-white45);text-decoration:none">Data Requests</a> &nbsp;·&nbsp; <span style="color:var(--t-white20)">UK GDPR compliant</span></p>
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+
+let SB=null;
+const S={user:null,plan:'free',score:null,billing:'mo'};
+function saveS(){}
+function getProfile(){try{return JSON.parse(localStorage.getItem('brd_profile')||'{}')}catch(e){return {}}}
+function saveProfile(u){const p=Object.assign(getProfile(),u);localStorage.setItem('brd_profile',JSON.stringify(p));}
+
+const CFG={
+  DOMAIN:'aenima.co.uk',
+  STRIPE_KEY:'pk_live_51TCFrBJB2Su5DD2stmbNEYIoJsBvnXZ5S7tgRMFDHClp6q8CHWjd2tm4QIDhpwqrQHBZBuD6NkHyc2RGdgYrvOhA00YBjXMj31',
+  CHECKOUT:'https://aenima.co.uk/api/create-checkout',
+  CLAUDE_KEY:'',  // Set ANTHROPIC_API_KEY in Vercel environment variables
+  HARDSHIP_LINK:'https://buy.stripe.com/14A4gA7Gz9fl520bqK0Ny00',
+  SUPABASE_URL:'https://vnbjwffkvpvpmdpiumyy.supabase.co',
+  SUPABASE_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuYmp3ZmZrdnB2cG1kcGl1bXl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTk3ODAsImV4cCI6MjA4OTM5NTc4MH0.7abpF9daa0o6G7EzjIcYuak8t_9ELK2-Bpen2WAesFo',
+  PRICES:{
+    starter_mo:'price_1TCGFwJB2Su5DD2s63b7Y3CB',
+    starter_qtr:'price_1TCGGUJB2Su5DD2s4UEFEpsk',
+    starter_yr:'price_1TCGH1JB2Su5DD2svomn2yh4',
+    pro_mo:'price_1TCGHaJB2Su5DD2s1OS6hwpM',
+    pro_qtr:'price_1TCGI7JB2Su5DD2spypCec2F',
+    pro_yr:'price_1TCGIbJB2Su5DD2s6ojHU3qr',
+    agency_mo:'price_1TCGJ1JB2Su5DD2swYB5UDh6',
+    hardship:'price_1TCGKFJB2Su5DD2sQSkAf0Tz',
+  },
+};
+
+// Init Supabase
+try{
+  if(typeof supabase!=='undefined'){
+    SB=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_KEY);
+  }
+}catch(e){console.warn('Supabase init failed',e);}
+
+// Core functions
+function runScore(){_runScore().catch(e=>console.error(e));}
+function _runScore(){
+  let raw=document.getElementById('pubUrl').value.trim();
+  if(!raw){alert('Please enter your website address.');return;}
+  raw=raw.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].trim().toLowerCase();
+  if(!raw){alert('Please enter a valid website address.');return;}
+
+  const btn=document.getElementById('scoreBtn');
+  const prog=document.getElementById('scoreProgWrap');
+  const bar=document.getElementById('scoreProgBar');
+  const txt=document.getElementById('scoreProgText');
+  btn.disabled=true;btn.textContent='Checking...';
+  if(prog)prog.style.display='block';
+
+  // Progress steps while API runs
+  const steps=[
+    [15,'Checking site availability...'],
+    [32,'Looking for Schema markup...'],
+    [50,'Checking llms.txt...'],
+    [66,'Checking AI crawler access...'],
+    [82,'Checking search signals...'],
+    [95,'Calculating score...']
+  ];
+  let stepIdx=0;
+  const stepTimer=setInterval(()=>{
+    if(stepIdx<steps.length){
+      const[p,m]=steps[stepIdx++];
+      if(bar)bar.style.width=p+'%';
+      if(txt)txt.textContent=m;
+    }
+  },600);
+
+  try{
+    const resp=await fetch('/api/check-domain',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({domain:raw})
+    });
+
+    clearInterval(stepTimer);
+    if(bar)bar.style.width='100%';
+    if(txt)txt.textContent='Done.';
+
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({error:'Server error'}));
+      throw new Error(err.error||'Check failed');
+    }
+
+    const data=await resp.json();
+
+    // Domain not found — show clear error, do not run score display
+    if(data.error==='domain_not_found'){
+      btn.disabled=false;btn.textContent='Check free →';
+      if(prog)prog.style.display='none';
+      if(bar)bar.style.width='0%';
+      if(txt)txt.textContent='';
+      const errBox=document.getElementById('scoreErr')||document.createElement('p');
+      errBox.id='scoreErr';
+      errBox.style.cssText='color:var(--red);font-size:16px;font-weight:600;margin-top:16px;text-align:center';
+      errBox.textContent=data.errorMessage;
+      const inputWrap=document.querySelector('.url-input-wrap');
+      if(inputWrap&&inputWrap.parentNode&&!document.getElementById('scoreErr')){
+        inputWrap.parentNode.insertBefore(errBox,inputWrap.nextSibling);
+      }
+      return;
+    }
+
+    // Build result object matching existing renderScore format
+    const r={
+      overall: data.overall,
+      cats: data.cats,
+      issues: data.issues,
+      checks: data.checks,
+      url: 'https://'+data.domain,
+      domain: data.domain,
+      ts: data.ts ? new Date(data.ts) : new Date(),
+      real: true,
+    };
+    S.score=r;
+    btn.disabled=false;btn.textContent='Check free →';
+    if(prog)prog.style.display='none';
+    if(bar)bar.style.width='0%';
+    // Clear any previous domain error
+    const oldErr=document.getElementById('scoreErr');if(oldErr)oldErr.remove();
+    renderScore(r);
+    saveScoreToSupabase(r);
+    const sfm=document.getElementById('scoreFixMsg');
+    if(sfm)sfm.style.display='block';
+
+  }catch(err){
+    clearInterval(stepTimer);
+    console.error('Score check failed:',err);
+    btn.disabled=false;btn.textContent='Check free →';
+    if(prog)prog.style.display='none';
+    if(bar)bar.style.width='0%';
+    if(txt)txt.textContent='';
+    alert('Could not check '+raw+'. Please check the domain and try again. Error: '+err.message);
+  }
+}
+function renderScore(r){
+  // Ring
+  const gr=r.overall<30?'low':r.overall<55?'mid':'good';
+  const ring=document.getElementById('scoreRing');
+  ring.className='score-ring '+gr;
+  document.getElementById('scoreNum').textContent=r.overall;
+  document.getElementById('scoreGrade').textContent=r.overall<60?'Limited AI visibility':r.overall<75?'Moderate visibility':'Good visibility';
+
+  // Cat bars
+  document.getElementById('catBars').innerHTML=Object.entries(r.cats).map(([name,c])=>{
+    const pct=Math.round((c.score/c.max)*100);
+    const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
+    const col=pct<40?'var(--red)':pct<65?'var(--amber)':'var(--green)';
+    return'<div class="cat-row"><div class="cat-hd"><span class="cat-name">'+name+'</span><span class="cat-score" style="color:'+col+'">'+c.score+'/'+c.max+'</span></div><div class="cat-track"><div class="cat-fill '+cls+'" style="width:'+pct+'%"></div></div>'+(c.detail?'<div style="font-size:12px;color:#888;margin-top:3px">'+c.detail+'</div>':'')+'</div>';
+  }).join('');
+
+  // Issues
+  document.getElementById('issuesTitle').textContent=`Issues found (${r.issues.length})`;
+  document.getElementById('issuesList').innerHTML=r.issues.map(i=>`
+    <div class="issue-row">
+      <span class="issue-badge ${i.p==='critical'?'badge-crit':'badge-high'}">${i.p.toUpperCase()}</span>
+      <span class="issue-text">${i.t}</span>
+    </div>`).join('');
+
+  // Show result section
+  const rs=document.getElementById('resultSection');
+  rs.style.display='block';
+  setTimeout(()=>rs.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+function renderScoreOverview(r){
+  const ms=document.getElementById('mScore');const md=document.getElementById('mDate');const mi=document.getElementById('mIssues');
+  // Hide getting started banner once score exists
+  const gs=document.getElementById('gettingStarted');
+  if(gs)gs.style.display='none';
+  if(ms)ms.textContent=r.overall;
+  if(md){
+    const d=r.ts?new Date(r.ts):null;
+    md.textContent=(d&&!isNaN(d))?d.toLocaleDateString('en-GB'):new Date().toLocaleDateString('en-GB');
+  }
+  const crit=r.issues.filter(i=>i.p==='critical').length;
+  if(mi)mi.textContent=crit;
+  const pf=document.getElementById('priFixes');
+  if(pf){const cf=r.issues.filter(i=>i.p==='critical');pf.innerHTML=cf.length?cf.map(i=>`<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px"><span class="issue-badge badge-crit">CRITICAL</span><span style="font-size:16px;color:var(--t-body)">${i.t}</span></div>`).join(''):'<p style="font-size:16px;color:var(--green)">No critical issues found.</p>';}
+}
+function buildReport(r){
+  const c=r.issues.filter(i=>i.p==='critical');const h=r.issues.filter(i=>i.p==='high');
+  return`<h4>Quick Analysis — ${r.bizName||r.domain}</h4>
+  <div class="rs"><h5>Overall finding</h5><p>Score: <span class="hl">${r.overall}/100</span>. ${r.overall<30?'<span class="rw">Not currently visible to AI search engines.</span>':r.overall<55?'<span class="rw">Limited AI visibility.</span> Competitors with better GEO and AEO are being recommended more often.':'<span class="rok">Reasonable visibility.</span> Targeted improvements will strengthen your position.'}</p></div>
+  ${c.length?`<div class="rs"><h5>Critical issues (${c.length})</h5><ul>${c.map(i=>`<li><span class="rw">${i.t}</span></li>`).join('')}</ul></div>`:''}
+  ${h.length?`<div class="rs"><h5>High priority (${h.length})</h5><ul>${h.map(i=>`<li>${i.t}</li>`).join('')}</ul></div>`:''}
+  <div class="rs"><h5>Next actions</h5><ul><li>Install your <span class="hl">AI visibility signals</span></li><li>Create and upload <span class="hl">llms.txt</span></li><li>Fix citation gaps across directories</li></ul></div>`;
+}
+function handleUpgrade(plan){
+  if(CFG.STRIPE_KEY==='pk_live_YOUR_STRIPE_KEY'){showUpgradeModal(plan);return;}
+  if(!S.user){
+    // Slim email+password modal — no full registration form
+    sessionStorage.setItem('pendingPlan',plan);
+    sessionStorage.setItem('pendingBilling',S.billing||'mo');
+    const o=mkModal(`
+      <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">One quick step</h2>
+      <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">We need your email to create your account and send your monthly reports. That's it.</p>
+      <p style="font-size:13px;color:var(--t-support);margin-bottom:20px;padding:10px 14px;background:var(--bg-warm);border-radius:6px">🔒 For your security and so we can match your payment to your account.</p>
+      <div id="qpErr" style="display:none;background:#FFF0EE;border:1px solid #FFCCCC;border-radius:8px;padding:10px 14px;font-size:14px;color:var(--red);margin-bottom:14px"></div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Email address</label>
+        <input id="qpEmail" type="email" placeholder="you@yourbusiness.co.uk" autocomplete="email" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Choose a password <span style="font-weight:400;text-transform:none;letter-spacing:0">(min 8 characters)</span></label>
+        <input id="qpPass" type="password" placeholder="••••••••" autocomplete="new-password" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
+      </div>
+      <button id="qpBtn" class="btn btn-primary btn-full" onclick="doQuickPay()">Continue to payment →</button>
+      <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--t-support)">Already have an account? <a onclick="this.closest('.modal-ov').remove();showPage('login')" style="color:var(--orange);cursor:pointer">Log in</a></p>`);
+    // Focus email field
+    setTimeout(()=>{const f=document.getElementById('qpEmail');if(f)f.focus();},100);
+    return;
+  }
+  const billing=S.billing||'mo';
+  const btn=event?.target;
+  if(btn){btn.disabled=true;btn.textContent='Redirecting to payment...';}
+  fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user.email,user_id:S.user.id})})
+    .then(r=>{
+      if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});
+      return r.json();
+    })
+    .then(d=>{
+      if(d.upgraded){
+        S.plan=d.plan;
+        syncNav(true);
+        updBilling();
+        showDp('billing',document.querySelector('.sb-item[onclick*="billing"]'));
+        toast('Upgraded to '+d.plan+' — you were only charged the difference.');
+      } else if(d.url){
+        window.location.replace(d.url);
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    })
+    .catch(err=>{
+      console.error('Checkout error:',err);
+      if(btn){btn.disabled=false;btn.textContent='Try again';}
+      alert('Payment error: '+err.message+'. Please visit technicalgraffiti.co.uk to get in touch');
+    });
+}
+function downloadScorePDF(){
+  if(!S.score)return;
+  const r=S.score;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<meta name="google-site-verification" content="smsqj64VWRJFp66mXwqet770wWYwDf2UkHHtFBt1Hbo" /><title>Machine-Visibility Report — ${r.domain}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 24px;color:#1A1A1A}
+    .hdr{background:#0A1628;color:#E8500A;padding:32px;border-radius:8px;margin-bottom:36px}
+    .hdr h1{font-size:26px;margin:0 0 6px;letter-spacing:-0.02em}
+    .hdr p{font-size:14px;color:rgba(255,255,255,0.5);margin:0}
+    .score{font-size:88px;font-weight:800;color:#E8500A;line-height:1;letter-spacing:-0.04em;margin:0 0 4px}
+    .grade{font-size:20px;color:#777;margin-bottom:36px}
+    h3{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#AAA;margin:28px 0 12px;border-bottom:1px solid #EEE;padding-bottom:10px}
+    .issue{display:flex;gap:12px;margin-bottom:10px;font-size:16px;color:#3D3D3D;align-items:flex-start}
+    .bdg{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+    .crit{background:#FFF0EE;color:#CC2200}.high{background:#FFF8E6;color:#CC6600}
+    .foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:13px;color:#AAA;display:flex;justify-content:space-between}
+    @media print{body{margin:20px}}
+  </style>
+
+</head><body>
+  <div class="hdr"><h1>Machine-Visibility Report</h1><p>${r.domain} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Issued by Technical Graffiti</p></div>
+  <div class="score">${r.overall}</div>
+  <div class="grade">${r.overall<30?'Not visible to AI search engines.':r.overall<55?'Limited AI visibility.':'Reasonable visibility — improvements available.'}</div>
+  <h3>Issues found</h3>
+  ${r.issues.map(i=>`<div class="issue"><span class="bdg ${i.p==='critical'?'crit':'high'}">${i.p.toUpperCase()}</span>${i.t}</div>`).join('')}
+  <h3>Recommended actions</h3>
+  <p style="font-size:16px;color:#3D3D3D;line-height:1.7">1. Log in to your Aenima dashboard to generate and download your AI visibility files.<br>2. Install your visibility files on your website or activate the WordPress plugin.<br>3. Check and fix your directory listings using the Citation Checker.</p>
+  <div class="foot"><span>Technical Graffiti Ltd · Company No. 07180346</span><span>technicalgraffiti.co.uk</span></div>
+  
+</body></html>`);
+  w.document.close();setTimeout(()=>{w.focus();w.print();},400);
+}
+function showContact(){
+  mkModal(`
+    <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">Get in touch</h2>
+    <p style="font-size:17px;color:var(--t-support);margin-bottom:24px">For Agency plans, white-label consultancy, and anything bespoke — talk to Stewart directly.</p>
+    <button id="ctReveal" class="btn btn-primary btn-full" onclick="document.getElementById('ctEmail').style.display='block';this.style.display='none'">Click to reveal contact email</button>
+    <div id="ctEmail" style="display:none;font-family:'DM Mono',monospace;font-size:18px;color:var(--orange);padding:16px 0;font-weight:500;text-align:center">ai@technicalgraffiti.co.uk</div>
+    <p style="font-size:16px;color:var(--t-support);margin-top:16px;text-align:center">Or visit <a href="https://technicalgraffiti.co.uk" target="_blank" rel="noopener" style="color:var(--orange)">technicalgraffiti.co.uk</a></p>
+    <button class="btn btn-outline btn-full" style="margin-top:16px" onclick="this.closest('.modal-ov').remove()">Close</button>`);
+}
+function openHardshipPayment(){
+  if(!CFG.HARDSHIP_LINK||CFG.HARDSHIP_LINK==='YOUR_STRIPE_HARDSHIP_PAYMENT_LINK'){
+    mkModal(`
+      <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:32px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">Set up the hardship payment link</h2>
+      <p style="font-size:16px;color:var(--t-support);margin-bottom:20px">To activate the £3.50/mo hardship option, create a Payment Link in Stripe and add it to your CONFIG.</p>
+      <div style="background:var(--bg-warm);border-radius:10px;padding:18px;margin-bottom:20px;font-size:15px;color:var(--t-body);line-height:1.8">
+        <strong>In Stripe dashboard:</strong><br>
+        1. Products → Add product → "Aenima Starter Hardship" → £3.50/mo recurring<br>
+        2. Payment Links → Create link → select that product<br>
+        3. Copy the link (buy.stripe.com/...)<br>
+        4. Open index.html → find CFG → replace YOUR_STRIPE_HARDSHIP_PAYMENT_LINK
+      </div>
+      <button class="btn btn-primary btn-full" onclick="window.open('https://dashboard.stripe.com/payment-links','_blank');this.closest('.modal-ov').remove()">Open Stripe dashboard →</button>
+      <button class="btn btn-outline btn-full" style="margin-top:10px" onclick="this.closest('.modal-ov').remove()">Close</button>`);
+    return;
+  }
+  // Email capture before Stripe hardship link
+  mkModal(`
+    <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">One quick step</h2>
+    <p style="font-size:15px;color:var(--t-support);margin-bottom:20px">We need your email so we can set up your account and send your monthly reports.</p>
+    <div id="hpErr" style="display:none;background:#FFF0EE;border:1px solid #FFCCCC;border-radius:8px;padding:10px 14px;font-size:14px;color:var(--red);margin-bottom:14px"></div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Email address</label>
+      <input id="hpEmail" type="email" placeholder="you@yourbusiness.co.uk" autocomplete="email" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
+    </div>
+    <button id="hpBtn" class="btn btn-primary btn-full" style="background:var(--orange)" onclick="doHardshipPay()">Continue to payment — £3.50/mo →</button>
+    <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--t-support)">Full Starter plan · Self-declared · No questions asked</p>`);
+  setTimeout(()=>{const f=document.getElementById('hpEmail');if(f)f.focus();},100);
+}
+function gotoAnchor(id){
+  showPage('marketing');
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(el)el.scrollIntoView({behavior:'smooth'});
+  },50);
+}
+function setGlobalBilling(period,btn){
+  S.billing=period;
+  PLAN_BILLING.starter=period;
+  PLAN_BILLING.pro=period;
+  // Update toggle buttons
+  document.querySelectorAll('.bill-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Update prices displayed on cards
+  ['starter','pro'].forEach(plan=>{
+    const priceEl=document.getElementById(plan+'-price');
+    const labelEl=document.getElementById(plan+'-billing-label');
+    const ctaEl=document.getElementById(plan+'-cta');
+    const p=PRICES[plan][period];
+    if(priceEl)priceEl.textContent=p;
+    if(labelEl)labelEl.innerHTML='<span>'+BILLING_LABELS[period]+'</span><span>£'+p+BILLING_UNITS[period]+'</span>';
+    if(ctaEl)ctaEl.textContent=CTA_TEXT[plan][period];
+  });
+}
+function toggleMobileMenu(){
+  const menu=document.getElementById('mobileMenu');
+  const btn=document.getElementById('hamburger');
+  if(!menu||!btn)return;
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+function closeMobileMenu(){
+  const menu=document.getElementById('mobileMenu');
+  const btn=document.getElementById('hamburger');
+  if(menu)menu.classList.remove('open');
+  if(btn)btn.classList.remove('open');
+}
+function showHardship(id){
+  const el=document.getElementById(id);if(!el)return;
+  el.style.display='block';el.textContent='ai@technicalgraffiti.co.uk';
+}
+function cpEl(id,btn){
+  const txt=document.getElementById(id)?.textContent;if(!txt)return;
+  navigator.clipboard.writeText(txt).then(()=>{const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,1500);});
+}
+function dlFile(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
+function toast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;top:76px;right:24px;z-index:999;background:var(--green);color:#FFFFFF;padding:14px 22px;border-radius:10px;font-family:"Work Sans",sans-serif;font-size:16px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.15);letter-spacing:-0.01em';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);
+}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// Nav
+function showPage(p){
+  window.location.href='https://aenima.co.uk/#'+p;
+}
+function syncNav(){}
+function buildDash(){}
+
+// Init
+window.addEventListener('DOMContentLoaded',function(){
+  // Check if returning from login
+  const hash=window.location.hash;
+  if(hash&&(hash.includes('access_token')||hash.includes('register')||hash.includes('login')||hash.includes('dashboard'))){
+    window.location.href='https://aenima.co.uk/'+hash;
+  }
+});
+</script>
+</body>
+</html>
