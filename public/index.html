@@ -972,24 +972,26 @@ nav{
 .diff-left .eyebrow{color:var(--orange)}
 .diff-left p{font-size:17px;color:var(--t-body);line-height:1.75;margin-top:16px;margin-bottom:20px}
 .diff-left strong{color:var(--t-heading);font-weight:500}
+.diff-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-lg);border:1px solid var(--border-lt)}
 .diff-table{
-  background:rgba(255,255,255,0.04);
+  background:#FFFFFF;
   border-radius:var(--radius-lg);
   overflow:hidden;
-  border:1px solid var(--border-dk);
+  min-width:360px;
+  width:100%;
 }
-.diff-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid rgba(255,255,255,0.05)}
+.diff-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border-lt)}
 .diff-row:last-child{border-bottom:none}
-.diff-row div{padding:14px 18px;font-size:15px}
+.diff-row div{padding:14px 18px;font-size:15px;line-height:1.4}
 .diff-row.hd div{
-  font-size:12px;font-weight:700;
+  font-size:11px;font-weight:700;
   letter-spacing:1px;text-transform:uppercase;
-  color:rgba(255,255,255,0.25);
-  background:rgba(255,255,255,0.03);
+  color:var(--t-support);
+  background:var(--bg-warm);
 }
-.diff-row div:nth-child(1){color:rgba(255,255,255,0.70)}
-.diff-row div:nth-child(2){color:rgba(255,255,255,0.30);border-left:1px solid rgba(255,255,255,0.05)}
-.diff-row div:nth-child(3){color:var(--orange);border-left:1px solid rgba(255,255,255,0.05);font-weight:500}
+.diff-row div:nth-child(1){color:var(--t-body)}
+.diff-row div:nth-child(2){color:var(--t-support);border-left:1px solid var(--border-lt)}
+.diff-row div:nth-child(3){color:var(--orange);border-left:1px solid var(--border-lt);font-weight:600}
 
 /* ═══════════════════════════════════════
    HARDSHIP + CONSULTANCY
@@ -2067,16 +2069,16 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <p style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(22px,2.5vw,32px);color:var(--orange);letter-spacing:-0.02em;margin-top:24px">We do.</p>
       </div>
       <div>
-        <div class="diff-table">
+        <div class="diff-table-wrap"><div class="diff-table">
           <div class="diff-row hd"><div>Factor</div><div>Every competitor</div><div>Aenima</div></div>
           <div class="diff-row"><div>What it does</div><div>Shows you the problem</div><div>Provides the files to fix it</div></div>
-          <div class="diff-row"><div>Generates Schema markup</div><div>✗</div><div style="color:#4ADE80;font-weight:700">✓</div></div>
-          <div class="diff-row"><div>Generates llms.txt</div><div>✗</div><div style="color:#4ADE80;font-weight:700">✓</div></div>
-          <div class="diff-row"><div>WordPress auto-install</div><div>✗</div><div style="color:#4ADE80;font-weight:700">✓</div></div>
+          <div class="diff-row"><div>Generates Schema markup</div><div>✗</div><div style="color:var(--green);font-weight:700">✓</div></div>
+          <div class="diff-row"><div>Generates llms.txt</div><div>✗</div><div style="color:var(--green);font-weight:700">✓</div></div>
+          <div class="diff-row"><div>WordPress auto-install</div><div>✗</div><div style="color:var(--green);font-weight:700">✓</div></div>
           <div class="diff-row"><div>Price</div><div>£85–£519/month</div><div>From £5.50</div></div>
           <div class="diff-row"><div>Free check</div><div>Sign-up required</div><div>No account. No sign-up. Ever.</div></div>
-          <div class="diff-row"><div>Contract</div><div>Yes</div><div style="color:#4ADE80;font-weight:700">No</div></div>
-        </div>
+          <div class="diff-row"><div>Contract</div><div>Yes</div><div style="color:var(--green);font-weight:700">No</div></div>
+        </div></div>
       </div>
     </div>
   </section>
