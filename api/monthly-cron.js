@@ -76,6 +76,57 @@ async function checkAIVisibility(domain, bizType, town) {
   }
 }
 
+// ── AI MONITORING — check if domain appears in Gemini response ────────────
+async function checkGeminiVisibility(domain, bizType, town) {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) return { checked: false, reason: 'No Gemini key configured' };
+
+  try {
+    const query = bizType && town
+      ? `Who are the best ${bizType} businesses in ${town}? Give me specific recommendations.`
+      : `What businesses can you recommend at ${domain}?`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: query }] }],
+          generationConfig: { maxOutputTokens: 500 },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.json();
+      console.error('Gemini error:', err);
+      return { checked: false, reason: `Gemini API error: ${err.error?.message || response.status}` };
+    }
+
+    const data = await response.json();
+    const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    const domainClean = domain.replace(/^www\./, '').toLowerCase();
+    const domainBase = domainClean.split('.')[0];
+
+    const appearsInResponse =
+      answer.toLowerCase().includes(domainClean) ||
+      answer.toLowerCase().includes(domainBase.replace(/-/g, ' '));
+
+    return {
+      checked: true,
+      appearsInGemini: appearsInResponse,
+      query,
+      snippet: answer.substring(0, 300),
+    };
+
+  } catch (e) {
+    console.error('Gemini monitoring check failed:', e.message);
+    return { checked: false, reason: e.message };
+  }
+}
+
 // ── SCORE CHECK ────────────────────────────────────────────────────────────
 async function runScoreCheck(domain) {
   try {
@@ -93,7 +144,7 @@ async function runScoreCheck(domain) {
 }
 
 // ── EMAIL ──────────────────────────────────────────────────────────────────
-async function sendMonthlyReport(user, score, previousScore, aiMonitoring) {
+async function sendMonthlyReport(user, score, previousScore, aiMonitoring, geminiMonitoring) {
   if (!RESEND_API_KEY || !user.email) return;
 
   const change = previousScore !== null ? score.overall - previousScore : null;
@@ -126,6 +177,27 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring) {
             <td>
               <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#CC6600">ChatGPT Visibility</p>
               <p style="margin:0;font-size:16px;font-weight:600;color:#1A1A1A">Your business was not found in ChatGPT responses this month. Improving your score will help.</p>
+            </td>
+          </tr></table>
+        </td></tr>`
+    : '';
+
+  // Gemini Monitoring badge
+  const geminiMonitoringBadge = geminiMonitoring?.checked
+    ? geminiMonitoring.appearsInGemini
+      ? `<tr><td style="background:#E6F7ED;border-left:4px solid #1A8A40;border-right:1px solid #E8E8E8;padding:20px 40px">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td>
+              <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1A8A40">✓ Google Gemini Visibility</p>
+              <p style="margin:0;font-size:16px;font-weight:600;color:#1A1A1A">Your business was found in Gemini's responses this month.</p>
+            </td>
+          </tr></table>
+        </td></tr>`
+      : `<tr><td style="background:#FFF8F0;border-left:4px solid #CC6600;border-right:1px solid #E8E8E8;padding:20px 40px">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td>
+              <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#CC6600">Google Gemini Visibility</p>
+              <p style="margin:0;font-size:16px;font-weight:600;color:#1A1A1A">Your business was not found in Gemini responses this month. Improving your score will help.</p>
             </td>
           </tr></table>
         </td></tr>`
@@ -198,6 +270,9 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring) {
 
   <!-- AI MONITORING BADGE -->
   ${aiMonitoringBadge}
+
+  <!-- GEMINI MONITORING BADGE -->
+  ${geminiMonitoringBadge}
 
   <!-- PRIORITY ACTION -->
   <tr><td style="background:${topIssue ? '#FFFBF0' : '#F0FBF4'};border-left:4px solid ${topIssue ? '#CC6600' : '#1A8A40'};border-right:1px solid #E8E8E8;padding:24px 40px">
@@ -327,9 +402,11 @@ module.exports = async (req, res) => {
 
       // AI Monitoring — only for Pro and Agency plans
       let aiMonitoring = { checked: false };
+      let geminiMonitoring = { checked: false };
       if (user.plan === 'pro' || user.plan === 'agency') {
         console.log(`Running AI monitoring for ${domain}`);
         aiMonitoring = await checkAIVisibility(domain, user.biz_type, user.town);
+        geminiMonitoring = await checkGeminiVisibility(domain, user.biz_type, user.town);
       }
 
       // Save score to Supabase
@@ -341,17 +418,19 @@ module.exports = async (req, res) => {
           cats: score.cats,
           issues: score.issues,
           ai_monitoring: aiMonitoring,
+          gemini_monitoring: geminiMonitoring,
         },
         created_at: new Date().toISOString()
       });
 
       // Send email report
-      await sendMonthlyReport(user, score, previousScore, aiMonitoring);
+      await sendMonthlyReport(user, score, previousScore, aiMonitoring, geminiMonitoring);
       results.push({
         email: user.email,
         domain,
         score: score.overall,
         ai_visible: aiMonitoring?.appearsInChatGPT ?? null,
+        gemini_visible: geminiMonitoring?.appearsInGemini ?? null,
       });
 
     } catch(e) {
