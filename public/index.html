@@ -4918,7 +4918,13 @@ initSupabase();
   } else if(S.user){
     showPage('dashboard');
   } else {
-    showPage('marketing');
+    // Handle inbound hash links e.g. from plugin buttons
+    const inHash=window.location.hash.replace('#','').toLowerCase();
+    if(inHash==='login'){showPage('login');}
+    else if(inHash==='register'){showPage('register');}
+    else if(inHash==='pricing'){showPage('marketing');setTimeout(()=>{const el=document.getElementById('pricing');if(el)el.scrollIntoView({behavior:'smooth'});},400);}
+    else if(inHash==='score'){showPage('marketing');setTimeout(()=>{const el=document.getElementById('score');if(el)el.scrollIntoView({behavior:'smooth'});},400);}
+    else{showPage('marketing');}
   }
   setTimeout(initConsent,300);
   window.addEventListener('popstate',function(e){
