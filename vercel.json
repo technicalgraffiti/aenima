@@ -55,6 +55,20 @@
       "dest": "/public/tg-check.html"
     },
     {
+      "src": "/marketing.html",
+      "status": 301,
+      "headers": {
+        "Location": "/"
+      }
+    },
+    {
+      "src": "/app.html",
+      "status": 301,
+      "headers": {
+        "Location": "/"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
