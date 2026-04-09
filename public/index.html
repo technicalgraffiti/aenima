@@ -1160,10 +1160,12 @@ nav{
 /* Report */
 .report-out{background:var(--bg-navy);border-radius:var(--radius-lg);padding:32px;margin-top:24px;color:rgba(255,255,255,0.85)}
 .report-out h4{font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--orange);margin-bottom:20px}
-.report-out h2,.report-out h3{color:var(--orange)}
-.report-out p,.report-out li,.report-out span{color:rgba(255,255,255,0.85)}
-.report-out strong{color:#fff}
-.report-out hr{border-color:rgba(255,255,255,0.15)}
+.report-out h2,.report-out h3,.report-out .rpt-h2,.report-out .rpt-h3{color:var(--orange)}
+.report-out p,.report-out li,.report-out span,.report-out .rpt-p,.report-out .rpt-litext{color:rgba(255,255,255,0.85)}
+.report-out strong,.report-out .rpt-strong{color:#fff}
+.report-out hr,.report-out .rpt-hr{border-color:rgba(255,255,255,0.15)}
+.report-out .rpt-li{display:flex;gap:10px;margin:6px 0}
+.report-out .rpt-num{color:var(--orange);font-weight:700;min-width:20px}
 /* Inline version (dashboard quick analysis on white card) */
 #dReport h4{font-size:20px;color:var(--t-heading);margin-bottom:14px}
 #dReport .rs{border-bottom:1px solid var(--border-lt)}
@@ -4277,13 +4279,13 @@ async function genReport(){
 function mdToHtml(text){
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^## (.+)$/gm,'<h3 style="font-size:16px;font-weight:700;color:#DD5827;margin:20px 0 8px">$1</h3>')
-    .replace(/^# (.+)$/gm,'<h2 style="font-size:20px;font-weight:800;color:#FFFFFF;margin:0 0 12px">$1</h2>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:#FFFFFF">$1</strong>')
-    .replace(/^(\d+)\. (.+)$/gm,'<div style="display:flex;gap:10px;margin:6px 0"><span style="color:#DD5827;font-weight:700;min-width:20px">$1.</span><span style="color:rgba(255,255,255,0.85)">$2</span></div>')
-    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:16px 0">')
-    .replace(/\n\n/g,'</p><p style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.8;margin:0 0 10px">')
-    .replace(/^(?!<)(.+)$/gm,'<p style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.8;margin:0 0 10px">$1</p>')
+    .replace(/^## (.+)$/gm,'<h3 class="rpt-h3">$1</h3>')
+    .replace(/^# (.+)$/gm,'<h2 class="rpt-h2">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong class="rpt-strong">$1</strong>')
+    .replace(/^(\d+)\. (.+)$/gm,'<div class="rpt-li"><span class="rpt-num">$1.</span><span class="rpt-litext">$2</span></div>')
+    .replace(/^---$/gm,'<hr class="rpt-hr">')
+    .replace(/\n\n/g,'</p><p class="rpt-p">')
+    .replace(/^(?!<)(.+)$/gm,'<p class="rpt-p">$1</p>')
     .replace(/<p[^>]*><\/p>/g,'');
 }
 function printRpt(saveMode){
@@ -4401,6 +4403,14 @@ hr{border:none;border-top:1px solid #EEE;margin:20px 0}
 [style*="background:#0A1628"] *,[style*="background: #0A1628"] *{color:#fff!important}
 .foot{margin-top:48px;padding-top:20px;border-top:2px solid #0A1628;font-size:12px;display:flex;justify-content:space-between}
 .foot,.foot *{color:#999!important}
+.rpt-h2{font-size:20px;font-weight:800;color:#0A1628!important;margin:0 0 12px}
+.rpt-h3{font-size:16px;font-weight:700;color:#F05A22!important;margin:20px 0 8px}
+.rpt-p{font-size:15px;color:#1A1A1A!important;line-height:1.8;margin:0 0 10px}
+.rpt-strong{font-weight:700;color:#0A1628!important}
+.rpt-li{display:flex;gap:10px;margin:6px 0}
+.rpt-num{color:#F05A22!important;font-weight:700;min-width:20px}
+.rpt-litext{color:#1A1A1A!important;line-height:1.6}
+.rpt-hr{border:none;border-top:1px solid #EEE;margin:16px 0}
 </style>
 </head>
 <body>
