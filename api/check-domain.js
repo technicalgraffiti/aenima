@@ -5,9 +5,10 @@
 const https = require('https');
 const http = require('http');
 
-// Fetch a URL with timeout, return {status, body, error}
-function fetchUrl(url, timeoutMs = 15000) {
+// Fetch a URL with timeout, follow redirects, return {status, body, error}
+function fetchUrl(url, timeoutMs = 15000, redirectCount = 0) {
   return new Promise((resolve) => {
+    if (redirectCount > 3) return resolve({ status: 0, body: '', error: 'too many redirects' });
     const protocol = url.startsWith('https') ? https : http;
     const req = protocol.get(url, {
       headers: {
@@ -16,6 +17,18 @@ function fetchUrl(url, timeoutMs = 15000) {
       },
       timeout: timeoutMs,
     }, (res) => {
+      // Follow 301/302/307/308 redirects
+      if ([301, 302, 307, 308].includes(res.statusCode) && res.headers.location) {
+        let location = res.headers.location;
+        // Handle relative redirects
+        if (location.startsWith('/')) {
+          const parsed = new URL(url);
+          location = `${parsed.protocol}//${parsed.host}${location}`;
+        }
+        res.resume(); // discard body
+        resolve(fetchUrl(location, timeoutMs, redirectCount + 1));
+        return;
+      }
       let body = '';
       res.on('data', chunk => { if (body.length < 500000) body += chunk; });
       res.on('end', () => resolve({ status: res.statusCode, body, error: null }));
