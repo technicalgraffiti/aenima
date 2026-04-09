@@ -3184,7 +3184,7 @@ function buildDash(){
           <div>
             <div class="dcard" style="margin-bottom:14px">
               <h3>Generated JSON-LD</h3>
-              <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">Paste inside a script tag with <span style="font-family:'DM Mono',monospace;font-size:13px">type="application/ld+json"</span> in your site head.</p>
+              <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">Click Download. Open the file in a text editor. Copy everything. In WordPress go to Breakdance → Settings → Custom Code → Head Code. Paste it in. Click Save Changes.</p>
               <div class="alert al-info" style="margin-bottom:12px;padding:12px 14px">The more detail you fill in here, the better AI can find and recommend your business.<br><br><strong>Starter:</strong> Complete all fields for best results. Download when ready and install on your site yourself.<br><br><strong>Pro:</strong> Complete all fields for best results. Your Pro WordPress plugin installs and updates your files automatically.</div>
               <div class="codebl"><button class="copy-btn" onclick="cpEl('schOut',this)">Copy</button><pre id="schOut">Fill in your business details to generate schema code.</pre></div>
               <div style="display:flex;gap:10px;margin-top:14px;justify-content:center">
@@ -3205,6 +3205,8 @@ function buildDash(){
             <strong>2. FAQ page content (you create this):</strong> Add a visible FAQ section to a page on your website with the same questions and answers. We do not create this for you — it is your content. Both are needed for maximum AI visibility.
           </div>
           <p style="font-size:16px;color:var(--t-support);margin-bottom:22px">AI engines extract FAQs directly from your pages. One of the highest-impact GEO changes you can make.</p>
+          <button class="btn btn-primary btn-sm" id="aiFaqBtn" onclick="aiGenFaq()" style="margin-bottom:18px">✦ Generate FAQs with AI</button>
+          <div id="aiFaqStatus" style="display:none;font-size:14px;margin-bottom:14px"></div>
           <div id="faqItems">
             <div class="faq-i" style="border:1.5px solid var(--border-lt);border-radius:10px;padding:20px;margin-bottom:14px">
               <p style="font-family:'Work Sans',sans-serif;font-weight:600;font-size:16px;color:var(--t-heading);margin-bottom:14px">Question 1</p>
@@ -3214,6 +3216,12 @@ function buildDash(){
           </div>
           <button class="btn btn-outline btn-sm" onclick="addFaq()" style="margin-bottom:22px">+ Add question</button>
           <div class="codebl"><button class="copy-btn" onclick="cpEl('faqOut',this)">Copy</button><pre id="faqOut">Add questions above to generate FAQ schema.</pre></div>
+          <div style="display:flex;gap:10px;margin-top:14px;justify-content:center">
+            <button class="btn btn-primary btn-sm" onclick="dlFaq()">Download FAQ schema</button>
+          </div>
+          <div style="background:#f0f7ff;border-left:3px solid #4A90D9;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:13px;color:var(--t-body);line-height:1.6">
+            <strong>How to install:</strong> Click Download. Open the file in a text editor. Copy everything. In WordPress go to Breakdance → Settings → Custom Code → Head Code. Paste it in. Click Save Changes.
+          </div>
         </div>
       </div>
       <div class="tabp" id="sch-svc">
@@ -3223,12 +3231,20 @@ function buildDash(){
         <div class="d2col">
           <div class="dcard">
             <h3>Service Schema</h3>
+            <button class="btn btn-primary btn-sm" id="aiSvcBtn" onclick="aiGenSvc()" style="margin-bottom:18px">✦ Generate Service Schema with AI</button>
+            <div id="aiSvcStatus" style="display:none;font-size:14px;margin-bottom:14px"></div>
             <div class="fg"><label>Service name</label><input type="text" id="vn" oninput="genSvc()" placeholder="Emergency Plumbing"></div>
             <div class="fg"><label>Description</label><textarea id="vd" oninput="genSvc()" placeholder="24/7 emergency plumbing across Wellingborough. Fast response, fixed pricing."></textarea></div>
             <div class="row2"><div class="fg"><label>Price from (£)</label><input type="text" id="vp" oninput="genSvc()" placeholder="85"></div><div class="fg"><label>Provider</label><input type="text" id="vpr" oninput="genSvc()" placeholder="Smith Plumbing Ltd"></div></div>
             <div class="fg"><label>Provider URL</label><input type="text" id="vu" oninput="genSvc()" placeholder="yourwebsite.co.uk"></div>
           </div>
           <div class="codebl" style="height:fit-content"><button class="copy-btn" onclick="cpEl('svcOut',this)">Copy</button><pre id="svcOut">Fill in service details.</pre></div>
+          <div style="display:flex;gap:10px;margin-top:14px;justify-content:center">
+            <button class="btn btn-primary btn-sm" onclick="dlSvc()">Download Service schema</button>
+          </div>
+          <div style="background:#f0f7ff;border-left:3px solid #4A90D9;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:13px;color:var(--t-body);line-height:1.6">
+            <strong>How to install:</strong> Click Download. Open the file in a text editor. Copy everything. In WordPress go to Breakdance → Settings → Custom Code → Head Code. Paste it in. Click Save Changes.
+          </div>
         </div>
       </div>
     </div>
@@ -3865,7 +3881,112 @@ function genSvc(){
   if(p)s.offers={'@type':'Offer','price':p,'priceCurrency':'GBP'};
   const el=document.getElementById('svcOut');if(el)el.textContent=JSON.stringify(JSON.parse(JSON.stringify(s)),null,2);
 }
-function dlSch(){const c=document.getElementById('schOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('schema.json',c,'application/json');}
+function dlFaq(){const c=document.getElementById('faqOut')?.textContent;if(!c||c.startsWith('Add')){alert('Generate your FAQ schema first.');return;}dlFile('faq-schema.html',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
+function dlSvc(){const c=document.getElementById('svcOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your service details first.');return;}dlFile('service-schema.html',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
+
+async function aiGenFaq(){
+  const btn=document.getElementById('aiFaqBtn');
+  const status=document.getElementById('aiFaqStatus');
+  const p=getProfile();
+  const bizName=p.bizName||v('sn')||'';
+  const bizType=p.bizType||v('st')||'';
+  const town=p.town||v('stw')||'';
+  const services=p.services||v('ss')||'';
+  const description=p.description||v('sd')||'';
+  const website=p.url||v('su')||'';
+  if(!bizName){alert('Fill in your business details in the Local Business tab first.');return;}
+  btn.disabled=true;btn.textContent='Generating…';
+  status.style.display='block';status.textContent='Asking AI to generate relevant FAQs for your business…';
+  try{
+    const prompt=`You are an AI visibility expert. Generate exactly 6 FAQ schema questions and answers for the following business. The questions must be the kind a potential customer would ask an AI assistant like ChatGPT or Google Gemini. Answers must be factual, specific and no longer than 2 sentences. Return ONLY a JSON array of objects with "question" and "answer" fields. No preamble, no markdown, no extra text.
+
+Business name: ${bizName}
+Business type: ${bizType}
+Town/area: ${town}
+Services: ${services}
+Description: ${description}
+Website: ${website}`;
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const faqs=JSON.parse(clean);
+    const container=document.getElementById('faqItems');
+    container.innerHTML='';
+    faqs.forEach((faq,i)=>{
+      const d=document.createElement('div');
+      d.className='faq-i';
+      d.style.cssText='border:1.5px solid var(--border-lt);border-radius:10px;padding:20px;margin-bottom:14px';
+      d.innerHTML=`<div style="display:flex;justify-content:space-between;font-family:'Work Sans',sans-serif;font-weight:600;font-size:16px;color:var(--t-heading);margin-bottom:14px">Question ${i+1}<button onclick="this.closest('.faq-i').remove();genFaq()" style="background:none;border:none;color:var(--t-support);cursor:pointer;font-size:20px">×</button></div><div class="fg"><label>Question</label><input type="text" class="fq" oninput="genFaq()" value="${faq.question.replace(/"/g,'&quot;')}"></div><div class="fg" style="margin-bottom:0"><label>Answer</label><textarea class="fa" oninput="genFaq()">${faq.answer}</textarea></div>`;
+      container.appendChild(d);
+    });
+    genFaq();
+    status.textContent='✓ FAQs generated — edit any answers before downloading.';
+    status.style.color='var(--green)';
+  }catch(e){
+    console.error('AI FAQ gen failed:',e);
+    status.textContent='Generation failed — fill in questions manually below.';
+    status.style.color='var(--red)';
+  }
+  btn.disabled=false;btn.textContent='✦ Generate FAQs with AI';
+}
+
+async function aiGenSvc(){
+  const btn=document.getElementById('aiSvcBtn');
+  const status=document.getElementById('aiSvcStatus');
+  const p=getProfile();
+  const bizName=p.bizName||v('sn')||'';
+  const bizType=p.bizType||v('st')||'';
+  const town=p.town||v('stw')||'';
+  const services=p.services||v('ss')||'';
+  const description=p.description||v('sd')||'';
+  const website=p.url||v('su')||'';
+  if(!bizName){alert('Fill in your business details in the Local Business tab first.');return;}
+  btn.disabled=true;btn.textContent='Generating…';
+  status.style.display='block';status.textContent='Asking AI to generate your service schema…';
+  try{
+    const prompt=`You are an AI visibility expert. Generate a Service schema JSON-LD object for the following business. Return ONLY valid JSON-LD with @context and @type Service. Include: name, description, provider (with @type LocalBusiness, name, url), areaServed, and hasOfferCatalog with individual service Offer items. No preamble, no markdown, no extra text.
+
+Business name: ${bizName}
+Business type: ${bizType}
+Town/area: ${town}
+Services: ${services}
+Description: ${description}
+Website: ${website}`;
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'';
+    const clean=text.replace(/```json|```/g,'').trim();
+    const schema=JSON.parse(clean);
+    const svcName=schema.name||bizName+' Services';
+    const svcDesc=schema.description||'';
+    const providerUrl=schema.provider?.url||website;
+    const el=document.getElementById('vn');if(el)el.value=svcName;
+    const eld=document.getElementById('vd');if(eld)eld.value=svcDesc;
+    const elpr=document.getElementById('vpr');if(elpr)elpr.value=bizName;
+    const elu=document.getElementById('vu');if(elu)elu.value=providerUrl.replace(/^https?:\/\//,'');
+    const out=document.getElementById('svcOut');
+    if(out)out.textContent=JSON.stringify(schema,null,2);
+    status.textContent='✓ Service schema generated — review and download.';
+    status.style.color='var(--green)';
+  }catch(e){
+    console.error('AI Svc gen failed:',e);
+    status.textContent='Generation failed — fill in fields manually.';
+    status.style.color='var(--red)';
+  }
+  btn.disabled=false;btn.textContent='✦ Generate Service Schema with AI';
+}
+function dlSch(){const c=document.getElementById('schOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('schema.json',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
 function validateSchema(){
   const u=v('su')||getProfile().url||'';
   const domain=u.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
@@ -3895,21 +4016,21 @@ function genLlms(){
   txt+=`# ${baseUrl||n}\n`;
   txt+=`# Last updated: ${today}\n\n`;
 
-  // Quick Summary MUST be first — AI reads first 100 tokens
   txt+=`## Quick Summary\n\n`;
-  txt+=`${n} is a ${t||'local business'}`;
-  if(ar){const firstArea=ar.split('\n')[0].trim();if(firstArea)txt+=` based in ${firstArea}`;}
-  txt+=`.`;
-  if(svcs.length>0)txt+=` Services include: ${svcs.slice(0,3).join(', ')}${svcs.length>3?' and more':''}.`;
+  const oneliner=v('lt')||'';
+  txt+=`${n}`;
+  if(ar){const firstArea=ar.split('\n')[0].trim();if(firstArea)txt+=` is based in ${firstArea}`;}
+  if(oneliner)txt+=`. ${oneliner}`;
+  txt+=`\n`;
+  if(svcs.length>0)txt+=`Services include: ${svcs.slice(0,3).join(', ')}${svcs.length>3?' and more':''}.\n`;
   if(fcts.length>0){
-    // Look for price/turnaround facts
     const priceFact=fcts.find(f=>/£|price|from|cost/i.test(f));
     const speedFact=fcts.find(f=>/day|week|hour|fast|quick|turn/i.test(f));
-    if(priceFact)txt+=` ${priceFact}.`;
-    if(speedFact)txt+=` ${speedFact}.`;
+    if(priceFact)txt+=`${priceFact}.\n`;
+    if(speedFact)txt+=`${speedFact}.\n`;
   }
-  if(ph)txt+=` Phone: ${ph}.`;
-  txt+=`\n\n`;
+  if(ph)txt+=`Phone: ${ph}.\n`;
+  txt+=`\n`;
 
   if(d)txt+=`${d}\n\n`;
   if(t)txt+=`> ${t}\n\n`;
@@ -3951,14 +4072,14 @@ function dlLlms(){const c=document.getElementById('llmsOut')?.textContent;if(!c|
    CITATION CHECKER
 ═══════════════════════════════════════ */
 const DIRS=[
-  {n:'Google Business Profile',u:'https://business.google.com',p:'critical',d:'Most important. Used by all AI engines.'},
+  {n:'Google Business Profile',u:'https://business.google.com/create',p:'critical',d:'Most important. Used by all AI engines.'},
   {n:'Bing Places',u:'https://www.bingplaces.com',p:'critical',d:'Microsoft Copilot relies on Bing data.'},
   {n:'Yell.com',u:'https://www.yell.com',p:'high',d:'Major UK directory — heavily AI-cited.'},
   {n:'Thomson Local',u:'https://www.thomsonlocal.com',p:'high',d:'Strong AI citation weight.'},
-  {n:'Checkatrade',u:'https://www.checkatrade.com',p:'high',d:'Trades — very high trust signal.'},
-  {n:'TrustATrader',u:'https://www.trustatrader.com',p:'high',d:'Trades — good citation weight.'},
+  {n:'Checkatrade',u:'https://www.checkatrade.com',p:'medium',d:'Trades businesses only — skip if you are not a consumer trade.'},
+  {n:'TrustATrader',u:'https://www.trustatrader.com',p:'medium',d:'Trades businesses only — skip if you are not a consumer trade.'},
   {n:'Bark.com',u:'https://www.bark.com',p:'medium',d:'Growing AI citation presence.'},
-  {n:'Rated People',u:'https://www.ratedpeople.com',p:'medium',d:'Trades — increasing AI mentions.'},
+  {n:'Rated People',u:'https://www.ratedpeople.com',p:'medium',d:'Trades businesses only — skip if you are not a consumer trade.'},
   {n:'FreeIndex',u:'https://www.freeindex.co.uk',p:'medium',d:'UK business directory.'},
   {n:'Hotfrog UK',u:'https://www.hotfrog.co.uk',p:'medium',d:'UK directory.'},
   {n:'Cylex UK',u:'https://www.cylex.co.uk',p:'low',d:'European directory.'},
@@ -3992,7 +4113,7 @@ function runCit(){
         <div class="cit-nap-found" id="napfound-${d.n.replace(/\s/g,'')}" style="font-size:13px;margin-top:6px;display:none"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-        <a href="${d.u}/search?q=${encodeURIComponent(nm)}+${encodeURIComponent(pc||ad||'')}" target="_blank" rel="noopener"
+        <a href="${d.n==='Google Business Profile'?`https://www.google.com/maps/search/${encodeURIComponent(nm+' '+(pc||ad||''))}`:d.n==='Bing Places'?`https://www.bingplaces.com`:d.n==='Yell.com'?`https://www.yell.com/ucs/UcsSearchAction.do?keywords=${encodeURIComponent(nm)}&location=${encodeURIComponent(pc||ad||'')}`:d.u+'/search?q='+encodeURIComponent(nm)+'+'+encodeURIComponent(pc||ad||'')}" target="_blank" rel="noopener"
            style="font-size:14px;color:var(--orange);text-decoration:none;font-weight:600;white-space:nowrap;border:1.5px solid var(--orange);padding:6px 14px;border-radius:6px">
           Search listing →
         </a>
