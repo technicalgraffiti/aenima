@@ -69,6 +69,14 @@
       }
     },
     {
+      "src": "/case-study-purely-air-tech",
+      "dest": "/public/case-study-purely-air-tech.html"
+    },
+    {
+      "src": "/case-study-purely-air-tech.html",
+      "dest": "/public/case-study-purely-air-tech.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
