@@ -93,6 +93,9 @@ module.exports = async (req, res) => {
       line_items:           [{ price, quantity: 1 }],
       success_url:          `${process.env.NEXT_PUBLIC_URL}/?upgraded=1&plan=${plan}`,
       cancel_url:           `${process.env.NEXT_PUBLIC_URL}/#pricing`,
+      custom_text: {
+        submit: { message: 'Cancel anytime. No contract. Keep your files if you cancel.' },
+      },
       subscription_data: {
         metadata: { plan, billing: billing || 'mo' },
       },
