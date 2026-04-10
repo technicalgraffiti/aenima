@@ -4843,17 +4843,44 @@ function handleUpgrade(plan){
   }
   const billing=S.billing||'mo';
   const btn=event?.target;
+
+  // If user has an existing paid plan, show confirmation modal before charging
+  if(S.plan && S.plan!=='free'){
+    if(btn){btn.disabled=true;btn.textContent='Checking...';}
+    fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user.email,user_id:S.user.id,preview:true})})
+      .then(r=>{if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});return r.json();})
+      .then(d=>{
+        if(btn){btn.disabled=false;btn.textContent='Go Pro & Automate →';}
+        if(d.preview){
+          const amt=d.prorationAmount!=null?'£'+d.prorationAmount.toFixed(2):'a pro-rata amount';
+          const nextDate=d.nextBillingDate||'your next billing date';
+          const o=mkModal(`
+            <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:24px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:12px">Confirm upgrade to Pro</h2>
+            <div style="background:var(--bg-warm);border-radius:8px;padding:16px 18px;margin-bottom:20px">
+              <p style="font-size:15px;color:var(--t-heading);margin:0 0 8px 0"><strong>Charged now:</strong> ${amt} <span style="font-size:13px;color:var(--t-support)">(pro-rata — remainder of this billing period)</span></p>
+              <p style="font-size:15px;color:var(--t-heading);margin:0"><strong>From ${nextDate}:</strong> £7.50/month</p>
+            </div>
+            <p style="font-size:13px;color:var(--t-support);margin-bottom:20px">Your saved card will be charged immediately. Cancel anytime.</p>
+            <button class="btn btn-secondary btn-full" onclick="doConfirmedUpgrade('${plan}','${billing}');this.closest('.modal-ov').remove();">Confirm &amp; Pay ${amt} now →</button>
+            <button onclick="this.closest('.modal-ov').remove()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:var(--t-support);font-size:14px;cursor:pointer">Cancel</button>`);
+        } else if(d.url){
+          window.location.replace(d.url);
+        }
+      })
+      .catch(err=>{
+        if(btn){btn.disabled=false;btn.textContent='Try again';}
+        alert('Payment error: '+err.message+'. Please visit technicalgraffiti.co.uk to get in touch');
+      });
+    return;
+  }
+
+  // New subscription — go straight to Stripe checkout
   if(btn){btn.disabled=true;btn.textContent='Redirecting to payment...';}
   fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user.email,user_id:S.user.id})})
-    .then(r=>{
-      if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});
-      return r.json();
-    })
+    .then(r=>{if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});return r.json();})
     .then(d=>{
       if(d.upgraded){
-        S.plan=d.plan;
-        syncNav(true);
-        updBilling();
+        S.plan=d.plan;syncNav(true);updBilling();
         showDp('billing',document.querySelector('.sb-item[onclick*="billing"]'));
         toast('Upgraded to '+d.plan+' — you were only charged the difference.');
       } else if(d.url){
@@ -4865,6 +4892,23 @@ function handleUpgrade(plan){
     .catch(err=>{
       console.error('Checkout error:',err);
       if(btn){btn.disabled=false;btn.textContent='Try again';}
+      alert('Payment error: '+err.message+'. Please visit technicalgraffiti.co.uk to get in touch');
+    });
+}
+
+function doConfirmedUpgrade(plan,billing){
+  fetch(CFG.CHECKOUT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,billing,email:S.user.email,user_id:S.user.id})})
+    .then(r=>{if(!r.ok)return r.json().then(e=>{throw new Error(e.error||'Server error');});return r.json();})
+    .then(d=>{
+      if(d.upgraded){
+        S.plan=d.plan;syncNav(true);updBilling();
+        showDp('billing',document.querySelector('.sb-item[onclick*="billing"]'));
+        toast('Upgraded to Pro — you were only charged the difference.');
+      } else if(d.url){
+        window.location.replace(d.url);
+      }
+    })
+    .catch(err=>{
       alert('Payment error: '+err.message+'. Please visit technicalgraffiti.co.uk to get in touch');
     });
 }

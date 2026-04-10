@@ -55,6 +55,29 @@ module.exports = async (req, res) => {
           const subscriptionItemId = subscription.items.data[0]?.id;
 
           if (subscriptionItemId) {
+
+            // ── PREVIEW MODE — return proration amount for confirmation modal ──
+            if (req.body.preview) {
+              const preview = await stripe.invoices.retrieveUpcoming({
+                customer: subscription.customer,
+                subscription: user.stripe_subscription_id,
+                subscription_items: [{ id: subscriptionItemId, price }],
+                subscription_proration_behavior: 'always_invoice',
+              });
+              const prorationLine = preview.lines.data.find(l => l.proration);
+              const prorationAmount = prorationLine
+                ? Math.abs(preview.amount_due) / 100
+                : null;
+              const nextDate = new Date(subscription.current_period_end * 1000)
+                .toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+              return res.status(200).json({
+                preview: true,
+                prorationAmount,
+                nextBillingDate: nextDate,
+                nextBillingAmount: 7.50,
+              });
+            }
+
             // Update subscription — Stripe prorates automatically
             await stripe.subscriptions.update(user.stripe_subscription_id, {
               items: [{
@@ -64,6 +87,7 @@ module.exports = async (req, res) => {
               proration_behavior: 'always_invoice',
               payment_behavior: 'error_if_incomplete',
               metadata: { plan, billing: billing || 'mo' },
+              description: `Aenima plan upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)} — pro-rata charge for remainder of billing period`,
             });
 
             // Update Supabase plan immediately
