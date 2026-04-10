@@ -5015,6 +5015,22 @@ initSupabase();
   // Handle Supabase email confirmation redirect
   const hash=window.location.hash;
   if(hash&&hash.includes('access_token')){
+    // Check if this is a password recovery link — if so, show new password page
+    if(hash.includes('type=recovery')){
+      history.replaceState({page:'newpass'},'',window.location.pathname);
+      if(SB){
+        try{
+          // Exchange the token so Supabase session is set
+          await SB.auth.getSession();
+        }catch(ex){console.warn('Recovery session error:',ex);}
+      }
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById('page-newpass').classList.add('active');
+      syncNav(false);
+      window.scrollTo(0,0);
+      setTimeout(initConsent,300);
+      return;
+    }
     history.replaceState({page:'marketing'},'',window.location.pathname);
     if(SB){
       try{
