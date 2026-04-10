@@ -2703,7 +2703,7 @@ function renderScore(r){
   const ring=document.getElementById('scoreRing');
   ring.className='score-ring '+gr;
   document.getElementById('scoreNum').textContent=r.overall;
-  document.getElementById('scoreGrade').textContent=r.overall<60?'Limited AI visibility':r.overall<75?'Moderate visibility':'Good visibility';
+  document.getElementById('scoreGrade').textContent=r.overall===100?'Perfect visibility':r.overall<30?'Not visible to AI search':r.overall<55?'Limited AI visibility':r.overall<80?'Moderate visibility':'Good visibility';
 
   // Cat bars
   document.getElementById('catBars').innerHTML=Object.entries(r.cats).map(([name,c])=>{
@@ -2751,7 +2751,7 @@ function downloadScorePDF(){
 </head><body>
   <div class="hdr"><h1>Machine-Visibility Report</h1><p>${r.domain} · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · Issued by Technical Graffiti</p></div>
   <div class="score">${r.overall}</div>
-  <div class="grade">${r.overall<30?'Not visible to AI search engines.':r.overall<55?'Limited AI visibility.':'Reasonable visibility — improvements available.'}</div>
+  <div class="grade">${r.overall===100?'Perfect visibility — all signals in place.':r.overall<30?'Not visible to AI search engines.':r.overall<55?'Limited AI visibility.':r.overall<80?'Moderate visibility — targeted improvements will help.':'Good visibility — keep your files updated monthly.'}</div>
   <h3>Issues found</h3>
   ${r.issues.map(i=>`<div class="issue"><span class="bdg ${i.p==='critical'?'crit':'high'}">${i.p.toUpperCase()}</span>${i.t}</div>`).join('')}
   <h3>Recommended actions</h3>
@@ -3231,7 +3231,7 @@ function buildDash(){
   <!-- SCHEMA -->
   <div class="dp" id="dp-schema">
     <div class="dh"><h2>Schema Generator</h2><p>Generate Schema 3.0 JSON-LD. Copy and paste into your website head with Starter, or use our WordPress Pro plugin that updates it for you automatically — nothing to do.</p></div>
-    <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Download ready-to-use Schema JSON-LD code with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
+    <div id="schGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Schema Generator — Starter plan</strong><p>Generate Schema markup built for your business. Monthly subscription — cancel anytime and keep the files you've downloaded. From £5.50. No contract.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="schContent">
       <div id="proSchemaNote" style="display:none"></div>
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
@@ -3327,7 +3327,7 @@ function buildDash(){
   <div class="dp" id="dp-llms">
     <div class="dh"><h2>llms.txt Generator</h2><p>The AI identity file for your site. Without it AI systems are guessing who you are. Download and upload yourself with Starter, or use our WordPress Pro plugin that publishes and updates it for you automatically — nothing to do.</p></div>
     <div id="proLlmsNote" style="display:none"></div>
-    <div id="llmsGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">llms.txt Generator — Starter plan</strong><p>Download your llms.txt file with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
+    <div id="llmsGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">llms.txt Generator — Starter plan</strong><p>Generate your AI identity file built for your business. Monthly subscription — cancel anytime and keep the files you've downloaded. From £5.50. No contract.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="llmsContent">
       <div id="llmsProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
@@ -3365,7 +3365,7 @@ function buildDash(){
       <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px">Why it matters</div><div style="font-size:14px;color:#333;line-height:1.6">AI cross-references your name, address and phone across the web. Gaps or inconsistencies reduce your visibility score and your chances of being recommended.</div></div>
       <div><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:6px">How to use it</div><div style="font-size:14px;color:#333;line-height:1.6">Enter your exact business name, phone and address below. Click Generate. Work through the checklist — each directory link opens directly so you can check or add your listing.</div></div>
     </div>
-    <div id="citGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Citation Checker — Starter plan</strong><p>See exactly which directories you're missing at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
+    <div id="citGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Citation Checker — Starter plan</strong><p>See exactly which directories you're missing and get a fix report. From £5.50. No contract.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="citContent">
       <div class="dcard">
         <h3>Your NAP — Name, Address, Phone</h3>
@@ -3384,7 +3384,7 @@ function buildDash(){
   <!-- REPORT -->
   <div class="dp" id="dp-report">
     <div class="dh"><h2>Audit Report</h2><p>Generate a professional AI visibility audit report and certificate for your business.</p></div>
-    <div id="rptGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Audit Report — Starter plan</strong><p>Generate full Machine-Visibility Certificates with a Starter subscription at £5.50/month.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
+    <div id="rptGate" style="display:none"><div class="ugate"><strong style="font-size:18px;color:var(--t-heading)">Audit Report — Starter plan</strong><p>Generate your full AI visibility audit report and Machine-Visibility Certificate. From £5.50. No contract.</p><button class="btn btn-primary" onclick="handleUpgrade('starter')">Upgrade to Starter — £5.50/month →</button></div></div>
     <div id="rptForm">
       <div class="d2col">
         <div class="dcard">
@@ -3795,7 +3795,7 @@ async function _runDScore(){
     const ring=document.getElementById('dRing');
     ring.className='d-ring '+(r.overall<30?'low':r.overall<55?'mid':'good');
     document.getElementById('dNum').textContent=r.overall;
-    document.getElementById('dGrade').textContent=r.overall<30?'Not visible to AI':r.overall<55?'Limited visibility':'Good visibility';
+    document.getElementById('dGrade').textContent=r.overall===100?'Perfect visibility':r.overall<30?'Not visible to AI':r.overall<55?'Limited visibility':r.overall<80?'Moderate visibility':'Good visibility';
     document.getElementById('dCats').innerHTML=Object.entries(r.cats).map(([name,c])=>{
       const pct=Math.round((c.score/c.max)*100);
       const cls=pct<40?'cat-low':pct<65?'cat-mid':'cat-ok';
@@ -3816,10 +3816,10 @@ async function _runDScore(){
 function buildReport(r){
   const c=r.issues.filter(i=>i.p==='critical');const h=r.issues.filter(i=>i.p==='high');
   return`<h4>Quick Analysis — ${r.bizName||r.domain}</h4>
-  <div class="rs"><h5>Overall finding</h5><p>Score: <span class="hl">${r.overall}/100</span>. ${r.overall<30?'<span class="rw">Not currently visible to AI search engines.</span>':r.overall<55?'<span class="rw">Limited AI visibility.</span> Competitors with better GEO and AEO are being recommended more often.':'<span class="rok">Reasonable visibility.</span> Targeted improvements will strengthen your position.'}</p></div>
+  <div class="rs"><h5>Overall finding</h5><p>Score: <span class="hl">${r.overall}/100</span>. ${r.overall<30?'<span class="rw">Not currently visible to AI search engines.</span>':r.overall<55?'<span class="rw">Limited AI visibility.</span> Competitors with better GEO and AEO are being recommended more often.':r.overall===100?'<span class="rok">Perfect visibility.</span> All AI signals are in place — keep your files updated monthly to maintain your position.':'<span class="rok">Good visibility.</span> Targeted improvements will strengthen your position.'}</p></div>
   ${c.length?`<div class="rs"><h5>Critical issues (${c.length})</h5><ul>${c.map(i=>`<li><span class="rw">${i.t}</span></li>`).join('')}</ul></div>`:''}
   ${h.length?`<div class="rs"><h5>High priority (${h.length})</h5><ul>${h.map(i=>`<li>${i.t}</li>`).join('')}</ul></div>`:''}
-  <div class="rs"><h5>Next actions</h5><ul><li>Install your <span class="hl">AI visibility signals</span></li><li>Create and upload <span class="hl">llms.txt</span></li><li>Fix citation gaps across directories</li></ul></div>`;
+  ${r.overall===100?'<div class="rs"><h5>Well done</h5><p style="color:var(--green)">Your AI visibility is perfect. Keep your files updated monthly to maintain your position.</p></div>':'<div class="rs"><h5>Next actions</h5><ul><li>Install your <span class="hl">AI visibility signals</span></li><li>Create and upload <span class="hl">llms.txt</span></li><li>Fix citation gaps across directories</li></ul></div>'}`;
 }
 function autoFill(){
   if(!S.score)return;
@@ -4718,7 +4718,7 @@ function updatePlanStatus(){
 }
 
 function updBilling(){
-  const desc={free:'Score check only',starter:'AI visibility files + monthly tracking',pro:'WordPress plugin — everything automated',agency:'10 sites, white-label, support'};
+  const desc={free:'Score check only — upgrade to get your files',starter:'AI visibility files + monthly tracking',pro:'WordPress plugin — everything automated',agency:'10 sites, white-label, support'};
   const bb=document.getElementById('bBadge');const bd=document.getElementById('bDesc');const ba=document.getElementById('bActions');
   const uc=document.getElementById('bUpgradeCards');const ut=document.getElementById('bUpgradeTitle');
   if(bb){bb.className=`pb pb-${S.plan}`;bb.textContent=S.plan.charAt(0).toUpperCase()+S.plan.slice(1);}
@@ -4734,12 +4734,12 @@ function updBilling(){
     uc.innerHTML=`
       <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-start">Starter</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£5.50/mo</span></div>
-        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">AI visibility files generated for your site. Download and install yourself. Monthly re-score and report.</p>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">All your AI visibility files generated for your site. Download and install yourself. Monthly subscription — cancel anytime and keep the files you've downloaded. Re-score and detailed monthly report included.</p>
         <button class="btn btn-primary btn-full btn-sm" onclick="handleUpgrade('starter')">Upgrade to Starter →</button>
       </div>
       <div style="border:1.5px solid var(--border-lt);border-radius:var(--radius);padding:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="pb pb-pro">Pro</span><span style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.03em">£7.50/mo</span></div>
-        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin installs and updates everything automatically. Nothing to do.</p>
+        <p style="font-size:15px;color:var(--t-support);margin-bottom:14px">WordPress plugin installs and updates all your visibility files automatically every month. Active subscription required — files stop updating if cancelled. Nothing to do after setup.</p>
         <button class="btn btn-secondary btn-full btn-sm" onclick="handleUpgrade('pro')">Upgrade to Pro →</button>
       </div>`;
   }
