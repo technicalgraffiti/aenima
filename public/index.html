@@ -3954,8 +3954,8 @@ function genSvc(){
   if(p)s.offers={'@type':'Offer','price':p,'priceCurrency':'GBP'};
   const el=document.getElementById('svcOut');if(el)el.textContent=JSON.stringify(JSON.parse(JSON.stringify(s)),null,2);
 }
-function dlFaq(){const c=document.getElementById('faqOut')?.textContent;if(!c||c.startsWith('Add')){alert('Generate your FAQ schema first.');return;}dlFile('faq-schema.html',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
-function dlSvc(){const c=document.getElementById('svcOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your service details first.');return;}dlFile('service-schema.html',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
+function dlFaq(){if(!minDataGuard())return;const c=document.getElementById('faqOut')?.textContent;if(!c||c.startsWith('Add')){alert('Generate your FAQ schema first.');return;}dlFile('faq-schema.html',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
+function dlSvc(){if(!minDataGuard())return;const c=document.getElementById('svcOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your service details first.');return;}dlFile('service-schema.html',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
 
 async function aiGenFaq(){
   const btn=document.getElementById('aiFaqBtn');
@@ -4059,7 +4059,19 @@ Website: ${website}`;
   }
   btn.disabled=false;btn.textContent='✦ Generate Service Schema with AI';
 }
-function dlSch(){const c=document.getElementById('schOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('schema.json',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
+function minDataGuard(){
+  const p=getProfile();
+  const missing=[];
+  if(!p.business&&!v('bn'))missing.push('business name');
+  if(!p.town&&!v('bt'))missing.push('town');
+  if(!p.url&&!v('su')&&!v('dUrl'))missing.push('website address');
+  if(missing.length){
+    alert('Please fill in your '+missing.join(', ')+' before generating files. Go to My Score to add your details.');
+    return false;
+  }
+  return true;
+}
+function dlSch(){if(!minDataGuard())return;const c=document.getElementById('schOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('schema.json',`<script type="application/ld+json">\n${c}\n<\/script>`,'text/plain');}
 function validateSchema(){
   const u=v('su')||getProfile().url||'';
   const domain=u.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
@@ -4139,7 +4151,7 @@ function genLlms(){
 
   const el=document.getElementById('llmsOut');if(el)el.textContent=txt;
 }
-function dlLlms(){const c=document.getElementById('llmsOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('llms.txt',c,'text/plain');}
+function dlLlms(){if(!minDataGuard())return;const c=document.getElementById('llmsOut')?.textContent;if(!c||c.startsWith('Fill')){alert('Fill in your business details first.');return;}dlFile('llms.txt',c,'text/plain');}
 
 /* ═══════════════════════════════════════
    CITATION CHECKER

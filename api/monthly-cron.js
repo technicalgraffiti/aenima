@@ -157,9 +157,35 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring, gemin
   const topIssue = criticals[0] || highs[0] || null;
 
   const scoreColour = score.overall < 30 ? '#CC2200' : score.overall < 55 ? '#CC6600' : '#1A8A40';
-  const scoreLabel = score.overall < 30 ? 'Not visible to AI search' : score.overall < 55 ? 'Limited AI visibility' : score.overall < 80 ? 'Moderate visibility' : 'Good visibility';
+  const scoreLabel = score.overall === 100 ? 'Perfect visibility' : score.overall < 30 ? 'Not visible to AI search' : score.overall < 55 ? 'Limited AI visibility' : score.overall < 80 ? 'Moderate visibility' : 'Good visibility';
   const monthName = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
   const name = user.name || user.business || 'there';
+
+  // Review message — contextual based on score and change
+  let reviewMessage = '';
+  if (score.overall === 100) {
+    reviewMessage = `Perfect score — all AI visibility signals are in place. Keep your subscription active to maintain your files and stay ahead as AI search evolves.`;
+  } else if (change === null) {
+    // First report — no previous score
+    if (score.overall >= 80) {
+      reviewMessage = `Strong start — your AI visibility is in good shape. A few targeted improvements will push your score higher and strengthen your chances of being recommended by AI engines.`;
+    } else if (score.overall >= 55) {
+      reviewMessage = `Your AI visibility needs work. The issues listed below are preventing AI engines from reliably identifying and recommending your business. Fix the critical ones first.`;
+    } else {
+      reviewMessage = `Your business is largely invisible to AI search right now. This means ChatGPT, Gemini and Perplexity cannot reliably find or recommend you. The good news — these issues are all fixable.`;
+    }
+  } else if (change > 0) {
+    reviewMessage = `Your score is up ${change} points this month — good progress. ${score.overall === 100 ? 'You have reached a perfect score. Keep your subscription active to stay there.' : 'Keep going — each improvement makes AI engines more likely to recommend your business.'}`;
+  } else if (change < 0) {
+    reviewMessage = `Your score dropped ${Math.abs(change)} points this month. This usually means a file has gone missing or a signal has changed on your site. Check the issues below and re-install your files if needed.`;
+  } else {
+    // No change
+    if (score.overall === 100) {
+      reviewMessage = `Perfect score maintained this month. Your AI visibility signals are all in place — nothing to do.`;
+    } else {
+      reviewMessage = `Your score is unchanged this month. If you haven't installed your visibility files yet, now is the time — it's the single biggest improvement you can make.`;
+    }
+  }
 
   // AI Monitoring badge
   const aiMonitoringBadge = aiMonitoring?.checked
@@ -265,8 +291,9 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring, gemin
   <!-- GREETING -->
   <tr><td style="background:#FFFFFF;padding:28px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8">
     <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0A1628;letter-spacing:-0.02em">Hi ${name},</p>
-    <p style="margin:0;font-size:16px;color:#555555;line-height:1.6">Here's your AI visibility update for ${monthName}. Your domain scored <strong style="color:${scoreColour}">${score.overall}/100</strong> — ${scoreLabel.toLowerCase()}.</p>
-    ${change !== null ? `<table cellpadding="0" cellspacing="0" style="margin-top:16px"><tr><td style="background:${changeBg};color:${changeColour};font-size:14px;font-weight:700;padding:8px 18px;border-radius:20px">${changeText}</td></tr></table>` : ''}
+    <p style="margin:0 0 12px;font-size:16px;color:#555555;line-height:1.6">Here's your AI visibility update for ${monthName}. Your domain scored <strong style="color:${scoreColour}">${score.overall}/100</strong> — ${scoreLabel.toLowerCase()}.</p>
+    ${change !== null ? `<table cellpadding="0" cellspacing="0" style="margin-top:0;margin-bottom:12px"><tr><td style="background:${changeBg};color:${changeColour};font-size:14px;font-weight:700;padding:8px 18px;border-radius:20px">${changeText}</td></tr></table>` : ''}
+    <p style="margin:0;font-size:15px;color:#444444;line-height:1.7;border-left:3px solid #F05A22;padding-left:14px">${reviewMessage}</p>
   </td></tr>
 
   <!-- AI MONITORING BADGE -->
