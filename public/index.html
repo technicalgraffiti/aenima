@@ -4004,10 +4004,10 @@ Services: ${services}
 Description: ${description}
 Website: ${website}`;
 
-    const res=await fetch('/api/ai-faq',{
+    const res=await fetch('/api/generate-report',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt})
+      body:JSON.stringify({mode:'faq',prompt})
     });
     const data=await res.json();
     const text=data.text||'';
@@ -4056,10 +4056,10 @@ Services: ${services}
 Description: ${description}
 Website: ${website}`;
 
-    const res=await fetch('/api/ai-faq',{
+    const res=await fetch('/api/generate-report',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt})
+      body:JSON.stringify({mode:'faq',prompt})
     });
     const data=await res.json();
     const text=data.text||'';

@@ -10,6 +10,18 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
+    // ── FAQ GENERATION MODE ──
+    if (req.body.mode === 'faq') {
+      const { prompt } = req.body;
+      if (!prompt) return res.status(400).json({ error: 'No prompt' });
+      const msg = await client.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      });
+      return res.status(200).json({ text: msg.content[0].text });
+    }
+
     const { bizName, bizType, town, domain, scoreData, plan } = req.body;
     const isPro = plan === 'pro' || plan === 'agency';
     const isStarter = plan === 'starter';
