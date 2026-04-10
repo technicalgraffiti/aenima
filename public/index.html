@@ -3259,8 +3259,8 @@ function buildDash(){
       <div id="schProfileNote" style="display:none;background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
         <strong>Complete your profile first</strong> — go to your Account profile and fill in your business name, type, town and services. This form will auto-populate with your details.
       </div>
-      <div class="tabs"><button class="tab on" onclick="swTab('sch','local',this)">Local Business</button><button class="tab" onclick="swTab('sch','faq',this)">FAQ Page</button><button class="tab" onclick="swTab('sch','svc',this)">Service</button></div>
-      <div class="tabp on" id="sch-local">
+
+      <div id="sch-local" style="margin-bottom:40px">
         <div class="d2col">
           <div class="dcard" style="margin-bottom:0">
             <h3>Business details</h3>
@@ -3290,7 +3290,7 @@ function buildDash(){
           </div>
         </div>
       </div>
-      <div class="tabp" id="sch-faq">
+      <div id="sch-faq" style="margin-bottom:40px">
         <div class="dcard">
           <h3>FAQ Schema</h3>
           <div style="background:#fff8f0;border-left:3px solid var(--orange);border-radius:6px;padding:14px 16px;margin-bottom:20px;font-size:14px;color:var(--t-body);line-height:1.7">
@@ -3319,7 +3319,7 @@ function buildDash(){
           </div>
         </div>
       </div>
-      <div class="tabp" id="sch-svc">
+      <div id="sch-svc" style="margin-bottom:40px">
         <div style="background:#f5f5f5;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--t-body)">
           <strong>Service schema</strong> is for businesses with individual service pages — for example yoursite.co.uk/emergency-plumbing or /boiler-installation. It tells AI exactly what each page offers. If you have one general website without separate service pages, use the Local Business tab instead.
         </div>
