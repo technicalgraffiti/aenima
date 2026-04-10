@@ -2452,7 +2452,8 @@ async function loadS(){
           saveS();
           // Populate brd_profile from Supabase so all form fields auto-fill
           const existing=getProfile();
-          localStorage.setItem('brd_profile',JSON.stringify(Object.assign({
+          const profKey='brd_profile'+data.session.user.id;
+          localStorage.setItem(profKey,JSON.stringify(Object.assign({
             business:profile.business||'',
             url:profile.website||'',
             name:profile.name||'',
@@ -2473,11 +2474,13 @@ function saveS(){if(S.user)localStorage.setItem('brd_u',JSON.stringify(S.user));
 // Any form can call saveProfile() to persist, fillForms() to spread
 
 function getProfile(){
-  try{return JSON.parse(localStorage.getItem('brd_profile')||'{}');}catch(e){return {};}
+  const k='brd_profile'+(S.user?.id||'');
+  try{return JSON.parse(localStorage.getItem(k)||'{}');}catch(e){return {};}
 }
 function saveProfile(updates){
   const p=Object.assign(getProfile(),updates);
-  localStorage.setItem('brd_profile',JSON.stringify(p));
+  const k='brd_profile'+(S.user?.id||'');
+  localStorage.setItem(k,JSON.stringify(p));
   if(S.user){
     if(updates.business)S.user.business=updates.business;
     if(updates.url)S.user.url=updates.url;
@@ -2833,7 +2836,7 @@ async function doLogin(){
         }
       }catch(pe){console.warn('Profile fetch error:',pe);}
       // Clear any cached profile from a previous account
-      localStorage.removeItem('brd_profile');
+      localStorage.removeItem('brd_profile'+(S.user?.id||''));
       S.user={
         id:data.user.id,
         email:e,
