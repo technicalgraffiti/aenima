@@ -2413,11 +2413,11 @@ function initSupabase(){
     // Listen for password reset session
     SB.auth.onAuthStateChange((event,session)=>{
       if(event==='PASSWORD_RECOVERY'){
+        window._passwordRecovery=true;
         history.replaceState({page:'newpass'},'',window.location.pathname);
         document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-        document.getElementById('page-newpass').classList.add('active');
-        syncNav(false);
-        window.scrollTo(0,0);
+        const np=document.getElementById('page-newpass');
+        if(np){np.classList.add('active');syncNav(false);window.scrollTo(0,0);}
       }
     });
   }
@@ -2925,7 +2925,7 @@ async function doReset(){
   btn.disabled=true;btn.textContent='Sending...';
   try{
     const{error}=await SB.auth.resetPasswordForEmail(e,{
-      redirectTo:window.location.origin+'/#newpass'
+      redirectTo:window.location.origin+'/'
     });
     btn.disabled=false;btn.textContent='Send reset link →';
     if(error){err.textContent=error.message;err.classList.add('show');return;}
@@ -5017,10 +5017,10 @@ initSupabase();
   if(hash&&hash.includes('access_token')){
     // Check if this is a password recovery link — if so, show new password page
     if(hash.includes('type=recovery')){
+      window._passwordRecovery=true;
       history.replaceState({page:'newpass'},'',window.location.pathname);
       if(SB){
         try{
-          // Exchange the token so Supabase session is set
           await SB.auth.getSession();
         }catch(ex){console.warn('Recovery session error:',ex);}
       }
@@ -5129,6 +5129,8 @@ initSupabase();
     } else {
       showPage('login');
     }
+  } else if(window._passwordRecovery){
+    // Password recovery — already handled above, do not override
   } else if(S.user){
     showPage('dashboard');
   } else {
