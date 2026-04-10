@@ -5111,6 +5111,7 @@ function toast(msg){
 initSupabase();
 (async()=>{
   await loadS();
+  if(S.user&&!S.score){await loadLastScore();}
 
   // Handle Supabase email confirmation redirect
   const hash=window.location.hash;
