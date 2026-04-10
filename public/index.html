@@ -2479,12 +2479,25 @@ function saveProfile(updates){
   const p=Object.assign(getProfile(),updates);
   localStorage.setItem('brd_profile',JSON.stringify(p));
   if(S.user){
-    // Sync key fields back to user object
     if(updates.business)S.user.business=updates.business;
     if(updates.url)S.user.url=updates.url;
     if(updates.name)S.user.name=updates.name;
     if(updates.email)S.user.email=updates.email;
     saveS();
+    if(SB){
+      const dbUpdate={};
+      if(updates.business!==undefined)dbUpdate.business=updates.business;
+      if(updates.url!==undefined)dbUpdate.website=updates.url;
+      if(updates.name!==undefined)dbUpdate.name=updates.name;
+      if(updates.phone!==undefined)dbUpdate.phone=updates.phone;
+      if(updates.town!==undefined)dbUpdate.town=updates.town;
+      if(updates.postcode!==undefined)dbUpdate.postcode=updates.postcode;
+      if(Object.keys(dbUpdate).length){
+        SB.from('users').update(dbUpdate).eq('id',S.user.id).then(({error})=>{
+          if(error)console.warn('Profile save to Supabase failed:',error.message);
+        });
+      }
+    }
   }
   fillForms();
 }
@@ -3268,7 +3281,7 @@ function buildDash(){
           <div>
             <div class="dcard" style="margin-bottom:14px">
               <h3>Generated JSON-LD</h3>
-              <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">Click Download. Open the file in a text editor. Copy everything. In WordPress go to Breakdance → Settings → Custom Code → Head Code. Paste it in. Click Save Changes.</p>
+              <p style="font-size:15px;color:var(--t-support);margin-bottom:6px">Click Download. Open the file in a text editor. Copy everything. In WordPress go to Appearance → Theme File Editor, or use a plugin such as WPCode, and paste it into your site head.</p>
               <div class="alert al-info" style="margin-bottom:12px;padding:12px 14px">The more detail you fill in here, the better AI can find and recommend your business.<br><br><strong>Starter:</strong> Complete all fields for best results. Download when ready and install on your site yourself.<br><br><strong>Pro:</strong> Complete all fields for best results. Your Pro WordPress plugin installs and updates your files automatically.</div>
               <div class="codebl"><button class="copy-btn" onclick="cpEl('schOut',this)">Copy</button><pre id="schOut">Fill in your business details to generate schema code.</pre></div>
               <div style="display:flex;gap:10px;margin-top:14px;justify-content:center">
@@ -3304,7 +3317,7 @@ function buildDash(){
             <button class="btn btn-primary btn-sm" onclick="dlFaq()">Download FAQ schema</button>
           </div>
           <div style="background:#f0f7ff;border-left:3px solid #4A90D9;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:13px;color:var(--t-body);line-height:1.6">
-            <strong>How to install:</strong> Click Download. Open the file in a text editor. Copy everything. In WordPress go to Breakdance → Settings → Custom Code → Head Code. Paste it in. Click Save Changes.
+            <strong>How to install:</strong> Click Download. Open the file in a text editor. Copy everything. In WordPress go to Appearance → Theme File Editor, or use a plugin such as WPCode, and paste it into your site head.
           </div>
         </div>
       </div>
@@ -3327,7 +3340,7 @@ function buildDash(){
             <button class="btn btn-primary btn-sm" onclick="dlSvc()">Download Service schema</button>
           </div>
           <div style="background:#f0f7ff;border-left:3px solid #4A90D9;border-radius:6px;padding:12px 16px;margin-top:16px;font-size:13px;color:var(--t-body);line-height:1.6">
-            <strong>How to install:</strong> Click Download. Open the file in a text editor. Copy everything. In WordPress go to Breakdance → Settings → Custom Code → Head Code. Paste it in. Click Save Changes.
+            <strong>How to install:</strong> Click Download. Open the file in a text editor. Copy everything. In WordPress go to Appearance → Theme File Editor, or use a plugin such as WPCode, and paste it into your site head.
           </div>
         </div>
       </div>
@@ -3991,13 +4004,13 @@ Services: ${services}
 Description: ${description}
 Website: ${website}`;
 
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/api/ai-faq',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({prompt})
     });
     const data=await res.json();
-    const text=data.content?.[0]?.text||'';
+    const text=data.text||'';
     const clean=text.replace(/```json|```/g,'').trim();
     const faqs=JSON.parse(clean);
     const container=document.getElementById('faqItems');
@@ -4043,13 +4056,13 @@ Services: ${services}
 Description: ${description}
 Website: ${website}`;
 
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/api/ai-faq',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({prompt})
     });
     const data=await res.json();
-    const text=data.content?.[0]?.text||'';
+    const text=data.text||'';
     const clean=text.replace(/```json|```/g,'').trim();
     const schema=JSON.parse(clean);
     const svcName=schema.name||bizName+' Services';
