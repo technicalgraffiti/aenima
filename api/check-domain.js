@@ -134,9 +134,26 @@ module.exports = async (req, res) => {
   const robotsExists = robotsCheck.status === 200;
 
   // Check if AI bots are explicitly blocked
-  const blocksGPTBot = robotsBody.includes('gptbot') && (robotsBody.includes('disallow: /') || robotsBody.includes('disallow:/'));
-  const blocksClaudeBot = robotsBody.includes('claudebot') && (robotsBody.includes('disallow: /') || robotsBody.includes('disallow:/'));
-  const blocksPerplexity = robotsBody.includes('perplexitybot') && (robotsBody.includes('disallow: /') || robotsBody.includes('disallow:/'));
+  // Must check that disallow: / appears under the specific bot's user-agent block, not just anywhere in the file
+  function isBotBlocked(body, botName) {
+    const lines = body.split('\n');
+    let inBotBlock = false;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('user-agent:')) {
+        inBotBlock = trimmed.includes(botName);
+      }
+      if (inBotBlock && trimmed.startsWith('disallow:')) {
+        const path = trimmed.replace('disallow:', '').trim();
+        // Blocked if disallow is exactly / or empty (full block)
+        if (path === '/' || path === '') return true;
+      }
+    }
+    return false;
+  }
+  const blocksGPTBot = isBotBlocked(robotsBody, 'gptbot');
+  const blocksClaudeBot = isBotBlocked(robotsBody, 'claudebot');
+  const blocksPerplexity = isBotBlocked(robotsBody, 'perplexitybot');
   const anyAiBlocked = blocksGPTBot || blocksClaudeBot || blocksPerplexity;
 
   // Check for wildcard block — must be exact 'disallow: /' not 'disallow: /something'

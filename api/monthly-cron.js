@@ -247,6 +247,7 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring, gemin
       <tr>
         <td>
           <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Monthly AI Visibility Report · ${monthName}</p>
+          <p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,0.45)">${domain}</p>
           <h1 style="margin:0 0 2px;font-size:32px;font-weight:800;color:#FFFFFF;letter-spacing:-0.04em;line-height:1">Aenima<span style="color:#F05A22">.</span></h1>
           <p style="margin:10px 0 0;font-size:15px;color:rgba(255,255,255,0.45)">${score.domain}</p>
         </td>
@@ -342,7 +343,7 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring, gemin
       body: JSON.stringify({
         from: 'Aenima <ai@aenima.co.uk>',
         to: user.email,
-        subject: `Your AI visibility report — ${monthName} · ${score.overall}/100`,
+        subject: `Your AI visibility report — ${domain} · ${monthName} · ${score.overall}/100`,
         html
       })
     });
