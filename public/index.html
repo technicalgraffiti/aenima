@@ -2506,11 +2506,15 @@ function fillForms(){
       }
     });
   });
-  // Lock dUrl to registered domain only if one exists
+  // Lock dUrl to registered domain only for paid plans
   const dUrl=document.getElementById('dUrl');
   if(dUrl){dUrl.readOnly=false;}
-  if(dUrl&&p.url){
+  if(dUrl&&p.url&&S.plan&&S.plan!=='free'){
     dUrl.readOnly=true;
+    const clean=p.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
+    dUrl.value=clean;
+  } else if(dUrl&&p.url&&!dUrl.value){
+    // Pre-fill but keep editable for free accounts
     const clean=p.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
     dUrl.value=clean;
   }
