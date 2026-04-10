@@ -2506,9 +2506,11 @@ function fillForms(){
       }
     });
   });
-  // Always lock dUrl to registered domain — cannot be changed
+  // Lock dUrl to registered domain only if one exists
   const dUrl=document.getElementById('dUrl');
+  if(dUrl){dUrl.readOnly=false;}
   if(dUrl&&p.url){
+    dUrl.readOnly=true;
     const clean=p.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
     dUrl.value=clean;
   }
@@ -3167,7 +3169,7 @@ function buildDash(){
           <label>Website address</label>
           <div style="display:flex;align-items:center;gap:6px;background:var(--bg-white);border:1.5px solid var(--border-lt);border-radius:8px;padding:0 12px;transition:border-color 0.2s">
             <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--t-support);white-space:nowrap;flex-shrink:0">https://</span>
-            <input type="text" id="dUrl" placeholder="yourwebsite.co.uk" style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--t-heading);padding:11px 0" readonly title="Checks run against your registered website">
+            <input type="text" id="dUrl" placeholder="yourwebsite.co.uk" style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--t-heading);padding:11px 0" title="Checks run against your registered website">
           </div>
         </div>
         <div class="fg" style="margin-bottom:0"><label>Business type</label><select id="dType"><option value="">Select...</option><option>Plumber</option><option>Electrician</option><option>Builder</option><option>Roofer</option><option>Solicitor</option><option>Accountant</option><option>Architect</option><option>Surveyor</option><option>Dentist</option><option>Restaurant</option><option>Shop / Retail</option><option>Mechanic</option><option>Landscaper</option><option>Other trade</option><option>Other professional</option></select></div>
