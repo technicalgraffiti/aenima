@@ -2450,6 +2450,17 @@ async function loadS(){
           };
           S.plan=S.user.plan;
           saveS();
+          // Populate brd_profile from Supabase so all form fields auto-fill
+          const existing=getProfile();
+          localStorage.setItem('brd_profile',JSON.stringify(Object.assign({
+            business:profile.business||'',
+            url:profile.website||'',
+            name:profile.name||'',
+            email:profile.email||'',
+            phone:profile.phone||'',
+            town:profile.town||'',
+            postcode:profile.postcode||'',
+          },existing)));
         }
       }
     }catch(ex){console.warn('Supabase session restore failed:',ex);}
