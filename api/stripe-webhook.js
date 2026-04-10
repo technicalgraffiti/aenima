@@ -21,6 +21,8 @@ const PLAN_MAP = {
   'price_1TCGKFJB2Su5DD2sQSkAf0Tz': 'starter',
 };
 
+const HARDSHIP_PRICE_ID = 'price_1TCGKFJB2Su5DD2sQSkAf0Tz';
+
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -78,6 +80,21 @@ module.exports = async (req, res) => {
       if (error) console.error('Supabase update failed:', error);
       else if (!data || data.length === 0) console.error(`No user found with email: ${email}`);
       else console.log(`Plan updated: ${email} → ${plan}`);
+
+      // If hardship plan — log domain to prevent repeat use
+      if (priceId === HARDSHIP_PRICE_ID) {
+        const domain = sub.metadata?.domain || session.metadata?.domain || null;
+        if (domain) {
+          const clean = domain.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].trim().toLowerCase();
+          const { error: hdErr } = await SB
+            .from('hardship_domains')
+            .upsert({ domain: clean, email: email || '' }, { onConflict: 'domain' });
+          if (hdErr) console.error('Failed to log hardship domain:', hdErr);
+          else console.log(`Hardship domain logged: ${clean}`);
+        } else {
+          console.warn('Hardship checkout — no domain in metadata, cannot log');
+        }
+      }
       break;
     }
 

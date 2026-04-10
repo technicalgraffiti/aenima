@@ -31,6 +31,10 @@
     "api/keepalive.js": {
       "memory": 128,
       "maxDuration": 10
+    },
+    "api/check-hardship.js": {
+      "memory": 128,
+      "maxDuration": 10
     }
   },
   "routes": [

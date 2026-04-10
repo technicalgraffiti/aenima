@@ -4942,29 +4942,56 @@ function openHardshipPayment(){
   // Email capture before Stripe hardship link
   mkModal(`
     <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">One quick step</h2>
-    <p style="font-size:15px;color:var(--t-support);margin-bottom:20px">We need your email so we can set up your account and send your monthly reports.</p>
+    <p style="font-size:15px;color:var(--t-support);margin-bottom:20px">We need your email and website domain so we can set up your account and send your monthly reports.</p>
     <div id="hpErr" style="display:none;background:#FFF0EE;border:1px solid #FFCCCC;border-radius:8px;padding:10px 14px;font-size:14px;color:var(--red);margin-bottom:14px"></div>
-    <div style="margin-bottom:20px">
+    <div style="margin-bottom:16px">
       <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Email address</label>
       <input id="hpEmail" type="email" placeholder="you@yourbusiness.co.uk" autocomplete="email" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--t-support);margin-bottom:6px">Your website domain</label>
+      <input id="hpDomain" type="text" placeholder="yourwebsite.co.uk" style="width:100%;border:1.5px solid var(--border-lt);border-radius:8px;font-size:16px;padding:11px 14px;outline:none;font-family:inherit">
     </div>
     <button id="hpBtn" class="btn btn-primary btn-full" style="background:var(--orange)" onclick="doHardshipPay()">Continue to payment — £3.50/mo →</button>
     <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--t-support)">Full Starter plan · Self-declared · No questions asked</p>`);
   setTimeout(()=>{const f=document.getElementById('hpEmail');if(f)f.focus();},100);
 }
 
-function doHardshipPay(){
+async function doHardshipPay(){
   const e=(document.getElementById('hpEmail')?.value||'').trim();
+  const d=(document.getElementById('hpDomain')?.value||'').trim().replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0].toLowerCase();
   const errEl=document.getElementById('hpErr');
   const btn=document.getElementById('hpBtn');
   if(!e||!e.includes('@')){
     if(errEl){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';}
     return;
   }
-  // Store email for post-payment use
+  if(!d||!d.includes('.')){
+    if(errEl){errEl.textContent='Please enter your website domain (e.g. yourbusiness.co.uk).';errEl.style.display='block';}
+    return;
+  }
+  if(btn){btn.disabled=true;btn.textContent='Checking eligibility...';}
+  if(errEl)errEl.style.display='none';
+  try{
+    const resp=await fetch('/api/check-hardship',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({domain:d})
+    });
+    const result=await resp.json();
+    if(!result.eligible){
+      if(errEl){errEl.textContent='This domain has already used the hardship rate. The hardship plan is available once per domain.';errEl.style.display='block';}
+      if(btn){btn.disabled=false;btn.textContent='Continue to payment — £3.50/mo →';}
+      return;
+    }
+  }catch(err){
+    console.warn('Hardship check failed, proceeding anyway:', err);
+  }
+  // Store email and domain for post-payment use
   sessionStorage.setItem('hardshipEmail',e);
+  sessionStorage.setItem('hardshipDomain',d);
   document.querySelector('.modal-ov')?.remove();
-  // Append email as prefill to Stripe link if supported
+  // Append email as prefill to Stripe link
   const url=CFG.HARDSHIP_LINK+(CFG.HARDSHIP_LINK.includes('?')?'&':'?')+'prefilled_email='+encodeURIComponent(e);
   window.open(url,'_blank');
 }
@@ -5138,6 +5165,20 @@ initSupabase();
         const{data}=await SB.from('users').select('plan,stripe_subscription_id').eq('id',S.user.id).single();
         if(data&&data.plan){S.plan=data.plan;S.user.plan=data.plan;saveS();}
       }catch(e){console.warn('Plan verify failed:',e);}
+    }
+    // If hardship domain stored in sessionStorage, save it now
+    const hDomain=sessionStorage.getItem('hardshipDomain');
+    const hEmail=sessionStorage.getItem('hardshipEmail');
+    if(hDomain){
+      sessionStorage.removeItem('hardshipDomain');
+      sessionStorage.removeItem('hardshipEmail');
+      try{
+        await fetch('/api/check-hardship',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({domain:hDomain,email:hEmail||'',save:true})
+        });
+      }catch(e){console.warn('Hardship domain save failed:',e);}
     }
     if(S.user){
       showPage('dashboard');
