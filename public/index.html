@@ -2804,6 +2804,8 @@ async function doLogin(){
           profile={name:meta.name||'',business:meta.business||'',website:meta.website||'',phone:meta.phone||'',town:meta.town||'',postcode:meta.postcode||'',plan:'free'};
         }
       }catch(pe){console.warn('Profile fetch error:',pe);}
+      // Clear any cached profile from a previous account
+      localStorage.removeItem('brd_profile');
       S.user={
         id:data.user.id,
         email:e,
@@ -2818,6 +2820,15 @@ async function doLogin(){
       };
       S.plan=S.user.plan;
       saveS();
+      // Seed local profile from Supabase data so forms pre-fill correctly
+      saveProfile({
+        name:profile?.name||'',
+        business:profile?.business||'',
+        url:profile?.website||'',
+        phone:profile?.phone||'',
+        town:profile?.town||'',
+        postcode:profile?.postcode||''
+      });
       if(btn){btn.disabled=false;btn.textContent='Log in →';}
       // Check for pending upgrade from before login
       const pp=sessionStorage.getItem('pendingPlan');
