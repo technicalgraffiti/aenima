@@ -1,6 +1,6 @@
 // api/check-domain.js
 // Real domain technical checks for AI visibility
-// Checks: HTTPS, Schema, llms.txt, robots.txt AI access, meta description
+// Checks: HTTPS, Schema, llms.txt, robots.txt AI access, meta description, Companies House
 
 const https = require('https');
 const http = require('http');
@@ -37,6 +37,84 @@ function fetchUrl(url, timeoutMs = 15000, redirectCount = 0) {
     req.on('timeout', () => { req.destroy(); resolve({ status: 0, body: '', error: 'timeout' }); });
   });
 }
+
+// ── COMPANIES HOUSE HELPERS ───────────────────────────────────────────────────
+
+// Extract all sameAs URLs from JSON-LD blocks in the page HTML
+function extractSameAsUrls(html) {
+  const urls = [];
+  const scriptRe = /<script[^>]+type=["']?application\/ld\+json["']?[^>]*>([\s\S]*?)<\/script>/gi;
+  let match;
+  while ((match = scriptRe.exec(html)) !== null) {
+    try {
+      const obj = JSON.parse(match[1]);
+      // Handle both single object and @graph array
+      const nodes = obj['@graph'] ? obj['@graph'] : [obj];
+      for (const node of nodes) {
+        if (node.sameAs) {
+          const sa = Array.isArray(node.sameAs) ? node.sameAs : [node.sameAs];
+          for (const u of sa) {
+            if (typeof u === 'string') urls.push(u);
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore malformed JSON-LD blocks
+    }
+  }
+  return urls;
+}
+
+// Extract company number from a Companies House URL
+// Handles: find-and-update.company-information.service.gov.uk/company/12345678
+function extractCompanyNumber(url) {
+  const match = url.match(/company-information\.service\.gov\.uk\/company\/([A-Z0-9]{8})/i);
+  return match ? match[1].toUpperCase() : null;
+}
+
+// Call Companies House API and return company data
+function fetchCompaniesHouse(companyNumber) {
+  return new Promise((resolve) => {
+    const apiKey = process.env.COMPANIES_HOUSE_API_KEY;
+    if (!apiKey) return resolve({ error: 'no_api_key' });
+
+    // CH API uses HTTP Basic Auth — API key as username, empty password
+    const auth = Buffer.from(`${apiKey}:`).toString('base64');
+    const options = {
+      hostname: 'api.company-information.service.gov.uk',
+      path: `/company/${companyNumber}`,
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Accept': 'application/json',
+      },
+      timeout: 8000,
+    };
+
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', chunk => { body += chunk; });
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          try {
+            resolve({ data: JSON.parse(body), error: null });
+          } catch (e) {
+            resolve({ error: 'parse_error' });
+          }
+        } else if (res.statusCode === 404) {
+          resolve({ error: 'not_found' });
+        } else {
+          resolve({ error: `http_${res.statusCode}` });
+        }
+      });
+    });
+    req.on('error', (err) => resolve({ error: err.message }));
+    req.on('timeout', () => { req.destroy(); resolve({ error: 'timeout' }); });
+    req.end();
+  });
+}
+
+// ── MAIN HANDLER ─────────────────────────────────────────────────────────────
 
 module.exports = async (req, res) => {
   // CORS
@@ -86,7 +164,6 @@ module.exports = async (req, res) => {
 
   // ── CHECK 2: SCHEMA MARKUP ───────────────────────────────────────────────
   const homepageBody = httpsCheck.body || '';
-  // PageSpeed removes quotes: type=application/ld+json or type="application/ld+json"
   const hasSchema = homepageBody.includes('application/ld+json') || 
     homepageBody.includes('application\/ld+json') ||
     homepageBody.includes('itemtype') || 
@@ -133,8 +210,6 @@ module.exports = async (req, res) => {
   const robotsBody = (robotsCheck.body || '').toLowerCase();
   const robotsExists = robotsCheck.status === 200;
 
-  // Check if AI bots are explicitly blocked
-  // Must check that disallow: / appears under the specific bot's user-agent block, not just anywhere in the file
   function isBotBlocked(body, botName) {
     const lines = body.split('\n');
     let inBotBlock = false;
@@ -145,7 +220,6 @@ module.exports = async (req, res) => {
       }
       if (inBotBlock && trimmed.startsWith('disallow:')) {
         const path = trimmed.replace('disallow:', '').trim();
-        // Blocked if disallow is exactly / or empty (full block)
         if (path === '/' || path === '') return true;
       }
     }
@@ -156,7 +230,6 @@ module.exports = async (req, res) => {
   const blocksPerplexity = isBotBlocked(robotsBody, 'perplexitybot');
   const anyAiBlocked = blocksGPTBot || blocksClaudeBot || blocksPerplexity;
 
-  // Check for wildcard block — must be exact 'disallow: /' not 'disallow: /something'
   const hasWildcardBlock = robotsBody.includes('user-agent: *') && 
     /disallow:\s*\/\s*(\r?\n|$)/m.test(robotsBody);
 
@@ -179,7 +252,6 @@ module.exports = async (req, res) => {
   };
 
   // ── CHECK 5: META DESCRIPTION ────────────────────────────────────────────
-  // Match meta description with or without quotes (PageSpeed removes quotes)
   const metaMatch = homepageBody.match(/<meta[^>]+name=["']?description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i)
     || homepageBody.match(/<meta[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?[^>]+name=["']?description["']?/i);
   const metaDesc = metaMatch ? metaMatch[1] : null;
@@ -196,6 +268,65 @@ module.exports = async (req, res) => {
     max: 20,
   };
 
+  // ── CHECK 6: COMPANIES HOUSE VERIFICATION ────────────────────────────────
+  // Extract sameAs URLs from JSON-LD, look for a Companies House URL,
+  // call the CH API to confirm active status and name match
+  const sameAsUrls = extractSameAsUrls(homepageBody);
+  const chUrl = sameAsUrls.find(u => u.includes('company-information.service.gov.uk/company/'));
+  const companyNumber = chUrl ? extractCompanyNumber(chUrl) : null;
+
+  let chResult = {
+    checked: false,
+    companyNumber: null,
+    companyName: null,
+    status: null,
+    active: false,
+    urlPresent: !!chUrl,
+    detail: '',
+    error: null,
+  };
+
+  if (companyNumber) {
+    const chResponse = await fetchCompaniesHouse(companyNumber);
+    if (chResponse.error) {
+      chResult = {
+        checked: true,
+        companyNumber,
+        urlPresent: true,
+        active: false,
+        detail: chResponse.error === 'not_found'
+          ? `Company number ${companyNumber} not found at Companies House — check the URL is correct`
+          : `Companies House check could not complete — ${chResponse.error}`,
+        error: chResponse.error,
+      };
+    } else {
+      const company = chResponse.data;
+      const isActive = company.company_status === 'active';
+      chResult = {
+        checked: true,
+        companyNumber,
+        companyName: company.company_name || null,
+        status: company.company_status || null,
+        active: isActive,
+        urlPresent: true,
+        detail: isActive
+          ? `Companies House confirmed — ${company.company_name} is active`
+          : `Companies House found — ${company.company_name} status is "${company.company_status}" — not active`,
+        error: null,
+      };
+    }
+  } else if (chUrl) {
+    // URL present but company number could not be extracted
+    chResult.detail = 'Companies House URL found but company number could not be read — check the URL format';
+    chResult.checked = true;
+    chResult.error = 'bad_url_format';
+  } else {
+    // No CH URL in sameAs at all
+    chResult.detail = 'No Companies House URL in schema sameAs — add your Companies House record to confirm your business is real and registered';
+  }
+
+  results.companiesHouse = chResult;
+
   // ── TOTAL SCORE ───────────────────────────────────────────────────────────
   const overall = results.https.score + results.schema.score + results.llms.score + results.robots.score + results.meta.score;
 
@@ -211,6 +342,13 @@ module.exports = async (req, res) => {
   if (results.robots.blocksPerplexity) issues.push({ p: 'critical', t: 'PerplexityBot blocked in robots.txt — Perplexity cannot crawl your site', cta: true });
   if (results.robots.hasWildcardBlock) issues.push({ p: 'critical', t: 'All bots blocked by wildcard rule in robots.txt — no AI engine can access your site', cta: true });
   if (!results.meta.pass) issues.push({ p: 'high', t: 'No meta description — AI engines have no text summary of what your business does', cta: true });
+
+  // Companies House issues
+  if (!chResult.urlPresent) {
+    issues.push({ p: 'high', t: 'No Companies House URL in schema — add your UK government registration record to confirm your business is real to AI engines', cta: true });
+  } else if (chResult.checked && !chResult.active) {
+    issues.push({ p: 'critical', t: `Companies House check failed — ${chResult.detail}`, cta: true });
+  }
 
   // ── ADVISORY ISSUES (advanced signals — Gemini-level optimisation) ────────
   const advisory = [];
@@ -241,6 +379,7 @@ module.exports = async (req, res) => {
     issues,
     advisory,
     checks: results,
+    companiesHouse: chResult,
     advancedSignals: {
       knowsAbout: hasKnowsAbout,
       priceSpecification: hasPriceSpec,
