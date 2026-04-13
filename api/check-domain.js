@@ -1,6 +1,6 @@
 // api/check-domain.js
 // Real domain technical checks for AI visibility
-// Checks: HTTPS, Schema, llms.txt, robots.txt AI access, meta description, Companies House
+// Checks: HTTPS, Schema, llms.txt, robots.txt AI access, meta description, Companies House, sameAs authority
 
 const https = require('https');
 const http = require('http');
@@ -70,6 +70,67 @@ function extractSameAsUrls(html) {
 function extractCompanyNumber(url) {
   const match = url.match(/company-information\.service\.gov\.uk\/company\/([A-Z0-9]{8})/i);
   return match ? match[1].toUpperCase() : null;
+}
+
+// ── SAMEAS AUTHORITY CLASSIFIER ──────────────────────────────────────────────
+// Classifies each sameAs URL by authority tier
+// Returns { tiers, hasHighAuthority, missingHighAuthority, classified }
+
+function classifySameAsAuthority(urls) {
+  const tiers = {
+    government:   { label: 'Government registry',   urls: [] },
+    knowledge:    { label: 'Knowledge graph',        urls: [] },
+    professional: { label: 'Professional network',   urls: [] },
+    directory:    { label: 'Established directory',  urls: [] },
+    social:       { label: 'Social media',           urls: [] },
+    other:        { label: 'Other',                  urls: [] },
+  };
+
+  const patterns = {
+    government:   [/company-information\.service\.gov\.uk/, /find-and-update\.company-information/],
+    knowledge:    [/wikidata\.org/, /dbpedia\.org/],
+    professional: [/linkedin\.com\/company\//],
+    directory:    [/yell\.com/, /google\.com\/maps/, /maps\.google/, /g\.page/, /yelp\.co/, /tripadvisor\.co/, /checkatrade\.com/, /ratedpeople\.com/, /trustpilot\.com/],
+    social:       [/facebook\.com/, /twitter\.com/, /x\.com/, /instagram\.com/, /tiktok\.com/, /youtube\.com/],
+  };
+
+  for (const url of urls) {
+    let matched = false;
+    for (const [tier, pats] of Object.entries(patterns)) {
+      if (pats.some(p => p.test(url))) {
+        tiers[tier].urls.push(url);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) tiers.other.urls.push(url);
+  }
+
+  const hasGovernment   = tiers.government.urls.length > 0;
+  const hasProfessional = tiers.professional.urls.length > 0;
+  const hasKnowledge    = tiers.knowledge.urls.length > 0;
+  const hasHighAuthority = hasGovernment || hasProfessional || hasKnowledge;
+
+  // LinkedIn personal profile check — /in/ not /company/
+  const hasLinkedInPersonal = urls.some(u => /linkedin\.com\/in\//.test(u));
+  const hasLinkedInCompany  = tiers.professional.urls.length > 0;
+
+  const missing = [];
+  if (!hasGovernment)   missing.push('Companies House (UK government registry)');
+  if (!hasProfessional) missing.push('LinkedIn company page');
+  if (!hasKnowledge)    missing.push('Wikidata knowledge graph entry');
+
+  return {
+    tiers,
+    hasHighAuthority,
+    hasGovernment,
+    hasProfessional,
+    hasKnowledge,
+    hasLinkedInPersonal,
+    hasLinkedInCompany,
+    missing,
+    totalUrls: urls.length,
+  };
 }
 
 // Call Companies House API and return company data
@@ -327,6 +388,10 @@ module.exports = async (req, res) => {
 
   results.companiesHouse = chResult;
 
+  // ── CHECK 7: SAMEAS AUTHORITY CLASSIFICATION ─────────────────────────────
+  const sameAsAuthority = classifySameAsAuthority(sameAsUrls);
+  results.sameAsAuthority = sameAsAuthority;
+
   // ── TOTAL SCORE ───────────────────────────────────────────────────────────
   const overall = results.https.score + results.schema.score + results.llms.score + results.robots.score + results.meta.score;
 
@@ -348,6 +413,20 @@ module.exports = async (req, res) => {
     issues.push({ p: 'high', t: 'No Companies House URL in schema — add your UK government registration record to confirm your business is real to AI engines', cta: true });
   } else if (chResult.checked && !chResult.active) {
     issues.push({ p: 'critical', t: `Companies House check failed — ${chResult.detail}`, cta: true });
+  }
+
+  // sameAs authority issues
+  if (sameAsUrls.length === 0) {
+    issues.push({ p: 'high', t: 'No sameAs links in schema — AI engines cannot cross-reference your business identity across trusted platforms', cta: true });
+  } else if (!sameAsAuthority.hasHighAuthority) {
+    issues.push({ p: 'high', t: `sameAs links present but all low authority — AI engines need government, professional or knowledge graph sources to trust your business identity. Missing: ${sameAsAuthority.missing.join(', ')}`, cta: true });
+  } else if (sameAsAuthority.missing.length > 0) {
+    issues.push({ p: 'advisory', t: `sameAs could be stronger — missing high-authority sources: ${sameAsAuthority.missing.join(', ')}`, cta: true });
+  }
+
+  // LinkedIn personal profile warning
+  if (sameAsAuthority.hasLinkedInPersonal && !sameAsAuthority.hasLinkedInCompany) {
+    issues.push({ p: 'high', t: 'LinkedIn URL in schema links to a personal profile not a company page — AI engines treat these differently. Replace with a LinkedIn company page URL', cta: true });
   }
 
   // ── ADVISORY ISSUES (advanced signals — Gemini-level optimisation) ────────
@@ -380,6 +459,7 @@ module.exports = async (req, res) => {
     advisory,
     checks: results,
     companiesHouse: chResult,
+    sameAsAuthority,
     advancedSignals: {
       knowsAbout: hasKnowsAbout,
       priceSpecification: hasPriceSpec,
