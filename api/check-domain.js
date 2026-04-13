@@ -1,6 +1,6 @@
 // api/check-domain.js
 // Real domain technical checks for AI visibility
-// Checks: HTTPS, Schema, llms.txt, robots.txt AI access, meta description, Companies House, sameAs authority
+// Checks: HTTPS, Schema, llms.txt, robots.txt AI access, meta description, Companies House, sameAs authority, FAQ schema, OpenGraph
 
 const https = require('https');
 const http = require('http');
@@ -329,7 +329,48 @@ module.exports = async (req, res) => {
     max: 20,
   };
 
-  // ── CHECK 6: COMPANIES HOUSE VERIFICATION ────────────────────────────────
+  // ── CHECK 6: FAQ SCHEMA ──────────────────────────────────────────────────
+  // FAQPage schema makes your answers available directly in AI responses
+  const hasFaqSchema = homepageBody.includes('"FAQPage"') ||
+    homepageBody.includes("'FAQPage'") ||
+    homepageBody.includes('@type":"FAQPage') ||
+    homepageBody.includes('@type\': \'FAQPage');
+  const hasFaqQuestions = homepageBody.includes('"Question"') ||
+    homepageBody.includes('@type":"Question');
+  results.faq = {
+    pass: hasFaqSchema,
+    hasQuestions: hasFaqQuestions,
+    detail: hasFaqSchema
+      ? (hasFaqQuestions ? 'FAQPage schema found with Question nodes' : 'FAQPage schema found but no Question nodes detected')
+      : 'No FAQPage schema — AI engines cannot pull your answers directly into search responses',
+    score: hasFaqSchema ? (hasFaqQuestions ? 10 : 5) : 0,
+    max: 10,
+  };
+
+  // ── CHECK 7: OPENGRAPH TAGS ──────────────────────────────────────────────
+  // OpenGraph controls what appears when your site is shared on LinkedIn, WhatsApp etc
+  const ogTitle = homepageBody.match(/<meta[^>]+property=["']?og:title["']?[^>]+content=["']?([^"'>]{3,})["']?/i);
+  const ogImage = homepageBody.match(/<meta[^>]+property=["']?og:image["']?[^>]+content=["']?([^"'>]{3,})["']?/i);
+  const ogType  = homepageBody.match(/<meta[^>]+property=["']?og:type["']?/i);
+  const ogUrl   = homepageBody.match(/<meta[^>]+property=["']?og:url["']?/i);
+  const ogCount = [ogTitle, ogImage, ogDesc, ogType, ogUrl].filter(Boolean).length;
+  const ogPass  = !!(ogTitle && ogImage && ogDesc);
+  results.og = {
+    pass: ogPass,
+    hasTitle:  !!ogTitle,
+    hasImage:  !!ogImage,
+    hasDesc:   !!ogDesc,
+    hasType:   !!ogType,
+    hasUrl:    !!ogUrl,
+    count:     ogCount,
+    detail: ogPass
+      ? `OpenGraph tags complete — title, image and description present`
+      : `OpenGraph tags incomplete — missing: ${[!ogTitle && 'title', !ogImage && 'image', !ogDesc && 'description'].filter(Boolean).join(', ')}`,
+    score: ogPass ? 10 : (ogCount >= 2 ? 5 : 0),
+    max: 10,
+  };
+
+  // ── CHECK 8: COMPANIES HOUSE VERIFICATION ────────────────────────────────
   // Extract sameAs URLs from JSON-LD, look for a Companies House URL,
   // call the CH API to confirm active status and name match
   const sameAsUrls = extractSameAsUrls(homepageBody);
@@ -393,7 +434,7 @@ module.exports = async (req, res) => {
   results.sameAsAuthority = sameAsAuthority;
 
   // ── TOTAL SCORE ───────────────────────────────────────────────────────────
-  const overall = results.https.score + results.schema.score + results.llms.score + results.robots.score + results.meta.score;
+  const overall = results.https.score + results.schema.score + results.llms.score + results.robots.score + results.meta.score + results.faq.score + results.og.score;
 
   // ── ISSUES LIST ───────────────────────────────────────────────────────────
   const issues = [];
@@ -407,6 +448,8 @@ module.exports = async (req, res) => {
   if (results.robots.blocksPerplexity) issues.push({ p: 'critical', t: 'PerplexityBot blocked in robots.txt — Perplexity cannot crawl your site', cta: true });
   if (results.robots.hasWildcardBlock) issues.push({ p: 'critical', t: 'All bots blocked by wildcard rule in robots.txt — no AI engine can access your site', cta: true });
   if (!results.meta.pass) issues.push({ p: 'high', t: 'No meta description — AI engines have no text summary of what your business does', cta: true });
+  if (!results.faq.pass) issues.push({ p: 'high', t: 'No FAQ schema — AI engines cannot pull your answers directly into search responses. Adding FAQ content makes your business the source AI quotes', cta: true });
+  if (!results.og.pass) issues.push({ p: 'high', t: `OpenGraph tags incomplete — when your site is shared on LinkedIn or WhatsApp the preview is broken or missing. Missing: ${[!results.og.hasTitle && 'title', !results.og.hasImage && 'image', !results.og.hasDesc && 'description'].filter(Boolean).join(', ')}`, cta: true });
 
   // Companies House issues
   if (!chResult.urlPresent) {
@@ -449,6 +492,8 @@ module.exports = async (req, res) => {
     'AI Crawler Access':   { score: results.robots.score, max: 20, detail: results.robots.detail },
     'Security & Trust':    { score: results.https.score,  max: 20, detail: results.https.detail },
     'Search Signals':      { score: results.meta.score,   max: 20, detail: results.meta.detail },
+    'FAQ Schema':          { score: results.faq.score,    max: 10, detail: results.faq.detail },
+    'Social Sharing':      { score: results.og.score,     max: 10, detail: results.og.detail },
   };
 
   res.status(200).json({
