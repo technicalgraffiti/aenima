@@ -1,6 +1,6 @@
 // api/create-checkout.js
 // Vercel serverless function — Stripe Checkout session creator
-// Handles new subscriptions AND upgrades (Starter → Pro with proration)
+// Handles TG tier checkouts AND Aenima new subscriptions AND upgrades
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
@@ -9,6 +9,25 @@ const SB = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
+
+// ── TG TIER PRICE IDs ────────────────────────────────────────────────────────
+const TG_PRICE_IDS = {
+  essential: 'price_1TM8eGJB2Su5DD2sJEESCX3i',
+  extended:  'price_1TM8fEJB2Su5DD2s5rL6MQxQ',
+  full:      'price_1TM8fpJB2Su5DD2sJAQLna20',
+};
+
+const TG_SETUP_FEES = {
+  essential: 1900,
+  extended:  4900,
+  full:      9900,
+};
+
+const TG_SETUP_LABELS = {
+  essential: 'AI Visibility Essential — files and setup',
+  extended:  'AI Visibility Extended — full audit and setup',
+  full:      'AI Visibility Full — complete fix and setup',
+};
 
 const PRICE_IDS = {
   starter_mo:  process.env.STRIPE_STARTER_MO  || 'price_1TCGFwJB2Su5DD2s63b7Y3CB',
@@ -27,7 +46,47 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
   if (req.method !== 'POST')    { res.status(405).json({ error: 'Method not allowed' }); return; }
 
-  const { plan, billing, email, user_id } = req.body;
+  const { plan, billing, email, user_id, tg_tier, domain } = req.body;
+
+  // ── TG TIER CHECKOUT ───────────────────────────────────────────────────────
+  if (tg_tier) {
+    if (!TG_PRICE_IDS[tg_tier]) {
+      return res.status(400).json({ error: `Invalid TG tier: ${tg_tier}` });
+    }
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'subscription',
+        line_items: [
+          {
+            price_data: {
+              currency: 'gbp',
+              product_data: { name: TG_SETUP_LABELS[tg_tier] },
+              unit_amount: TG_SETUP_FEES[tg_tier],
+            },
+            quantity: 1,
+          },
+          {
+            price: TG_PRICE_IDS[tg_tier],
+            quantity: 1,
+          },
+        ],
+        subscription_data: {
+          trial_period_days: 30,
+          metadata: { domain: domain || '', tg_tier },
+        },
+        metadata: { domain: domain || '', tg_tier },
+        success_url: `https://technicalgraffiti.co.uk/free-assessment/?success=1&tier=${tg_tier}`,
+        cancel_url:  `https://technicalgraffiti.co.uk/free-assessment/?cancelled=1`,
+      });
+      return res.status(200).json({ url: session.url });
+    } catch (err) {
+      console.error('TG checkout error:', err.message);
+      return res.status(500).json({ error: 'Could not create TG checkout session.' });
+    }
+  }
+
+  // ── EXISTING AENIMA LOGIC BELOW — UNCHANGED ───────────────────────────────
   const key   = `${plan}_${billing || 'mo'}`;
   const price = PRICE_IDS[key];
 
