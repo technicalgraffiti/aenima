@@ -1546,7 +1546,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       "@id": "https://aenima.co.uk/#software",
       "name": "Aenima",
       "alternateName": "Aenima AI Visibility Tool",
-      "description": "GEO, AEO and AIO AI visibility scoring and file generation tool for UK local businesses. Checks five technical signals — schema markup, llms.txt, robots.txt, directory citations, and Google Business Profile — scores AI visibility out of 100, and generates the files that fix any gaps.",
+      "description": "GEO, AEO and AIO AI visibility scoring and file generation tool for UK local businesses. Checks seven scored signals — schema markup, llms.txt, AI crawler access, security and trust, meta description, FAQ schema, and OpenGraph — plus identity signals including Companies House and sameAs links. Scores AI visibility out of 100 and generates the files that fix any gaps.",
       "url": "https://aenima.co.uk",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
@@ -1862,7 +1862,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
                 </div>
               </div>
             </div>
-            <span class="ac-btn">Fix it now &rarr; <span class="ac-cost">Starter &pound;5.50/mo &mdash; all three included</span></span>
+            <span class="ac-btn">Fix it now &rarr; <span class="ac-cost">Starter &pound;5.50/mo &mdash; schema, llms.txt &amp; robots.txt included</span></span>
           </div>
 
           <!-- PDF — 1/4 width -->
@@ -3278,6 +3278,11 @@ function buildDash(){
             <div class="fg"><label>Services (one per line)</label><textarea id="ss" oninput="genSch()" placeholder="Emergency plumbing&#10;Boiler installation&#10;Bathroom fitting"></textarea></div>
             <div class="fg"><label>Areas served (one per line)</label><textarea id="sa" oninput="genSch()" placeholder="Wellingborough&#10;Northampton&#10;Kettering"></textarea></div>
             <div class="row2"><div class="fg"><label>Founded</label><input type="text" id="sf" oninput="genSch()" placeholder="2010"></div><div class="fg"><label>Price range</label><select id="sp" oninput="genSch()"><option value="£">£ Budget</option><option value="££" selected>££ Mid-range</option><option value="£££">£££ Premium</option></select></div></div>
+            <div style="background:#f0f7ff;border-left:3px solid #4A90D9;border-radius:6px;padding:12px 16px;margin-bottom:10px;font-size:13px;color:var(--t-body);line-height:1.6"><strong>Optional identity signals</strong> — these help AI engines verify your business is real and trusted. Leave blank if not applicable.</div>
+            <div class="fg"><label>Companies House number <span style="font-weight:400;color:var(--t-support)">(limited companies only)</span></label><input type="text" id="sch" oninput="genSch()" placeholder="07180346"></div>
+            <div class="fg"><label>Google Business Profile URL <span style="font-weight:400;color:var(--t-support)">(optional)</span></label><input type="text" id="sgb" oninput="genSch()" placeholder="https://maps.google.com/..."></div>
+            <div class="fg"><label>LinkedIn page URL <span style="font-weight:400;color:var(--t-support)">(optional)</span></label><input type="text" id="sli" oninput="genSch()" placeholder="https://linkedin.com/company/..."></div>
+            <div class="fg"><label>Facebook page URL <span style="font-weight:400;color:var(--t-support)">(optional)</span></label><input type="text" id="sfb" oninput="genSch()" placeholder="https://facebook.com/..."></div>
           </div>
           <div>
             <div class="dcard" style="margin-bottom:14px">
@@ -3915,13 +3920,28 @@ function genSch(){
     business.knowsAbout=definedTerms;
   }
 
-  // sameAs — GBP + directories (Gemini signal 4)
+  // sameAs — GBP + directories (Gemini signal 4) + user-supplied links
   const sameas=[];
   if(baseUrl)sameas.push(baseUrl);
   if(tw){
     sameas.push('https://www.google.com/maps/search/'+encodeURIComponent(n+' '+tw));
   }
+  const sgb=v('sgb');const sli=v('sli');const sfb=v('sfb');
+  if(sgb)sameas.push(sgb);
+  if(sli)sameas.push(sli);
+  if(sfb)sameas.push(sfb);
   if(sameas.length)business.sameAs=sameas;
+
+  // Companies House (optional — Ltd cos only)
+  const chNum=v('sch');
+  if(chNum){
+    business.legalName=n;
+    business.identifier={'@type':'PropertyValue','name':'Companies House','value':chNum};
+    business.url=business.url||baseUrl;
+    const chUrl='https://find-and-update.company-information.service.gov.uk/company/'+chNum.replace(/\s/g,'').toUpperCase();
+    if(!sameas.includes(chUrl))sameas.push(chUrl);
+    if(sameas.length)business.sameAs=sameas;
+  }
 
   // Services with PriceSpecification (Gemini signal 2)
   const graph=[business];
@@ -4372,7 +4392,12 @@ async function genReport(){
         domain,
         keywords:v('rte')||'',
         scoreData,
-        plan:S.plan||'free'
+        plan:S.plan||'free',
+        companiesHouseNumber:v('sch')||'',
+        companiesHouseUrl:v('sch')?'https://find-and-update.company-information.service.gov.uk/company/'+(v('sch')||'').replace(/\s/g,'').toUpperCase():'',
+        sameAsGoogle:v('sgb')||'',
+        sameAsLinkedIn:v('sli')||'',
+        sameAsFacebook:v('sfb')||''
       })
     });
     const rptData=await rptResp.json();
