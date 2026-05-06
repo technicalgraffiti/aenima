@@ -1,12 +1,7 @@
-# robots.txt — aenima.co.uk
-# Updated: March 2026
-
-User-agent: Googlebot
+User-agent: *
 Allow: /
 
-User-agent: Bingbot
-Allow: /
-
+# AI crawlers — explicitly permitted
 User-agent: GPTBot
 Allow: /
 
@@ -19,19 +14,11 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-User-agent: Anthropic-ai
+User-agent: Googlebot
 Allow: /
 
-User-agent: ChatGPT-User
+User-agent: Bingbot
 Allow: /
 
-User-agent: cohere-ai
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: *
-Allow: /
-
+# Sitemap
 Sitemap: https://aenima.co.uk/sitemap.xml
