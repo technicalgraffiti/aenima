@@ -453,16 +453,16 @@ module.exports = async (req, res) => {
 
   // Companies House issues
   if (!chResult.urlPresent) {
-    issues.push({ p: 'high', t: 'No Companies House URL in schema — add your UK government registration record to confirm your business is real to AI engines', cta: true });
+    issues.push({ p: 'advisory', t: 'No Companies House URL in schema — add your UK government registration record to confirm your business is real to AI engines', cta: true });
   } else if (chResult.checked && !chResult.active) {
     issues.push({ p: 'critical', t: `Companies House check failed — ${chResult.detail}`, cta: true });
   }
 
   // sameAs authority issues
   if (sameAsUrls.length === 0) {
-    issues.push({ p: 'high', t: 'No sameAs links in schema — AI engines cannot cross-reference your business identity across trusted platforms', cta: true });
+    issues.push({ p: 'advisory', t: 'No sameAs links in schema — AI engines cannot cross-reference your business identity across trusted platforms', cta: true });
   } else if (!sameAsAuthority.hasHighAuthority) {
-    issues.push({ p: 'high', t: `sameAs links present but all low authority — AI engines need government, professional or knowledge graph sources to trust your business identity. Missing: ${sameAsAuthority.missing.join(', ')}`, cta: true });
+    issues.push({ p: 'advisory', t: `sameAs links present but all low authority — AI engines need government, professional or knowledge graph sources to trust your business identity. Missing: ${sameAsAuthority.missing.join(', ')}`, cta: true });
   } else if (sameAsAuthority.missing.length > 0) {
     issues.push({ p: 'advisory', t: `sameAs could be stronger — missing high-authority sources: ${sameAsAuthority.missing.join(', ')}`, cta: true });
   }
