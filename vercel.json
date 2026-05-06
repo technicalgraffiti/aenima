@@ -92,6 +92,50 @@
       "dest": "/public/case-study-purely-air-tech.html"
     },
     {
+      "src": "/what-is-llms-txt",
+      "dest": "/public/what-is-llms-txt.html"
+    },
+    {
+      "src": "/what-is-llms-txt.html",
+      "status": 301,
+      "headers": {
+        "Location": "/what-is-llms-txt"
+      }
+    },
+    {
+      "src": "/ai-search-visibility",
+      "dest": "/public/ai-search-visibility.html"
+    },
+    {
+      "src": "/ai-search-visibility.html",
+      "status": 301,
+      "headers": {
+        "Location": "/ai-search-visibility"
+      }
+    },
+    {
+      "src": "/geo-aeo-optimisation",
+      "dest": "/public/geo-aeo-optimisation.html"
+    },
+    {
+      "src": "/geo-aeo-optimisation.html",
+      "status": 301,
+      "headers": {
+        "Location": "/geo-aeo-optimisation"
+      }
+    },
+    {
+      "src": "/free-ai-visibility-check",
+      "dest": "/public/free-ai-visibility-check.html"
+    },
+    {
+      "src": "/free-ai-visibility-check.html",
+      "status": 301,
+      "headers": {
+        "Location": "/free-ai-visibility-check"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/index.html"
     }
