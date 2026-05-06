@@ -434,7 +434,20 @@ module.exports = async (req, res) => {
   results.sameAsAuthority = sameAsAuthority;
 
   // ── TOTAL SCORE ───────────────────────────────────────────────────────────
-  const overall = results.https.score + results.schema.score + results.llms.score + results.robots.score + results.meta.score + results.faq.score + results.og.score;
+  // ── IDENTITY SIGNAL SCORES (advisory-weighted — 5pts each) ─────────────
+  // CH: active confirmed = 5, URL present but unverified = 2, missing = 0
+  const chScore = (chResult.urlPresent && chResult.active) ? 5
+    : chResult.urlPresent ? 2
+    : 0;
+
+  // sameAs: high authority present = 5, low authority only = 2, none = 0
+  const sameAsScore = sameAsAuthority.hasHighAuthority ? 5
+    : sameAsUrls.length > 0 ? 2
+    : 0;
+
+  // Raw total out of 130, scaled to 100
+  const rawTotal = results.https.score + results.schema.score + results.llms.score + results.robots.score + results.meta.score + results.faq.score + results.og.score + chScore + sameAsScore;
+  const overall = Math.min(100, Math.round(rawTotal * 100 / 130));
 
   // ── ISSUES LIST ───────────────────────────────────────────────────────────
   const issues = [];
@@ -494,6 +507,8 @@ module.exports = async (req, res) => {
     'Search Signals':      { score: results.meta.score,   max: 20, detail: results.meta.detail },
     'FAQ Schema':          { score: results.faq.score,    max: 10, detail: results.faq.detail },
     'Social Sharing':      { score: results.og.score,     max: 10, detail: results.og.detail },
+    'Companies House':     { score: chScore,   max: 5,  detail: chResult.urlPresent ? (chResult.active ? 'Verified and active' : 'URL present — not verified active') : 'No Companies House URL in schema' },
+    'Identity Signals':    { score: sameAsScore, max: 5, detail: sameAsUrls.length > 0 ? (sameAsAuthority.hasHighAuthority ? 'High-authority sameAs links present' : 'Low-authority sameAs links only') : 'No sameAs links in schema' },
   };
 
   res.status(200).json({
