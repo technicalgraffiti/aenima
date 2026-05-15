@@ -482,8 +482,32 @@ module.exports = async (req, res) => {
 
   // LinkedIn personal profile warning
   if (sameAsAuthority.hasLinkedInPersonal && !sameAsAuthority.hasLinkedInCompany) {
-    issues.push({ p: 'high', t: 'Your schema links to a personal LinkedIn profile rather than a LinkedIn company page — AI engines treat these very differently. A personal profile does not verify your business. You need a LinkedIn company page URL.', cta: true });
+    issues.push({ p: 'high', t: 'Your schema links to a personal LinkedIn profile rather than a LinkedIn company page — AI engines treat these very differently. A personal profile does not verify your business. You need a LinkedIn company page URL.', avail: 'Complete package', cta: true });
   }
+
+  // ── UNVERIFIABLE CHECKS — Extended tier deliverables ─────────────────────
+  issues.push({ p: 'advisory', t: 'Your business name, address and phone number could not be verified across the web. Inconsistent business details across directories, Google and your website is one of the most common reasons AI engines lose confidence in a local business. A full NAP consistency report shows exactly where your details are wrong and what to fix.', avail: 'Extended & Complete packages', cta: true });
+  issues.push({ p: 'advisory', t: 'We cannot tell from your website what ChatGPT says about your business when someone asks for recommendations in your area. Most businesses are invisible — or described incorrectly. A live ChatGPT visibility check shows exactly what AI says about you right now.', avail: 'Extended & Complete packages', cta: true });
+  issues.push({ p: 'advisory', t: 'We cannot tell from your website what Google Gemini says about your business when someone searches for services like yours. A live Gemini visibility check shows exactly what Google\'s AI says about you right now.', avail: 'Extended & Complete packages', cta: true });
+
+  // ── UNVERIFIABLE CHECKS — Complete tier deliverables ─────────────────────
+  issues.push({ p: 'advisory', t: 'We cannot confirm whether your Google Business Profile is optimised for AI search. Google Gemini pulls directly from GBP when recommending local businesses — if your profile is incomplete or missing, you will not appear. Professionally written GBP copy, ready to apply immediately, is included.', avail: 'Complete package', cta: true });
+
+  // LinkedIn — complete tier
+  if (sameAsAuthority.hasLinkedInCompany) {
+    issues.push({ p: 'advisory', t: 'Your LinkedIn company page is linked but we cannot verify the content is optimised for AI search. Professionally written LinkedIn About copy positions your business correctly for AI recommendations.', avail: 'Complete package', cta: true });
+  } else {
+    issues.push({ p: 'advisory', t: 'We could not find a LinkedIn company page linked to your website. AI engines use LinkedIn company pages as a trust signal to verify your business is legitimate and active. Professionally written LinkedIn About copy positions your business correctly for AI recommendations.', avail: 'Complete package', cta: true });
+  }
+
+  // Facebook — complete tier
+  if (sameAsAuthority.tiers.social.urls.some(u => /facebook\.com/.test(u))) {
+    issues.push({ p: 'advisory', t: 'Your Facebook business page is linked but we cannot verify the content is optimised for AI trust signals. Professionally written Facebook page copy strengthens your business identity across AI platforms.', avail: 'Complete package', cta: true });
+  } else {
+    issues.push({ p: 'advisory', t: 'We could not find a Facebook business page linked to your website. AI engines cross-reference your business across social platforms to confirm your identity. Professionally written Facebook page copy optimised for AI trust signals is included.', avail: 'Complete package', cta: true });
+  }
+
+  issues.push({ p: 'advisory', t: 'Your homepage meta title and description could not be assessed for AI optimisation quality. A well-written meta description is one of the first things AI engines read to understand your business. Professionally written homepage meta copy, optimised for both search and AI, is included.', avail: 'Complete package', cta: true });
 
   // ── ADVISORY ISSUES (advanced signals — Gemini-level optimisation) ────────
   const advisory = [];
