@@ -451,52 +451,52 @@ module.exports = async (req, res) => {
 
   // ── ISSUES LIST ───────────────────────────────────────────────────────────
   const issues = [];
-  if (!results.https.pass) issues.push({ p: 'critical', t: 'Site not reachable over HTTPS — AI engines cannot access or trust your site', cta: true });
-  if (!results.schema.pass) issues.push({ p: 'critical', t: 'No Schema markup — AI engines cannot identify your business type, location or services', cta: true });
-  else if (!results.schema.hasLocalBiz) issues.push({ p: 'high', t: 'Schema present but no LocalBusiness type — AI cannot classify your business', cta: true });
-  if (!results.llms.pass) issues.push({ p: 'critical', t: 'No llms.txt file — AI systems have no machine-readable summary of your business', cta: true });
-  else if (!results.llms.hasContent) issues.push({ p: 'high', t: 'llms.txt found but appears empty — needs proper business content', cta: true });
-  if (results.robots.blocksGPTBot) issues.push({ p: 'critical', t: 'GPTBot blocked in robots.txt — ChatGPT cannot crawl your site', cta: true });
-  if (results.robots.blocksClaudeBot) issues.push({ p: 'critical', t: 'ClaudeBot blocked in robots.txt — Claude cannot crawl your site', cta: true });
-  if (results.robots.blocksPerplexity) issues.push({ p: 'critical', t: 'PerplexityBot blocked in robots.txt — Perplexity cannot crawl your site', cta: true });
-  if (results.robots.hasWildcardBlock) issues.push({ p: 'critical', t: 'All bots blocked by wildcard rule in robots.txt — no AI engine can access your site', cta: true });
-  if (!results.meta.pass) issues.push({ p: 'high', t: 'No meta description — AI engines have no text summary of what your business does', cta: true });
-  if (!results.faq.pass) issues.push({ p: 'high', t: 'No FAQ schema — AI engines cannot pull your answers directly into search responses. Adding FAQ content makes your business the source AI quotes', cta: true });
-  if (!results.og.pass) issues.push({ p: 'high', t: `OpenGraph tags incomplete — when your site is shared on LinkedIn or WhatsApp the preview is broken or missing. Missing: ${[!results.og.hasTitle && 'title', !results.og.hasImage && 'image', !results.og.hasDesc && 'description'].filter(Boolean).join(', ')}`, cta: true });
+  if (!results.https.pass) issues.push({ p: 'critical', t: 'Your site is not loading securely — AI engines will not trust or index a site without HTTPS. You need an SSL certificate.', cta: true });
+  if (!results.schema.pass) issues.push({ p: 'critical', t: 'No Schema markup found — this is the file that tells AI engines who you are, what you do, and where you are. Without it, AI search ignores your business entirely.', cta: true });
+  else if (!results.schema.hasLocalBiz) issues.push({ p: 'high', t: 'You have some Schema markup but it does not identify you as a local business — AI engines cannot classify what type of business you are or where you operate.', cta: true });
+  if (!results.llms.pass) issues.push({ p: 'critical', t: 'No llms.txt file found — this is a plain text summary of your business written specifically for AI systems like ChatGPT and Gemini. Without it, AI has nothing reliable to read about you.', cta: true });
+  else if (!results.llms.hasContent) issues.push({ p: 'high', t: 'You have an llms.txt file but it appears to be empty — AI systems cannot use a blank file. It needs your business description, services and location.', cta: true });
+  if (results.robots.blocksGPTBot) issues.push({ p: 'critical', t: 'Your website is actively blocking ChatGPT from reading your pages — this means ChatGPT cannot include your business in any AI-generated results.', cta: true });
+  if (results.robots.blocksClaudeBot) issues.push({ p: 'critical', t: 'Your website is actively blocking Claude (Anthropic) from reading your pages — AI-powered tools using Claude will not know your business exists.', cta: true });
+  if (results.robots.blocksPerplexity) issues.push({ p: 'critical', t: 'Your website is actively blocking Perplexity from reading your pages — Perplexity AI search will not include your business in results.', cta: true });
+  if (results.robots.hasWildcardBlock) issues.push({ p: 'critical', t: 'Your robots.txt file is blocking all automated systems from your site — this includes every AI search engine. No AI tool can read or recommend your business.', cta: true });
+  if (!results.meta.pass) issues.push({ p: 'high', t: 'No meta description found — this is the short sentence that describes your business in search results and AI summaries. Without it, AI engines have nothing to quote about you.', cta: true });
+  if (!results.faq.pass) issues.push({ p: 'high', t: 'No FAQ Schema found — when someone asks an AI a question your business could answer, FAQ schema is what makes your business the source the AI quotes. You are missing every opportunity to be the answer.', cta: true });
+  if (!results.og.pass) issues.push({ p: 'high', t: `Your social sharing tags are incomplete — when someone shares your website on LinkedIn or WhatsApp, the preview appears broken or blank. Missing: ${[!results.og.hasTitle && 'page title', !results.og.hasImage && 'preview image', !results.og.hasDesc && 'description'].filter(Boolean).join(', ')}.`, cta: true });
 
   // Companies House issues
   if (!chResult.urlPresent) {
-    issues.push({ p: 'advisory', t: 'No Companies House URL in schema — add your UK government registration record to confirm your business is real to AI engines', cta: true });
+    issues.push({ p: 'advisory', t: 'No Companies House link in your schema — adding your official UK government registration URL tells AI engines your business is verified and real. Without it, AI has no way to confirm you are a legitimate registered company.', cta: true });
   } else if (chResult.checked && !chResult.active) {
     issues.push({ p: 'critical', t: `Companies House check failed — ${chResult.detail}`, cta: true });
   }
 
   // sameAs authority issues
   if (sameAsUrls.length === 0) {
-    issues.push({ p: 'advisory', t: 'No sameAs links in schema — AI engines cannot cross-reference your business identity across trusted platforms', cta: true });
+    issues.push({ p: 'advisory', t: 'No business profile links in your schema — AI engines verify your business is real by cross-referencing it against trusted sources like LinkedIn, Google Business Profile and Companies House. You have none of these linked, so AI cannot confirm your identity.', cta: true });
   } else if (!sameAsAuthority.hasHighAuthority) {
-    issues.push({ p: 'advisory', t: `sameAs links present but all low authority — AI engines need government, professional or knowledge graph sources to trust your business identity. Missing: ${sameAsAuthority.missing.join(', ')}`, cta: true });
+    issues.push({ p: 'advisory', t: `Your schema links to some business profiles but they are low-authority sources — AI engines need links to trusted platforms like LinkedIn, Google Business Profile or government registries to fully trust your business identity. You are missing: ${sameAsAuthority.missing.join(', ')}.`, cta: true });
   } else if (sameAsAuthority.missing.length > 0) {
-    issues.push({ p: 'advisory', t: `sameAs could be stronger — missing high-authority sources: ${sameAsAuthority.missing.join(', ')}`, cta: true });
+    issues.push({ p: 'advisory', t: `Your schema includes some business profile links but is missing the most trusted ones — adding LinkedIn, Google Business Profile or your Companies House record would significantly strengthen how AI engines verify your business. Missing: ${sameAsAuthority.missing.join(', ')}.`, cta: true });
   }
 
   // LinkedIn personal profile warning
   if (sameAsAuthority.hasLinkedInPersonal && !sameAsAuthority.hasLinkedInCompany) {
-    issues.push({ p: 'high', t: 'LinkedIn URL in schema links to a personal profile not a company page — AI engines treat these differently. Replace with a LinkedIn company page URL', cta: true });
+    issues.push({ p: 'high', t: 'Your schema links to a personal LinkedIn profile rather than a LinkedIn company page — AI engines treat these very differently. A personal profile does not verify your business. You need a LinkedIn company page URL.', cta: true });
   }
 
   // ── ADVISORY ISSUES (advanced signals — Gemini-level optimisation) ────────
   const advisory = [];
   if(results.schema.pass && !hasKnowsAbout)
-    advisory.push({ p: 'advisory', t: 'No knowsAbout/DefinedTerm in schema — AI engines cannot verify your topical authority. Add knowsAbout with DefinedTerm nodes for your key services.' });
+    advisory.push({ p: 'advisory', t: 'Your schema does not list your specialist services — AI engines cannot verify what you are an expert in. Adding your key services as structured data makes you the authority AI quotes for those topics.' });
   if(results.schema.pass && !hasPriceSpec)
-    advisory.push({ p: 'advisory', t: 'No PriceSpecification in schema — AI comparison tools cannot extract your pricing. Add minPrice and maxPrice to each service offer.' });
+    advisory.push({ p: 'advisory', t: 'No pricing information in your schema — AI comparison tools cannot show your prices when people ask. Adding your price range as structured data puts you in front of customers at the moment they are ready to buy.' });
   if(results.schema.pass && !hasDateModified)
-    advisory.push({ p: 'advisory', t: 'No dateModified in schema — AI engines may deprioritise content without a freshness signal. Add dateModified to your schema.' });
+    advisory.push({ p: 'advisory', t: 'Your schema has no last updated date — AI engines may treat your content as old or unreliable. Adding a date tells AI systems your information is current and worth recommending.' });
   if(results.schema.pass && !hasSameAsMultiple)
-    advisory.push({ p: 'advisory', t: 'Weak sameAs signals — AI engines verify identity by cross-referencing multiple sources. Add sameAs links to Google Business Profile, Companies House, and directory listings.' });
+    advisory.push({ p: 'advisory', t: 'Your business profile links are weak or missing — AI engines verify your business is real by checking it against trusted sources like Google Business Profile, Companies House and LinkedIn. The more verified sources you link to, the more AI trusts and recommends you.' });
   if(results.schema.pass && !hasReviewNode)
-    advisory.push({ p: 'advisory', t: 'No Review schema node — adding a verifiable review or testimonial as structured data increases AI recommendation confidence.' });
+    advisory.push({ p: 'advisory', t: 'No reviews in your schema — AI recommendation engines trust businesses with verified customer feedback. Adding even one structured review to your schema makes you significantly more likely to be recommended.' });
 
   // ── CATEGORIES for display ────────────────────────────────────────────────
   const cats = {
