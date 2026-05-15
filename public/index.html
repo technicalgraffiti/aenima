@@ -5033,6 +5033,9 @@ async function doQuickPay(){
     // Store user ID in sessionStorage so we can recover it after Stripe redirect
     if(S.user?.id) sessionStorage.setItem('pendingUserId', S.user.id);
     if(S.user?.email) sessionStorage.setItem('pendingUserEmail', S.user.email);
+    // Save last checked domain so score page pre-populates on return from Stripe
+    const _preCheckDomain = S.score?.domain || document.getElementById('pubUrl')?.value?.trim();
+    if(_preCheckDomain) sessionStorage.setItem('pendingScoreDomain', _preCheckDomain);
     const plan=sessionStorage.getItem('pendingPlan')||'starter';
     S.billing=sessionStorage.getItem('pendingBilling')||'mo';
     sessionStorage.removeItem('pendingPlan');
@@ -5310,6 +5313,15 @@ initSupabase();
       showPage('dashboard');
       setTimeout(()=>showDp('billing',null),500);
       toast('Account created and payment complete. Welcome to Aenima.');
+      // Pre-fill and run score if domain was saved before Stripe redirect
+      const _psd = sessionStorage.getItem('pendingScoreDomain');
+      sessionStorage.removeItem('pendingScoreDomain');
+      if(_psd){
+        setTimeout(()=>{
+          const inp = document.getElementById('pubUrl');
+          if(inp){ inp.value = _psd; runScore(); }
+        }, 800);
+      }
     } else {
       showPage('login');
     }
