@@ -317,7 +317,8 @@ module.exports = async (req, res) => {
   const pageTitle = pageTitleMatch ? pageTitleMatch[1].replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
   const h1Match = homepageBody.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
   const h1Raw = h1Match ? h1Match[1].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
-  const sitemapExists = !!(await fetchUrl(`https://${raw}/sitemap.xml`, 5000)).status && (await fetchUrl(`https://${raw}/sitemap.xml`, 5000)).status < 400;
+  const sitemapFetch = await fetchUrl(`https://${raw}/sitemap.xml`, 5000);
+  const sitemapExists = !!(sitemapFetch.status && sitemapFetch.status < 400);
 
   // Infer dominant keyword from title — strip brand name (last segment after ·|—|-||)
   let dominantKeyword = null;
@@ -572,6 +573,51 @@ module.exports = async (req, res) => {
       dominantKeyword,
       sitemapPresent: sitemapExists,
       metaDescription: results.meta ? results.meta.content : null,
+      summary: await (async () => {
+        try {
+          const identity = pageTitle ? pageTitle.split(/[·\-–—|]/)[0].trim() : domain;
+          const keyword = dominantKeyword || identity;
+          const metaText = results.meta ? results.meta.content : null;
+          const schemaPass = results.schema && results.schema.pass;
+          const sitemapText = sitemapExists ? 'A sitemap is present.' : 'No sitemap found.';
+          const metaText2 = metaText ? `Meta description: "${metaText.substring(0,120)}"` : 'No meta description found.';
+
+          const prompt = `You are writing a brief, plain English SEO snapshot for a business website. Be specific, factual and direct. No fluff. Maximum 3 short paragraphs.
+
+Domain: ${domain}
+Google reads this business as: ${identity}
+Strongest keyword signal: ${keyword}
+Schema markup: ${schemaPass ? 'present' : 'not found'}
+${metaText2}
+${sitemapText}
+
+Write a 3-paragraph SEO snapshot:
+1. What Google currently thinks this business is and what it ranks for (be specific to the data above)
+2. The single biggest opportunity to improve Google ranking (based on the data)
+3. One sentence on why the files in this package help both AI and Google search simultaneously
+
+Keep it under 120 words total. Plain English. No bullet points. No headings.`;
+
+          const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY,
+              'anthropic-version': '2023-06-01',
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'claude-haiku-4-5-20251001',
+              max_tokens: 200,
+              messages: [{ role: 'user', content: prompt }],
+            }),
+          });
+          if (!resp.ok) return null;
+          const data = await resp.json();
+          return data?.content?.[0]?.text || null;
+        } catch (e) {
+          return null;
+        }
+      })(),
     },
     ts: new Date().toISOString(),
   });
