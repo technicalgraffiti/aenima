@@ -312,6 +312,21 @@ module.exports = async (req, res) => {
     max: 20,
   };
 
+  // ── SEO SNAPSHOT DATA (TG report use only — added to response, not scored) ─
+  const pageTitleMatch = homepageBody.match(/<title[^>]*>([^<]{3,})<\/title>/i);
+  const pageTitle = pageTitleMatch ? pageTitleMatch[1].replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
+  const h1Match = homepageBody.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  const h1Raw = h1Match ? h1Match[1].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
+  const sitemapExists = !!(await fetchUrl(`https://${raw}/sitemap.xml`, 5000)).status && (await fetchUrl(`https://${raw}/sitemap.xml`, 5000)).status < 400;
+
+  // Infer dominant keyword from title — strip brand name (last segment after ·|—|-||)
+  let dominantKeyword = null;
+  if (pageTitle) {
+    const parts = pageTitle.split(/[·\-–—|]/);
+    const candidate = parts[0].trim();
+    dominantKeyword = candidate.length > 3 ? candidate : (parts[1] ? parts[1].trim() : candidate);
+  }
+
   // ── CHECK 5: META DESCRIPTION ────────────────────────────────────────────
   const metaMatch = homepageBody.match(/<meta[^>]+name=["']?description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i)
     || homepageBody.match(/<meta[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?[^>]+name=["']?description["']?/i);
@@ -550,6 +565,13 @@ module.exports = async (req, res) => {
       dateModified: hasDateModified,
       sameAsMultiple: hasSameAsMultiple,
       reviewNode: hasReviewNode,
+    },
+    seo: {
+      pageTitle,
+      h1: h1Raw,
+      dominantKeyword,
+      sitemapPresent: sitemapExists,
+      metaDescription: results.meta ? results.meta.content : null,
     },
     ts: new Date().toISOString(),
   });
