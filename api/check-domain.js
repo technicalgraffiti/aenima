@@ -596,7 +596,7 @@ Write a 3-paragraph SEO snapshot:
 2. The single biggest opportunity to improve Google ranking (based on the data)
 3. One sentence on why the files in this package help both AI and Google search simultaneously
 
-Keep it under 120 words total. Plain English. No bullet points. No headings.`;
+Keep it under 120 words total. Plain English. No bullet points. No headings. Write in UK English only. Use British spelling throughout (e.g. 'optimise' not 'optimize', 'organise' not 'organize').`;
 
           const resp = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
