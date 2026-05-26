@@ -252,8 +252,22 @@ module.exports = async (req, res) => {
     (homepageBody.match(/sameAs.*\[/g) || []).length >= 1;
   const hasReviewNode = homepageBody.includes('"Review"') || homepageBody.includes('@type":"Review');
 
+  // ── EXTRACT SAMEAS EARLY — needed to parallelise Companies House API call ──
+  const sameAsUrls = extractSameAsUrls(homepageBody);
+  const chUrl = sameAsUrls.find(u => u.includes('company-information.service.gov.uk/company/'));
+  const companyNumber = chUrl ? extractCompanyNumber(chUrl) : null;
+
+  // ── PARALLEL FETCHES — llms.txt, robots.txt, sitemap.xml, Companies House ──
+  // Running these in parallel cuts check time from ~12s to ~3-5s
+  const [llmsCheck, robotsCheck, sitemapFetch, chApiResult] = await Promise.all([
+    fetchUrl(`${baseUrl}/llms.txt`),
+    fetchUrl(`${baseUrl}/robots.txt`),
+    fetchUrl(`https://${raw}/sitemap.xml`, 5000),
+    companyNumber ? fetchCompaniesHouse(companyNumber) : Promise.resolve(null),
+  ]);
+  const sitemapExists = !!(sitemapFetch.status && sitemapFetch.status < 400);
+
   // ── CHECK 3: LLMS.TXT ────────────────────────────────────────────────────
-  const llmsCheck = await fetchUrl(`${baseUrl}/llms.txt`);
   const llmsExists = llmsCheck.status === 200 && llmsCheck.body.length > 10;
   const llmsHasContent = llmsExists && (llmsCheck.body.includes('# ') || llmsCheck.body.includes('Description:') || llmsCheck.body.length > 100);
   results.llms = {
@@ -267,7 +281,6 @@ module.exports = async (req, res) => {
   };
 
   // ── CHECK 4: ROBOTS.TXT AI ACCESS ───────────────────────────────────────
-  const robotsCheck = await fetchUrl(`${baseUrl}/robots.txt`);
   const robotsBody = (robotsCheck.body || '').toLowerCase();
   const robotsExists = robotsCheck.status === 200;
 
@@ -317,8 +330,7 @@ module.exports = async (req, res) => {
   const pageTitle = pageTitleMatch ? pageTitleMatch[1].replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
   const h1Match = homepageBody.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
   const h1Raw = h1Match ? h1Match[1].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
-  const sitemapFetch = await fetchUrl(`https://${raw}/sitemap.xml`, 5000);
-  const sitemapExists = !!(sitemapFetch.status && sitemapFetch.status < 400);
+  // sitemapExists already set from parallel fetch above
 
   // Infer dominant keyword from title — strip brand name (last segment after ·|—|-||)
   let dominantKeyword = null;
@@ -387,11 +399,7 @@ module.exports = async (req, res) => {
   };
 
   // ── CHECK 8: COMPANIES HOUSE VERIFICATION ────────────────────────────────
-  // Extract sameAs URLs from JSON-LD, look for a Companies House URL,
-  // call the CH API to confirm active status and name match
-  const sameAsUrls = extractSameAsUrls(homepageBody);
-  const chUrl = sameAsUrls.find(u => u.includes('company-information.service.gov.uk/company/'));
-  const companyNumber = chUrl ? extractCompanyNumber(chUrl) : null;
+  // sameAsUrls, chUrl, companyNumber already extracted above for parallel fetch
 
   let chResult = {
     checked: false,
@@ -404,8 +412,8 @@ module.exports = async (req, res) => {
     error: null,
   };
 
-  if (companyNumber) {
-    const chResponse = await fetchCompaniesHouse(companyNumber);
+  if (companyNumber && chApiResult) {
+    const chResponse = chApiResult;
     if (chResponse.error) {
       chResult = {
         checked: true,
