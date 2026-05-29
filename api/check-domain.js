@@ -330,6 +330,15 @@ module.exports = async (req, res) => {
   const pageTitle = pageTitleMatch ? pageTitleMatch[1].replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
   const h1Match = homepageBody.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
   const h1Raw = h1Match ? h1Match[1].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&#039;/g,"'").trim() : null;
+  // Canonical tag — detect if page self-references or points elsewhere
+  const canonicalMatch = homepageBody.match(/<link[^>]+rel=["'']?canonical["'']?[^>]+href=["'']?([^"''>\s]+)["'']?/i)
+    || homepageBody.match(/<link[^>]+href=["'']?([^"''>\s]+)["'']?[^>]+rel=["'']?canonical["'']?/i);
+  const canonicalUrl = canonicalMatch ? canonicalMatch[1].trim() : null;
+  const canonicalIsSelf = canonicalUrl ? (canonicalUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase() === raw) : null;
+
+  // Meta description length — calculated after meta check completes
+  const metaDescLength = results.meta && results.meta.content ? results.meta.content.length : null;
+
   // sitemapExists already set from parallel fetch above
 
   // Infer dominant keyword from title — strip brand name (last segment after ·|—|-||)
@@ -581,6 +590,9 @@ module.exports = async (req, res) => {
       dominantKeyword,
       sitemapPresent: sitemapExists,
       metaDescription: results.meta ? results.meta.content : null,
+      metaDescriptionLength: metaDescLength,
+      canonical: canonicalUrl,
+      canonicalIsSelf,
       summary: await (async () => {
         try {
           const identity = pageTitle ? pageTitle.split(/[·\-–—|]/)[0].trim() : domain;
@@ -588,7 +600,10 @@ module.exports = async (req, res) => {
           const metaText = results.meta ? results.meta.content : null;
           const schemaPass = results.schema && results.schema.pass;
           const sitemapText = sitemapExists ? 'A sitemap is present.' : 'No sitemap found.';
-          const metaText2 = metaText ? `Meta description: "${metaText.substring(0,120)}"` : 'No meta description found.';
+          const metaText2 = metaText ? `Meta description (${metaDescLength} chars): "${metaText.substring(0,120)}"` : 'No meta description found.';
+          const canonicalText = canonicalUrl
+            ? (canonicalIsSelf ? 'Canonical tag present — points to own domain.' : `Canonical tag present — points to ${canonicalUrl} (external or different URL).`)
+            : 'No canonical tag found.';
 
           const prompt = `You are writing a brief, plain English SEO snapshot for a business website. Be specific, factual and direct. No fluff. Maximum 3 short paragraphs.
 
@@ -598,6 +613,7 @@ Strongest keyword signal: ${keyword}
 Schema markup: ${schemaPass ? 'present' : 'not found'}
 ${metaText2}
 ${sitemapText}
+${canonicalText}
 
 Write a 3-paragraph SEO snapshot:
 1. What Google currently thinks this business is and what it ranks for (be specific to the data above)
