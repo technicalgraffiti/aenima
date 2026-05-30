@@ -214,7 +214,9 @@ module.exports = async (req, res) => {
   }
 
   // ── CHECK 1: HTTPS ───────────────────────────────────────────────────────
-  const httpsCheck = domainCheck.status > 0 ? domainCheck : await fetchUrl(baseUrl);
+  // Always do a fresh full fetch — domain check uses 8s timeout which may return
+  // incomplete body on slow servers, causing OG and other head tags to be missed.
+  const httpsCheck = await fetchUrl(baseUrl);
   results.https = {
     pass: httpsCheck.status >= 200 && httpsCheck.status < 400,
     detail: httpsCheck.status > 0 ? `HTTP ${httpsCheck.status}` : `Not reachable (${httpsCheck.error || 'no response'})`,
