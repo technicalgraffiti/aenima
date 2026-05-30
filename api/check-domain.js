@@ -355,7 +355,8 @@ module.exports = async (req, res) => {
   const metaMatch = homepageBody.match(/<meta[^>]+name=["']?description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i)
     || homepageBody.match(/<meta[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?[^>]+name=["']?description["']?/i);
   const metaDesc = metaMatch ? metaMatch[1] : null;
-  const ogDesc = homepageBody.match(/<meta[^>]+property=["']?og:description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i);
+  const ogDesc = homepageBody.match(/<meta[^>]+property=["']?og:description["']?[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?/i)
+    || homepageBody.match(/<meta[^>]+content=["']?([^"'>\s][^"'>]{9,})["']?[^>]+property=["']?og:description["']?/i);
   results.meta = {
     pass: !!(metaDesc || ogDesc),
     content: metaDesc || (ogDesc ? ogDesc[1] : null),
@@ -388,10 +389,14 @@ module.exports = async (req, res) => {
 
   // ── CHECK 7: OPENGRAPH TAGS ──────────────────────────────────────────────
   // OpenGraph controls what appears when your site is shared on LinkedIn, WhatsApp etc
-  const ogTitle = homepageBody.match(/<meta[^>]+property=["']?og:title["']?[^>]+content=["']?([^"'>]{3,})["']?/i);
-  const ogImage = homepageBody.match(/<meta[^>]+property=["']?og:image["']?[^>]+content=["']?([^"'>]{3,})["']?/i);
-  const ogType  = homepageBody.match(/<meta[^>]+property=["']?og:type["']?/i);
-  const ogUrl   = homepageBody.match(/<meta[^>]+property=["']?og:url["']?/i);
+  const ogTitle = homepageBody.match(/<meta[^>]+property=["']?og:title["']?[^>]+content=["']?([^"'>]{3,})["']?/i)
+    || homepageBody.match(/<meta[^>]+content=["']?([^"'>]{3,})["']?[^>]+property=["']?og:title["']?/i);
+  const ogImage = homepageBody.match(/<meta[^>]+property=["']?og:image["']?[^>]+content=["']?([^"'>]{3,})["']?/i)
+    || homepageBody.match(/<meta[^>]+content=["']?([^"'>]{3,})["']?[^>]+property=["']?og:image["']?/i);
+  const ogType  = homepageBody.match(/<meta[^>]+property=["']?og:type["']?/i)
+    || homepageBody.match(/<meta[^>]+content=[^>]+property=["']?og:type["']?/i);
+  const ogUrl   = homepageBody.match(/<meta[^>]+property=["']?og:url["']?/i)
+    || homepageBody.match(/<meta[^>]+content=[^>]+property=["']?og:url["']?/i);
   const ogCount = [ogTitle, ogImage, ogDesc, ogType, ogUrl].filter(Boolean).length;
   const ogPass  = !!(ogTitle && ogImage && ogDesc);
   results.og = {
