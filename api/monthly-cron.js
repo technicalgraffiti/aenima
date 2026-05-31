@@ -345,7 +345,7 @@ async function sendMonthlyReport(user, score, previousScore, aiMonitoring, gemin
   <tr><td style="background:#FFFFFF;padding:32px 40px;border-left:1px solid #E8E8E8;border-right:1px solid #E8E8E8;text-align:center">
     <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#0A1628;letter-spacing:-0.01em">Your updated visibility files are ready.</p>
     <p style="margin:0 0 24px;font-size:15px;color:#777777">Log in to your dashboard to download and install them.</p>
-    <a href="${APP_URL}" style="display:inline-block;background:#F05A22;color:#FFFFFF;text-decoration:none;padding:16px 40px;border-radius:8px;font-size:16px;font-weight:800;letter-spacing:-0.02em">Open my dashboard →</a>
+    <a href="${APP_URL}/#login" style="display:inline-block;background:#F05A22;color:#FFFFFF;text-decoration:none;padding:16px 40px;border-radius:8px;font-size:16px;font-weight:800;letter-spacing:-0.02em">Open my dashboard →</a>
   </td></tr>
 
   <!-- FOOTER -->
