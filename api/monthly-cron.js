@@ -144,7 +144,7 @@ async function runScoreCheck(domain) {
 }
 
 // ── EMAIL ──────────────────────────────────────────────────────────────────
-async function sendMonthlyReport(user, score, previousScore, aiMonitoring, geminiMonitoring) {
+async function sendMonthlyReport(user, domain, score, previousScore, aiMonitoring, geminiMonitoring) {
   if (!RESEND_API_KEY || !user.email) return;
 
   const change = previousScore !== null ? score.overall - previousScore : null;
@@ -452,7 +452,7 @@ module.exports = async (req, res) => {
       });
 
       // Send email report
-      await sendMonthlyReport(user, score, previousScore, aiMonitoring, geminiMonitoring);
+      await sendMonthlyReport(user, domain, score, previousScore, aiMonitoring, geminiMonitoring);
       results.push({
         email: user.email,
         domain,
