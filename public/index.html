@@ -2724,6 +2724,8 @@ async function _runScore(){
     const oldErr=document.getElementById('scoreErr');if(oldErr)oldErr.remove();
     renderScore(r);
     saveScoreToSupabase(r);
+    // Silent domain logger — fire and forget, no await
+    fetch('/api/aenima-log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:data.domain,score:data.overall})}).catch(()=>{});
     const sfm=document.getElementById('scoreFixMsg');if(sfm)sfm.style.display='block';
 
   }catch(err){
