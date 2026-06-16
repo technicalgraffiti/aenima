@@ -185,7 +185,23 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { domain } = req.body;
+  // Parse body manually — req.body may be undefined in server-to-server calls (e.g. monthly-cron)
+  let bodyData = req.body;
+  if (!bodyData || typeof bodyData === 'string') {
+    try {
+      const raw_body = await new Promise((resolve, reject) => {
+        let data = '';
+        req.on('data', chunk => { data += chunk; });
+        req.on('end', () => resolve(data));
+        req.on('error', reject);
+      });
+      bodyData = raw_body ? JSON.parse(raw_body) : {};
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid request body' });
+    }
+  }
+
+  const { domain } = bodyData;
   if (!domain) return res.status(400).json({ error: 'Domain required' });
 
   // Normalise domain
