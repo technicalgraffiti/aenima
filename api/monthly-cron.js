@@ -453,6 +453,13 @@ module.exports = async (req, res) => {
 
       // Send email report
       await sendMonthlyReport(user, domain, score, previousScore, aiMonitoring, geminiMonitoring);
+
+      // Log delivery timestamp
+      await SB.from('users').update({
+        last_delivery_at: new Date().toISOString(),
+        last_delivery_status: 'ok',
+      }).eq('id', user.id);
+
       results.push({
         email: user.email,
         domain,
