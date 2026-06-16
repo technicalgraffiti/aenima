@@ -1,4 +1,4 @@
-{
+{ 
   "functions": {
     "api/create-checkout.js": {
       "memory": 256,

@@ -1,4 +1,4 @@
-// api/aenima-log.js
+// api/aenima-log.js 
 // Silently logs free checker usage to aenima_assessments table
 // No personal data — domain and score only
 
