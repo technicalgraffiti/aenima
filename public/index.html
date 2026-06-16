@@ -1599,7 +1599,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       "name": "Technical Graffiti Ltd",
       "legalName": "Technical Graffiti Ltd",
       "url": "https://technicalgraffiti.co.uk",
-      "email": "ai@technicalgraffiti.co.uk",
+      "email": "ai@aenima.co.uk",
       "telephone": "+447726318601",
       "vatID": "GB07180346",
       "address": {
@@ -1924,9 +1924,17 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
 
         </div>
 
+        <div style="margin-top:20px;margin-bottom:16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:16px 24px;display:flex;align-items:center;gap:16px">
+          <span style="font-size:28px;flex-shrink:0">🛡️</span>
+          <div>
+            <p style="margin:0 0 2px;font-family:'Work Sans',sans-serif;font-weight:800;font-size:15px;color:#FFFFFF;letter-spacing:-0.01em">Zero Risk &mdash; Delivery Guaranteed</p>
+            <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.5">Files delivered automatically within minutes of purchase. If anything goes wrong, we fix it or refund you.</p>
+          </div>
+        </div>
+
         <div class="fix-hardship">
           Can&rsquo;t afford any paid tier right now? 
-          <button onclick="showHardship('hResult')">Email Stewart &mdash; no judgment</button>
+          <button onclick="showHardship('hResult')">Email us &mdash; no judgment</button>
           <div id="hResult" style="display:none;color:rgba(255,255,255,0.6);margin-top:6px;font-family:'DM Mono',monospace;font-size:13px"></div>
         </div>
       </div>
@@ -2043,7 +2051,6 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
           <li>White-label reports — your logo</li>
           <li>Reports auto-emailed to clients</li>
           <li>Reseller dashboard</li>
-          <li>Onboarding call</li>
           <li>Email support — 1 business day</li>
           <li>All Aenima branding removed</li>
         </ul>
@@ -2051,6 +2058,14 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       </div>
 
     </div>
+
+    <div class="wrap">
+    <div style="margin-top:32px;background:#F05A22;border-radius:12px;padding:32px 40px;text-align:center">
+      <p style="margin:0 0 6px;font-family:'Work Sans',sans-serif;font-weight:800;font-size:clamp(24px,3vw,36px);color:#FFFFFF;letter-spacing:-0.02em;line-height:1.1">Zero Risk — Delivery Guaranteed</p>
+      <p style="margin:0;font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,0.88);line-height:1.6;font-weight:500">Files delivered automatically within minutes of purchase.<br>If anything goes wrong, we fix it or refund you. No questions asked.</p>
+    </div>
+    </div>
+
   </section>
 
   <!-- DIFFERENCE -->
@@ -2150,7 +2165,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
         <div style="font-size:14px;color:var(--t-white70)"><strong style="color:#FFFFFF">Free score check</strong> — unlimited, no account needed</div>
       </div>
 
-      <p style="font-size:13px;color:rgba(255,255,255,0.25);margin-bottom:8px">Or talk to Stewart directly:</p>
+      <p style="font-size:13px;color:rgba(255,255,255,0.25);margin-bottom:8px">Or get in touch directly:</p>
       <button class="reveal-btn" onclick="showHardship('hFooter')" style="font-size:14px">Click to reveal contact email</button>
       <div class="reveal-out" id="hFooter"></div>
     </div>
@@ -2207,7 +2222,6 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
             <li><a onclick="gotoAnchor('pricing')">Agency plan — £89/mo</a></li>
             <li><a onclick="showContact()">White-label reports</a></li>
             <li><a onclick="showContact()">Reseller dashboard</a></li>
-            <li><a onclick="showContact()">Onboarding call</a></li>
           </ul>
         </div>
         <div class="fc">
@@ -2326,7 +2340,7 @@ footer{background:var(--bg-navy);padding:56px 5vw 40px}
       <p>Free account — no credit card needed.</p>
       <div class="auth-err" id="regErr"></div>
       <div class="row2">
-        <div class="fg"><label>Your name</label><input type="text" id="rgName" placeholder="Stewart" autocomplete="given-name"></div>
+        <div class="fg"><label>Your name</label><input type="text" id="rgName" placeholder="Your name" autocomplete="given-name"></div>
         <div class="fg"><label>Business name</label><input type="text" id="rgBiz" placeholder="Smith Plumbing"></div>
       </div>
       <div class="fg"><label>Email</label><input type="email" id="rgEmail" placeholder="you@yourbusiness.co.uk" autocomplete="email"></div>
@@ -5121,9 +5135,9 @@ function showUpgradeModal(plan){
 function showContact(){
   mkModal(`
     <h2 style="font-family:'Work Sans',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.025em;color:var(--t-heading);margin-bottom:8px">Get in touch</h2>
-    <p style="font-size:17px;color:var(--t-support);margin-bottom:24px">For Agency plans, white-label consultancy, and anything bespoke — talk to Stewart directly.</p>
+    <p style="font-size:17px;color:var(--t-support);margin-bottom:24px">For Agency plans, white-label consultancy, and anything bespoke — get in touch directly.</p>
     <button id="ctReveal" class="btn btn-primary btn-full" onclick="document.getElementById('ctEmail').style.display='block';this.style.display='none'">Click to reveal contact email</button>
-    <div id="ctEmail" style="display:none;font-family:'DM Mono',monospace;font-size:18px;color:var(--orange);padding:16px 0;font-weight:500;text-align:center">ai@technicalgraffiti.co.uk</div>
+    <div id="ctEmail" style="display:none;font-family:'DM Mono',monospace;font-size:18px;color:var(--orange);padding:16px 0;font-weight:500;text-align:center">ai@aenima.co.uk</div>
     <p style="font-size:16px;color:var(--t-support);margin-top:16px;text-align:center">Or visit <a href="https://technicalgraffiti.co.uk" target="_blank" rel="noopener" style="color:var(--orange)">technicalgraffiti.co.uk</a></p>
     <button class="btn btn-outline btn-full" style="margin-top:16px" onclick="this.closest('.modal-ov').remove()">Close</button>`);
 }
@@ -5144,7 +5158,7 @@ function slowOpen(url){
 }
 function showHardship(id){
   const el=document.getElementById(id);if(!el)return;
-  el.style.display='block';el.textContent='ai@technicalgraffiti.co.uk';
+  el.style.display='block';el.textContent='ai@aenima.co.uk';
 }
 
 /* ═══════════════════════════════════════
@@ -5468,7 +5482,7 @@ function closeMobileMenu(){
       <p>This policy explains what personal data Aenima (operated by Technical Graffiti Ltd, Northamptonshire, England) collects, why, how we store it, and your rights under UK GDPR and the Data (Use and Access) Act 2025.</p>
 
       <h2>1. Who we are</h2>
-      <p>Technical Graffiti Ltd is the data controller for all personal data collected through aenima.co.uk. Registered address: Northamptonshire, England. Company No. 07180346. Contact: <strong><button onclick="this.innerHTML='ai@technicalgraffiti.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong></p>
+      <p>Technical Graffiti Ltd is the data controller for all personal data collected through aenima.co.uk. Registered address: Northamptonshire, England. Company No. 07180346. Contact: <strong><button onclick="this.innerHTML='ai@aenima.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong></p>
       <p>We are registered with the Information Commissioner&rsquo;s Office (ICO) as required under UK GDPR.</p>
 
       <h2>2. What data we collect and why</h2>
@@ -5531,7 +5545,7 @@ function closeMobileMenu(){
         <li><strong>Objection</strong> — object to processing based on legitimate interest</li>
         <li><strong>Withdraw consent</strong> — at any time, without affecting prior processing</li>
       </ul>
-      <p>To exercise any right, email <strong><button onclick="this.innerHTML='ai@technicalgraffiti.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong> with the subject &ldquo;Data Request&rdquo;. We will respond within 30 days.</p>
+      <p>To exercise any right, email <strong><button onclick="this.innerHTML='ai@aenima.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong> with the subject &ldquo;Data Request&rdquo;. We will respond within 30 days.</p>
 
       <h2>6. Data security</h2>
       <p>Passwords are hashed before storage. Data is transmitted over HTTPS. Access to production data is restricted to authorised personnel only. We follow ICO guidance on appropriate technical and organisational measures.</p>
@@ -5667,7 +5681,7 @@ function closeMobileMenu(){
       </ul>
 
       <h2>How to make a request</h2>
-      <p>Email <strong><button onclick="this.innerHTML='ai@technicalgraffiti.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong> with the subject line <strong>"Data Request"</strong> and tell us what you would like us to do. We will respond within <strong>30 days</strong>.</p>
+      <p>Email <strong><button onclick="this.innerHTML='ai@aenima.co.uk';this.style.cssText='background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:inherit;cursor:text;padding:0'" style="background:none;border:none;color:var(--orange);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;transition:opacity 0.2s" onmouseover="this.style.opacity='0.65'" onmouseout="this.style.opacity='1'">Click to reveal email</button></strong> with the subject line <strong>"Data Request"</strong> and tell us what you would like us to do. We will respond within <strong>30 days</strong>.</p>
       <p>Please include the email address associated with your Aenima account so we can locate your data quickly.</p>
 
       <h2>What we'll need from you</h2>
